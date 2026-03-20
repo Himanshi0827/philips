@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "apis": [
+    {
+      "identifier": "conga-platform",
+      "source": "@conga-platform/v1.0#pnzbhmjcia7w2",
+      "integrity": "sha512-/1Y9vzEzovA58n+N2r2LzpUU5KSpH58/nlqRUR0dhi39iTaVdBVzrAMJM1POcqMeRi7PAIOBdeQqZrfFvwGG6g==",
+      "installerVersion": "6.1.3"
+    }
+  ]
+}
