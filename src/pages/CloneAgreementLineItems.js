@@ -15,8 +15,9 @@ function CloneAgreementLineItems() {
  
 // 🔥 STATIC DEV MODE (remove later)
 const agreementName =
-  location.state?.agreementName ||
-  "Philips Trial";
+  location.state?.agreementName;
+  //  ||
+  // "Philips Trial";
   const targetAgreementId = location.state?.targetAgreementId;
  const targetAgreementName = location.state?.targetAgreementName;
   const [sourceAgreement, setSourceAgreement] = useState(null);
