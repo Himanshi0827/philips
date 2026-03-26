@@ -1,7 +1,8 @@
 
 import { useNavigate, useLocation } from "react-router-dom";
 import "../Dashboard.css";
-import { useEffect, useState, useMemo,useParams } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useParams } from "react-router-dom";
 import { getAgreementLineItems } from "../api/api";
 import { deleteAgreementLineItem } from "../api/api";
 import { queryAgreementLineItemsByAgreement, queryGetAgreementDetails } from "../api/queryAgreementLineItemsByAgreement"; //head
