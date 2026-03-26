@@ -3,15 +3,29 @@ import { UserManager, Log } from "oidc-client-ts";
  
 const API_URL =
   "https://preview-rls09.congacloud.com/api/data/v1/objects/AgreementLineItem";
- 
-const userManager = new UserManager({
+ const userManager = new UserManager({
   authority: "https://login-rlspreview.congacloud.com/api/v1/auth",
+  //client_id:import.meta.env.client_id,
   client_id:"e77fc3cf-b8d0-4c60-a5e0-e0cbf614247f",
+// "user-id": "d3076209-7f2f-7a9b-d78d-adfaeda55713",
+ // "access-control-allow-origin" : "*",
+ // "organization-id":"8ade1b2b-41fb-4045-88c3-05c70b474cd6",
+ // "organization-fid":"org-001157-8ade1b2b-41fb-4045-88c3-05c70b474cd6",
+  
   //client_id: "05d7c408-393e-42c1-bc4a-3741caa0e131",
-  redirect_uri: "https://localhost:3000/callback",
+  redirect_uri: `${window.location.origin}/callback`,
   response_type: "code",
   scope: "openid",
+  userStore: new WebStorageStateStore({ store: window.localStorage }),
 });
+// const userManager = new UserManager({
+//   authority: "https://login-rlspreview.congacloud.com/api/v1/auth",
+//   client_id:"e77fc3cf-b8d0-4c60-a5e0-e0cbf614247f",
+//   //client_id: "05d7c408-393e-42c1-bc4a-3741caa0e131",
+//   redirect_uri: "https://localhost:3000/callback",
+//   response_type: "code",
+//   scope: "openid",
+// });
  
 Log.setLogger(console);
  
