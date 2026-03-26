@@ -1,16 +1,27 @@
 import { useState, useEffect } from "react";
 import { getAgreementById, updateAgreement,SubmitForApproval } from "../api/api";
-import { useNavigate, useLocation } from "react-router-dom";
+import {useParams, useNavigate, useLocation } from "react-router-dom";
 //import "./AgreementExtension.css";
 
 export default function TerminateAgreement() {
 
-  const location = useLocation();
+  //const location = useLocation();
   const navigate = useNavigate();
 
-  const id =
-    location.state?.agreementId ||
-    "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
+  // const id =
+  //   location.state?.agreementId ||
+  //   "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
+const { agreementId } = useParams();   // 👈 from URL
+const location = useLocation();
+ 
+const id =
+  agreementId ||                      // ✅ FIRST priority (URL)
+  location.state?.agreementId ||     // fallback (navigation)
+  null;
+ 
+if (!id) {
+  console.error("Agreement ID not found in URL or state");
+}
 
   const [agreement, setAgreement] = useState(null);
   const [terminationReason, setTerminationReason] = useState("");

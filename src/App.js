@@ -19,16 +19,16 @@ function App() {
     <ToastContainer position="top-right" autoClose={3000}/>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/:agreementId" element={<Home />} />
         <Route path="/new-agreement" element={<NewAgreement />} />
         <Route path="/edit" element={<EditAgreement />} />
         <Route path="/callback" element={<Callback />} />
         <Route path="/clone" element={<CloneAgreementLineItems />} />
         <Route path="/newALIfromquote" element={<NewALIfromQuotes />} />
         {/* <Route path="/confirmation" element={<ConfirmationPage/>} /> */}
-        <Route path= "/extension" element={<AgreementExtension/>}/>
-        <Route path= "/terminate" element={<TerminateAgreement/>}/>
-        <Route path= "/amend" element={<AgreementAmendAddendum/>}/>
+        <Route path= "/extension/:agreementId" element={<AgreementExtension/>}/>
+        <Route path= "/terminate/:agreementId" element={<TerminateAgreement/>}/>
+        <Route path= "/amend/:agreementId" element={<AgreementAmendAddendum/>}/>
       </Routes>
     </BrowserRouter>
     </>

@@ -1,7 +1,7 @@
 
 import { useNavigate, useLocation } from "react-router-dom";
 import "../Dashboard.css";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo,useParams } from "react";
 import { getAgreementLineItems } from "../api/api";
 import { deleteAgreementLineItem } from "../api/api";
 import { queryAgreementLineItemsByAgreement, queryGetAgreementDetails } from "../api/queryAgreementLineItemsByAgreement"; //head
@@ -10,21 +10,35 @@ import { getAgreementLineItemById } from "../api/api";
 const PAGE_SIZE = 5;
 
 function Home() {
-  const location = useLocation();//head
+  //const location = useLocation();//head
   const navigate = useNavigate();
   //head
 //   const agreementId = location.state?.agreementId;
 // const agreementName = location.state?.agreementName;
 // const agreementHeader = location.state?.agreementHeader;
 
-const agreementId =
-  location.state?.agreementId ||
-  "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
+// const agreementId =
+//   location.state?.agreementId ||
+//   "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
+
+// const agreementName =
+//   location.state?.agreementName ||
+//   "Philips Trial";
+const { agreementId } = useParams();   // 👈 from URL
+const location = useLocation();
+ 
+const id =
+  agreementId ||                      // ✅ FIRST priority (URL)
+  location.state?.agreementId ||     // fallback (navigation)
+  null;
+ 
+if (!id) {
+  console.error("Agreement ID not found in URL or state");
+}
 
 const agreementName =
   location.state?.agreementName ||
   "Philips Trial";
-
 const agreementHeader = location.state?.agreementHeader || null;
 //head
   const [agreements, setAgreements] = useState([]);
@@ -40,7 +54,7 @@ const agreementHeader = location.state?.agreementHeader || null;
         setLoading(true);
         setError(null);
         //head
-        const data = await queryAgreementLineItemsByAgreement(agreementId);  //head
+        const data = await queryAgreementLineItemsByAgreement(id);  //head
      
         const records = Array.isArray(data?.Data)
   ? data.Data
@@ -76,7 +90,7 @@ setAgreements(filtered_agreements);
     };
 
     loadData();
-  }, [agreementId]);
+  }, [id]);
 
   const handleEdit = (Id) => {
     navigate("/edit", { state: { id: Id } });
@@ -196,7 +210,7 @@ const handleDelete = async (id) => {
     state: {
       AccountName: Acc?.[0]?.Account?.Name,
       AccountId: Acc?.[0]?.Account?.Id,
-      Id: agreementId
+      Id: id
     }
   })
 }
@@ -211,7 +225,7 @@ const handleDelete = async (id) => {
             onClick={() =>
               navigate("/clone", {
   state: {
-    targetAgreementId: agreementId,
+    targetAgreementId: id,
     targetAgreementName: agreementName,
     agreementHeader: agreementHeader
   }
@@ -232,7 +246,7 @@ const handleDelete = async (id) => {
             onClick={() =>
               navigate("/new-agreement", {
     state: {
-      agreementId,
+      id,
       agreementName,
       agreementHeader
     }

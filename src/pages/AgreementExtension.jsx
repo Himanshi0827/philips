@@ -1,19 +1,29 @@
 import { useEffect, useState } from "react";
 import { getAgreementById, updateAgreement } from "../api/api";
-import {  useNavigate , useLocation } from "react-router-dom";
+import {  useParams, useNavigate , useLocation } from "react-router-dom";
 import "../AgreementExtension.css";
 export default function AgreementExtension() {
- const location = useLocation();//head
+ //const location = useLocation();//head
   const navigate = useNavigate();
 
+// const id =
+//   location.state?.agreementId ||
+//   "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
+
+// const agreementName =
+//   location.state?.agreementName ||
+//   "Philips Trial";
+const { agreementId } = useParams();   // 👈 from URL
+const location = useLocation();
+ 
 const id =
-  location.state?.agreementId ||
-  "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
-
-const agreementName =
-  location.state?.agreementName ||
-  "Philips Trial";
-
+  agreementId ||                      // ✅ FIRST priority (URL)
+  location.state?.agreementId ||     // fallback (navigation)
+  null;
+ 
+if (!id) {
+  console.error("Agreement ID not found in URL or state");
+}
 
  
 
@@ -88,6 +98,7 @@ else if (endDate > oldEndDate) {
     ContractEndDate: endDate,
     APTS_Extend_post_Save_action__c: "E",
     Apttus__Status__c: "Being Extended",
+
     APTS_Extension_SAP_Status__c: "In Progress",
     APTS_Last_Extended_on_Date__c: new Date().toISOString().split("T")[0]
   };
