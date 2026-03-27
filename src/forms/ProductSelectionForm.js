@@ -752,7 +752,7 @@ useEffect(() => {
   </tr>
 )}
 
-{data.MatchProductsBy === "Product" && showParentLookup && data.selectedProducts?.length>0 (
+{data.MatchProductsBy === "Product" && showParentLookup && data.selectedProducts?.length>0 &&(
   <tr>
     <td className="label">Select Parent Product</td>
     <td>
