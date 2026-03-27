@@ -202,7 +202,7 @@ const handleDelete = async (id) => {
         </div>
 
         <div className="header-actions">
-          <button onClick={() => navigate("/")}>Back to Agreement</button>
+          <button onClick={() => window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`}>Back to Agreement</button>
           <button onClick={() => window.location.reload()}>Refresh</button>
           <button
             className="primary"

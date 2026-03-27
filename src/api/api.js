@@ -34,10 +34,19 @@ Log.setLevel(Log.DEBUG);
 /* ---------------- AUTH ---------------- */
  
 // Login
-export function login() {
-  userManager.signinRedirect();
-}
+// export function login() {
+//   userManager.signinRedirect();
+// }
  
+export function login() {
+  const currentPath = window.location.pathname + window.location.search;
+
+  userManager.signinRedirect({
+    state: {
+      returnUrl: currentPath,
+    },
+  });
+}
 // Handle callback & store user in session
 export async function handleCallback() {
   console.log("Handle callback");
