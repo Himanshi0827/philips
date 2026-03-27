@@ -171,7 +171,8 @@ else if (adjType === "Net Price Override") {
       }
     }
       toast.success("ALI process completed successfully!");
-      navigate("/");
+     // navigate("/");
+     navigate(`/${acc.state?.Id}`);
     } catch (err) {
       console.error(err);
       toast.error("Error confirming ALIs");
@@ -216,7 +217,8 @@ else if (adjType === "Net Price Override") {
  
   const navigate = useNavigate();
   const handleback = () => {
-    navigate("/");
+   // navigate("/");
+   navigate(`/${acc.state?.Id}`);
   };
   // const toggleSelectItem= (item) =>
   // {
@@ -310,9 +312,13 @@ else if (adjType === "Net Price Override") {
       await Promise.all(requests);
  
       toast.success(`${SelectedItems.length} Agreement Line Items created!`);
- 
+
       // 4. Navigate back or refresh
-      navigate("/", {
+      // navigate("/", {
+      //   state: { agreementId: targetAgreementId, agreementName: accountname },
+      // });
+
+       navigate(`/${acc.state?.Id}`, {
         state: { agreementId: targetAgreementId, agreementName: accountname },
       });
     } catch (err) {

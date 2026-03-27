@@ -20,10 +20,10 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/:agreementId" element={<Home />} />
-        <Route path="/new-agreement" element={<NewAgreement />} />
-        <Route path="/edit" element={<EditAgreement />} />
+        <Route path="/new-agreement/:agreementId" element={<NewAgreement />} />
+        <Route path="/edit/:agreementId" element={<EditAgreement />} />
         <Route path="/callback" element={<Callback />} />
-        <Route path="/clone" element={<CloneAgreementLineItems />} />
+        <Route path="/clone/:agreementId" element={<CloneAgreementLineItems />} />
         <Route path="/newALIfromquote" element={<NewALIfromQuotes />} />
         {/* <Route path="/confirmation" element={<ConfirmationPage/>} /> */}
         <Route path= "/extension/:agreementId" element={<AgreementExtension/>}/>

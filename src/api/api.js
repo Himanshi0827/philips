@@ -52,6 +52,7 @@ export async function handleCallback() {
   console.log("Handle callback");
   const user = await userManager.signinRedirectCallback();
   sessionStorage.setItem("user", JSON.stringify(user));
+  console.log("user:",user);
   return user;
 }
  
@@ -60,6 +61,7 @@ export function getAccessToken() {
   if (!user || !user.access_token) {
     login();
   }
+  console.log("bearer",user.accessToken);
   return user.access_token;
 }
  

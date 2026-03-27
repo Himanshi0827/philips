@@ -290,7 +290,8 @@ try {
             {
                 toast.success("AgreementLineItems are Amended successfully");
             }
-            navigate(`/agreement/${newAgreementId}`);
+         window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`;
+            // navigate(`/agreement/${newAgreementId}`);
         } catch (err) {
             alert("Unexpected error: " + getErrorMessage(err));
             console.error(err);
@@ -504,7 +505,7 @@ try {
                         Continue
           </button>
  
-                    <button className="btn" onClick={() => navigate("/")}>
+                    <button className="btn" onClick={() => window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`}>
                         Cancel
           </button>
                 </div>
@@ -549,7 +550,7 @@ try {
                             Continue
             </button>
  
-                        <button className="btn" onClick={() => navigate("/")}>
+                        <button className="btn" onClick={() => window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`}>
                             Cancel
             </button>
                     </div>

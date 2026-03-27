@@ -4,7 +4,7 @@ function TopBar({
   onSave,
   agreementHeader,
   mode,
-  // agreementId, 
+  agreementId, 
   activeTab = "",
   completedTabs = [],
   onAddProduct,
@@ -35,8 +35,8 @@ function TopBar({
 
         <div className="header-right">
           <button
-            // onClick={() => navigate(`/${agreementId}`)}
-              onClick={() => navigate("/")}
+             onClick={() => navigate(`/${agreementId}`)}
+            //  onClick={() => navigate("/")}
             className="btn secondary"
           >
             Back to List

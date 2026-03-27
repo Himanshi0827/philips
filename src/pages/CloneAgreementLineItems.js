@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useLocation,useParams } from "react-router-dom";
 import LookupTypeAhead from "../components/LookupTypeAhead";
 import { searchLookupRecords } from "../api/SearchLookup";
 import {  createAgreementLineItem,createAgreementGroup } from "../api/api";
@@ -11,14 +11,25 @@ import {toast} from "react-toastify";
  
 function CloneAgreementLineItems() {
   const navigate=useNavigate();
-  const location = useLocation();
+ // const location = useLocation();
  
+  const { agreementId } = useParams();   // 👈 from URL
+const location = useLocation();
+ 
+const targetAgreementId =
+  agreementId ||                      // ✅ FIRST priority (URL)
+  location.state?.agreementId ||     // fallback (navigation)
+  null;
+ 
+if (!targetAgreementId) {
+  console.error("Agreement ID not found in URL or state");
+}
 // 🔥 STATIC DEV MODE (remove later)
 const agreementName =
   location.state?.agreementName;
   //  ||
   // "Philips Trial";
-  const targetAgreementId = location.state?.targetAgreementId;
+ // const targetAgreementId = location.state?.targetAgreementId;
  const targetAgreementName = location.state?.targetAgreementName;
   const [sourceAgreement, setSourceAgreement] = useState(null);
   // const [sourceGroup, setSourceGroup] = useState(null);
@@ -242,7 +253,7 @@ console.log("item",itemsToClone);
     }
 
     toast.success("Agreement Lines cloned successfully");
-    navigate("/");
+    navigate(`/${agreementId}`);
 
   } catch (error) {
     console.error("Error cloning agreement lines:", error);
@@ -256,6 +267,7 @@ console.log("item",itemsToClone);
     title="Clone Agreement Line Items"
     onSave={handleClone}
     agreementHeader={agreementName}
+    agreementId={agreementId}
   />
  
   <div className="clone-card">

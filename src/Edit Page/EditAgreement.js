@@ -4,7 +4,7 @@ import Sidebar from "../components/Sidebar";
 import TopBar from "../components/TopBar";
 import "../FormLayout.css";
 import { getAgreementLineItemById, getAgreementById } from "../api/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import EditAgreementGroupForm from "./EditAgreementGroupForm";
 import EditProductSelectionForm from "./EditProductSelectionForm";
 import EditDiscountPricingStrategyForm from "./EditDiscountPricingStrategyForm";
@@ -16,10 +16,21 @@ import { toast } from "react-toastify";
 
 function EditAgreement() {
   const navigate = useNavigate();
+  const { agreementId } = useParams();   // 👈 from URL
 const location = useLocation();
-  // 🔥 STATIC DEV MODE (remove later)
-  const agreementId =
-    location.state?.agreementId || "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
+ 
+const id =
+  agreementId ||                      // ✅ FIRST priority (URL)
+  location.state?.agreementId ||     // fallback (navigation)
+  null;
+ 
+if (!id) {
+  console.error("Agreement ID not found in URL or state");
+}
+// const location = useLocation();
+//   // 🔥 STATIC DEV MODE (remove later)
+//   const agreementId =
+//     location.state?.agreementId || "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
   const agreementName = location.state?.agreementName || "Philips Trial";
   const [agreementHeader, setAgreementHeader] = useState([]);
    useEffect(() => {
@@ -138,7 +149,8 @@ const location = useLocation();
       }
 
       //  alert("Agreement updated successfully");
-      navigate("/");
+     // navigate("/");
+      navigate(`/${agreementId}`);
     } catch (err) {
       toast.error(err.Errors[0].Message);
 

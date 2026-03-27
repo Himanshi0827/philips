@@ -94,8 +94,9 @@ if (!id) {
     await SubmitForApproval(approvalPayload);
 
     alert("Agreement termination submitted for approval");
-
-    navigate(`/agreement/${id}`);
+    
+    window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`;
+    // navigate(`/agreement/${id}`);
 
   } catch (err) {
 
@@ -118,7 +119,7 @@ if (!id) {
             Continue
           </button>
 
-          <button className="btn" onClick={() => navigate("/")}>
+          <button className="btn"  onClick={() => window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`}>
             Cancel
           </button>
         </div>
@@ -148,7 +149,7 @@ if (!id) {
               Continue
             </button>
 
-            <button className="btn" onClick={() => navigate("/")}>
+            <button className="btn"  onClick={() => window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`}>
               Cancel
             </button>
           </div>

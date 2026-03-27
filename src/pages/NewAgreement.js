@@ -3,7 +3,7 @@ import Sidebar from "../components/Sidebar";
 import TopBar from "../components/TopBar";
 import { createAgreementLineItem, getAgreementById } from "../api/api"; //head
 import "../FormLayout.css";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import AgreementGroupForm from "../forms/AgreementGroupForm";
 import ProductSelectionForm from "../forms/ProductSelectionForm";
 import DiscountPricingStrategyForm from "../forms/DiscountPricingStrategyForm";
@@ -15,16 +15,27 @@ import { toast } from "react-toastify";
 function NewAgreement() {
   const navigate = useNavigate();
   //head
-  const location = useLocation();
-  // 🔥 STATIC DEV MODE (remove later)
-  const agreementId =
-    location.state?.agreementId || "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
+  // const location = useLocation();
+  // // 🔥 STATIC DEV MODE (remove later)
+  // const agreementId =
+  //   location.state?.agreementId || "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
+const { agreementId } = useParams();   // 👈 from URL
+const location = useLocation();
+ 
+const id =
+  agreementId ||                      // ✅ FIRST priority (URL)
+  location.state?.agreementId ||     // fallback (navigation)
+  null;
+ 
+if (!id) {
+  console.error("Agreement ID not found in URL or state");
+}
   const agreementName = location.state?.agreementName || "Philips Trial";
   const [agreementHeader, setAgreementHeader] = useState([]);
   useEffect(() => {
     const fetchAgreement = async () => {
       try {
-        const data = await getAgreementById(agreementId);
+        const data = await getAgreementById(id);
         console.log("Agreement Header:", data);
         setAgreementHeader(data?.[0] || null);
         console.log("Agreement Header:", agreementHeader);
@@ -34,7 +45,7 @@ function NewAgreement() {
     };
 
     fetchAgreement();
-  }, [agreementId]);
+  }, [id]);
 
   // const agreementId = location.state?.agreementId;
   // const agreementHeader = location.state?.agreementHeader;
@@ -160,7 +171,7 @@ useEffect(() => {
 
   //head
   const handleFinalSubmit = async () => {
-    if (!agreementId) {
+    if (!id) {
       alert("Agreement context missing. Please go back and reopen.");
       return;
     }
@@ -199,7 +210,7 @@ useEffect(() => {
        console.log('non discountable',childProduct?.nonDiscountable);
         const lineItemPayload = {
           Name: payload.agreementGroup.AgreementLineItemName,
-          Agreement: agreementId, //head
+          Agreement: id, //head
           //Agreement: "a1cdb476-909d-484c-b686-8852a7f994f9", // Static ID from your code
         //  APTS_Not_Discountable_c: childProduct?.nonDiscountable|| false,
         
@@ -332,7 +343,7 @@ APTS_Not_Discountable_c: activeDiscountSource?.nonDiscountable ||payload.discoun
         const lineItemPayload = {
           Name: payload.agreementGroup.AgreementLineItemName,
           // Agreement: "a1cdb476-909d-484c-b686-8852a7f994f9",
-          Agreement: agreementId, //head
+          Agreement: id, //head
           // 3️⃣ Assign the mapped Billing Plan
           // APTS_BillingPlan_c: selectedBillingPlan || "",
           APTS_Not_Discountable_c:payload.discountPricing.non_Disc_Hierarchy ||false,
@@ -546,9 +557,9 @@ APTS_Not_Discountable_c: activeDiscountSource?.nonDiscountable ||payload.discoun
     return;
   }
 
-  navigate("/", {
+  navigate(`/${agreementId}`, {
     state: {
-      agreementId,
+      id,
       agreementName: "Philips Trial",
     },
   });
@@ -855,6 +866,7 @@ case "Product Selection":
           onAddDiscount={() => setActiveTab("Discount Pricing Strategy")}
           onAddBilling={() => setActiveTab("Billing Plan")}
           onSubmitAgreement={handleFinalSubmit}
+          agreementId={agreementId}
         />
      
         <div style={{ padding: "20px" }}>{renderForm()}</div>
