@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from "react";
 import { getAgreementById, getAmendAgreement, createAgreementGroup, createAgreementLineItem,  createAgreement,updateAgreement } from "../api/api";
 import { queryAgreementLineItemsByAgreement, queryAgreementGroupByAgreement } from "../api/queryAgreementLineItemsByAgreement";

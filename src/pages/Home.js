@@ -94,7 +94,8 @@ setAgreements(filtered_agreements);
   }, [id]);
 
   const handleEdit = (Id) => {
-    navigate("/edit", { state: { id: Id } });
+    // navigate("/edit", { state: { id: Id } });
+    navigate(`/edit/${agreementId}`, { state: { id: Id } });
   };
 
   const [page, setPage] = useState(1);
@@ -224,7 +225,9 @@ const handleDelete = async (id) => {
           <button
             className="primary"
             onClick={() =>
-              navigate("/clone", {
+          //    navigate("/clone", {
+
+ navigate(`/clone/${agreementId}`, {
   state: {
     targetAgreementId: id,
     targetAgreementName: agreementName,
@@ -245,7 +248,8 @@ const handleDelete = async (id) => {
           <button
             className="primary"
             onClick={() =>
-              navigate("/new-agreement", {
+              // navigate("/new-agreement", {
+               navigate(`/new-agreement/${agreementId}`, {
     state: {
       id,
       agreementName,
