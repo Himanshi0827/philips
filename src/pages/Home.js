@@ -27,6 +27,7 @@ function Home() {
 //   "Philips Trial";
 const { agreementId } = useParams();   // 👈 from URL
 const location = useLocation();
+ sessionStorage.setItem("agreementId",agreementId);
  
 const id =
   agreementId ||                      // ✅ FIRST priority (URL)
