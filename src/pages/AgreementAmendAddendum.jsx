@@ -91,6 +91,10 @@ export default function AgreementAmendAddendum() {
                         ParentAgreement:{Id:id}
                     }
                     await updateAgreement(newAgreementId,updatePayload);
+                    var payload={
+                        RecordType:'Deal_Locked'
+                    }
+                    await updateAgreement(id,payload);
                     toast.success("Agreement amended successfully");
                 } else if (agreementType === "Addendum") {
  
@@ -101,6 +105,10 @@ export default function AgreementAmendAddendum() {
                     };
  
                     await updateAgreement(newAgreementId, updatePayload);
+                      const payload={
+                        RecordType:'Deal_Locked'
+                    }
+                    await updateAgreement(id,payload);
  
                     toast.success("Agreement Addendum created successfully");
                 }
@@ -185,7 +193,7 @@ export default function AgreementAmendAddendum() {
                         ...line,
                         Id:null,
                         Agreement: newAgreementId,
-                    
+                        APTS_Origin_Line_Item_Id_c:{Id:line.Id,Name:line.Name},
                         APTS_Agreement_Group_c: { Id: newGroupId },
                      
                     };
