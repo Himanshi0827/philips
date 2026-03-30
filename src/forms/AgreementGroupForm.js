@@ -4,6 +4,7 @@ import LookupTypeAhead from "../components/LookupTypeAhead";
 import { searchLookupRecords } from "../api/SearchLookup";
 
 function AgreementGroupForm({ data,onChange,onComplete }) {
+ const agreementId=sessionStorage.getItem("agreementId");
  
   const [form, setForm] = useState({
     agreementGroup: "",
@@ -54,7 +55,8 @@ function AgreementGroupForm({ data,onChange,onComplete }) {
     <LookupTypeAhead
       field={{
         DisplayName: "Agreement Group",
-        LookupObjectName: "APTS_Agreement_Groups_c"
+        LookupObjectName: "APTS_Agreement_Groups_c",
+        AgreementId:agreementId
       }}
       value={data.agreementGroup}   // { Id, Name }
       onChange={(record) =>

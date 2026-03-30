@@ -31,10 +31,14 @@ debounceRef.current = setTimeout(async () => {
   const data = await searchFn(inputValue, field.LookupObjectName);
   
   let filtered = data || [];
-
+if(field?.AgreementId)
+  {
+    filtered=filtered.filter(record=> record?.APTS_Agreement_c===field?.AgreementId);
+  }
   // Filter by TargetAgreement ID if it's provided in the field config
   if (field.TargetAgreement) {
     filtered = filtered.filter(record => {
+      
       // Check common API variations for Agreement lookup fields
       const recordAgreementId = record.Agreement_c || record.APTS_Agreement_c || record.Agreement__c;
       

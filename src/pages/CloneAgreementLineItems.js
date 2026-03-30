@@ -24,13 +24,14 @@ const targetAgreementId =
 if (!targetAgreementId) {
   console.error("Agreement ID not found in URL or state");
 }
-// 🔥 STATIC DEV MODE (remove later)
-const agreementName =
-  location.state?.agreementName;
+
+// const agreementName =
+//   location.state?.agreementName;
+const agreementName =sessionStorage.getItem("agreementName") ;
   //  ||
   // "Philips Trial";
  // const targetAgreementId = location.state?.targetAgreementId;
- const targetAgreementName = location.state?.targetAgreementName;
+ const targetAgreementName = sessionStorage.getItem("agreementName");
   const [sourceAgreement, setSourceAgreement] = useState(null);
   // const [sourceGroup, setSourceGroup] = useState(null);
   const [targetGroup, setTargetGroup] = useState(null);

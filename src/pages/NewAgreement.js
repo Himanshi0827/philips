@@ -30,7 +30,8 @@ const id =
 if (!id) {
   console.error("Agreement ID not found in URL or state");
 }
-  const agreementName = location.state?.agreementName || "Philips Trial";
+  // const agreementName = location.state?.agreementName ;
+  const agreementName =sessionStorage.getItem("agreementName") ;
   const [agreementHeader, setAgreementHeader] = useState([]);
   useEffect(() => {
     const fetchAgreement = async () => {

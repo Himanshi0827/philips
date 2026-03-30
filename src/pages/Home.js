@@ -38,9 +38,7 @@ if (!id) {
   console.error("Agreement ID not found in URL or state");
 }
 
-const agreementName =
-  location.state?.agreementName ||
-  "Philips Trial";
+const agreementName =sessionStorage.getItem("agreementName") ;
 const agreementHeader = location.state?.agreementHeader || null;
 //head
   const [agreements, setAgreements] = useState([]);
@@ -67,6 +65,7 @@ const agreementHeader = location.state?.agreementHeader || null;
 const trying = await queryGetAgreementDetails(records[0].Agreement);
   console.log(trying);
   setAcc(trying);
+ sessionStorage.setItem("agreementName",trying[0].Name);
 // const filtered_agreements = records.sort(
 //   (x, y) => new Date(y.CreatedDate) - new Date(x.CreatedDate)
 // );

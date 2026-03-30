@@ -31,7 +31,7 @@ if (!id) {
 //   // 🔥 STATIC DEV MODE (remove later)
 //   const agreementId =
 //     location.state?.agreementId || "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
-  const agreementName = location.state?.agreementName || "Philips Trial";
+const agreementName =sessionStorage.getItem("agreementName") ;
   const [agreementHeader, setAgreementHeader] = useState([]);
    useEffect(() => {
       const fetchAgreement = async () => {
@@ -234,6 +234,7 @@ if (!id) {
   title={activeTab}
   onSave={handleSave}
   mode="edit"
+  agreementId={agreementId}
 />
 
         <div style={{ padding: "20px" }}>{renderForm()}</div>

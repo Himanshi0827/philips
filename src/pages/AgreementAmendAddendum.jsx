@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getAgreementById, getAmendAgreement, createAgreementGroup, createAgreementLineItem,  createAgreement,updateAgreement } from "../api/api";
+import { getAgreementById, getAmendAgreement, createAgreementGroup, createAgreementLineItem, createAgreement, updateAgreement } from "../api/api";
 import { queryAgreementLineItemsByAgreement, queryAgreementGroupByAgreement } from "../api/queryAgreementLineItemsByAgreement";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import "../AgreementExtension.css";
@@ -7,22 +7,21 @@ import { toast } from "react-toastify";
  
 export default function AgreementAmendAddendum() {
  
-
+    // const location = useLocation();
     const navigate = useNavigate();
  
-    
- const { agreementId } = useParams();   // 👈 from URL
-const location = useLocation();
+    const { agreementId } = useParams();   // 👈 from URL
+    const location = useLocation();
  
-const id =
-  agreementId ||                      // ✅ FIRST priority (URL)
-  location.state?.agreementId ||     // fallback (navigation)
-  null;
+    const id =
+        agreementId ||                      // ✅ FIRST priority (URL)
+        location.state?.agreementId ||     // fallback (navigation)
+        null;
  
-if (!id) {
-  console.error("Agreement ID not found in URL or state");
-}
-
+    if (!id) {
+        console.error("Agreement ID not found in URL or state");
+    }
+ 
     const [agreement, setAgreement] = useState(null);
     const [agreementType, setAgreementType] = useState("Amendment");
     const [pppValue, setPppValue] = useState("");
@@ -65,8 +64,8 @@ if (!id) {
     };
  
     const handleContinue = async () => {
-      //  if(agreementType==="Amendment")
-       // {
+        //  if(agreementType==="Amendment")
+        // {
         try {
  
             if (isDealAgreement && !pppValue) {
@@ -76,46 +75,52 @@ if (!id) {
  
             // 1️⃣ Clone Agreement
             let newAgreementId;
-
-try {
-
-  // Step 1: clone agreement using amend API
-  newAgreementId = await getAmendAgreement(id);
-
-  if (!newAgreementId) {
-    toast.error("Failed to clone agreement");
-    return;
-  }
-
-  if (agreementType === "Amendment") {
-
-    toast.success("Agreement amended successfully");
-
-  } else if (agreementType === "Addendum") {
-
-    // Step 2: update only the name
-    const updatePayload = {
-      Name: `${agreement.Name} Addendum`
-    };
-
-    await updateAgreement(newAgreementId, updatePayload);
-
-    toast.success("Agreement Addendum created successfully");
-  }
-
-} catch (err) {
-
-  toast.error(getErrorMessage(err));
-  return;
-
-}
-
-            //  Fetch old groups
+ 
+            try {
+ 
+                // Step 1: clone agreement using amend API
+                newAgreementId = await getAmendAgreement(id);
+ 
+                if (!newAgreementId) {
+                    toast.error("Failed to clone agreement");
+                    return;
+                }
+ 
+                if (agreementType === "Amendment") {
+                    var updatePayload={
+                        ParentAgreement:{Id:id}
+                    }
+                    await updateAgreement(newAgreementId,updatePayload);
+                    toast.success("Agreement amended successfully");
+                } else if (agreementType === "Addendum") {
+ 
+                    // Step 2: update only the name
+                    const updatePayload = {
+                        Name: `${agreement.Name} Addendum`,
+                        ParentAgreement:{Id:id}
+                    };
+ 
+                    await updateAgreement(newAgreementId, updatePayload);
+ 
+                    toast.success("Agreement Addendum created successfully");
+                }
+ 
+            } catch (err) {
+ 
+                toast.error(getErrorMessage(err));
+                return;
+ 
+            }
+            // // 2️⃣ Fetch old groups
             let oldGroups;
  
             try {
-                oldGroups = await queryAgreementGroupByAgreement(id);
-                console.log("Old groups",oldGroups);
+                let temp = await queryAgreementGroupByAgreement(id);
+                oldGroups= temp.map(item =>{
+                    const {CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,ETag,...rest}=item;
+                    return rest;
+                });
+                console.log("Old groups", oldGroups);
             } catch (err) {
                 toast.error(getErrorMessage(err));
                 return;
@@ -123,19 +128,21 @@ try {
  
  
             const groupMapping = {};
-            let status=false;
+            let status = false;
             // 3️⃣ Create new groups
             for (const grp of oldGroups) {
  
                 try {
  
                     const newGroupPayload = {
-                        Name: grp.Name,
-                        APTS_Agreement_c: newAgreementId
+                        ...grp,
+                        Id:null,
+                        APTS_Agreement_c: newAgreementId,
+                        APTS_Origin_Group_Id_c:{Id:grp.Id,Name:grp.Name}
                     };
  
                     const createdGroup = await createAgreementGroup(newGroupPayload);
-                    status= createdGroup?.Success;
+                    status = createdGroup?.Success;
                     const newGroupId = createdGroup?.Data;
                     groupMapping[grp.Id] = newGroupId;
  
@@ -144,8 +151,7 @@ try {
                     return;
                 }
             }
-            if(status)
-            {
+            if (status) {
                 toast.success("Agreement groups are Amended successfully");
             }
             console.log("Group Mapping", groupMapping);
@@ -155,12 +161,17 @@ try {
             let oldLineItems;
  
             try {
-                oldLineItems = await queryAgreementLineItemsByAgreement(id);
+                let temp = await queryAgreementLineItemsByAgreement(id);
+                oldLineItems= temp.map(item =>{
+                    const {CreatedBy,CreatedDate,ModifiedBy,ModifiedDate,ETag,...rest}=item;
+                    return rest;
+                });
+ 
             } catch (err) {
                 alert("Failed to fetch agreement line items: " + getErrorMessage(err));
                 return;
             }
-            let final_status=false;
+            let final_status = false;
             // 5️⃣ Clone line items
             for (const line of oldLineItems) {
  
@@ -170,67 +181,33 @@ try {
                     const newGroupId = groupMapping[oldGroupId];
  
                     const linePayload = {
-                        Name: line.Name,
+                
+                        ...line,
+                        Id:null,
                         Agreement: newAgreementId,
-                        Description: line.Description,
+                    
                         APTS_Agreement_Group_c: { Id: newGroupId },
-                        APTS_Billing_Plan_c: line.APTS_Billing_Plan_c,
-                        APTS_Discount_Type_c: line.APTS_Discount_Type_c,
-                        APTS_Match_Products_By_c: line.APTS_Match_Products_By_c,
-                        APTS_MG3_Service_c: line.APTS_MG3_Service_c,
-                        Line_Type_c: line.Line_Type_c
+                     
                     };
  
-                    if (line.Product?.Id) {
-                        linePayload.Product = { Id: line.Product.Id };
-                    }
+                 
  
-                    if (line.Hierarchy_c?.Id) {
-                        linePayload.Hierarchy_c = { Id: line.Hierarchy_c.Id };
-                    }
- 
-                    const discountFields = [
-                        "APTS_Discount_Tier_1_c",
-                        "APTS_Discount_Tier_2_c",
-                        "APTS_Discount_Tier_3_c",
-                        "APTS_Discount_Tier_4_c",
-                        "APTS_Discount_Tier_5_c",
-                        "APTS_Scaled_Discount_Percent_Tier_1_c",
-                        "APTS_Scaled_Discount_Percent_Tier_2_c",
-                        "APTS_Scaled_Discount_Percent_Tier_3_c",
-                        "APTS_Scaled_Discount_Percent_Tier_4_c",
-                        "APTS_Scaled_Discount_Percent_Tier_5_c",
-                        "APTS_Volume_Threshold_1_c",
-                        "APTS_Volume_Threshold_2_c",
-                        "APTS_Volume_Threshold_3_c",
-                        "APTS_Volume_Threshold_4_c",
-                        "APTS_Volume_Threshold_5_c"
-                    ];
- 
-                    discountFields.forEach(field => {
-                        if (line[field] !== null && line[field] !== undefined) {
-                            linePayload[field] = line[field];
-                        }
-                    });
- 
-                    const response=await createAgreementLineItem(linePayload);
-                    final_status=response?.Success;
+                    const response = await createAgreementLineItem(linePayload);
+                    final_status = response?.Success;
                 } catch (err) {
                     toast.error(getErrorMessage(err));
                     return;
                 }
             }
-            if(final_status)
-            {
+            if (final_status) {
                 toast.success("AgreementLineItems are Amended successfully");
             }
-         window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`;
+            window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`;
             // navigate(`/agreement/${newAgreementId}`);
         } catch (err) {
             alert("Unexpected error: " + getErrorMessage(err));
             console.error(err);
         }
- 
     };
     if (!agreement) return <div>Loading...</div>;
  
@@ -301,3 +278,5 @@ try {
         </div>
     );
 }
+
+ 
