@@ -215,7 +215,8 @@ useEffect(() => {
           //Agreement: "a1cdb476-909d-484c-b686-8852a7f994f9", // Static ID from your code
         //  APTS_Not_Discountable_c: childProduct?.nonDiscountable|| false,
         
-APTS_Not_Discountable_c: activeDiscountSource?.nonDiscountable ||payload.discountPricing.nonDiscountable|| false,
+//APTS_Not_Discountable_c: activeDiscountSource?.nonDiscountable ||payload.discountPricing.nonDiscountable|| false,
+APTS_Not_Discountable_c: activeDiscountSource?.nonDiscountable || !activeDiscountSource?.IsDiscountable ||payload.discountPricing.nonDiscountable|| false,
          // APTS_Not_Discountable_c:payload.discountPricing.nonDiscountable ||false,
           // Product IDs
           Product: { Id: childProduct.Id, Name: childProduct.Name },
