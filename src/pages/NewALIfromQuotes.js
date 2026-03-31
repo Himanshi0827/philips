@@ -219,6 +219,7 @@ else if (adjType === "Net Price Override") {
   const handleback = () => {
    // navigate("/");
    navigate(`/${acc.state?.Id}`);
+   console.log("agre",acc.state?.Id);
   };
   // const toggleSelectItem= (item) =>
   // {

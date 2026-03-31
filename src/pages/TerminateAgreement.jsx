@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { getAgreementById, updateAgreement,SubmitForApproval } from "../api/api";
 import {useParams, useNavigate, useLocation } from "react-router-dom";
 //import "./AgreementExtension.css";
+import { toast } from "react-toastify";
 
 export default function TerminateAgreement() {
 
@@ -93,15 +94,16 @@ if (!id) {
     //  Submit for Approval
     await SubmitForApproval(approvalPayload);
 
-    alert("Agreement termination submitted for approval");
-    
+  alert("Agreement termination submitted for approval");
+     // toast.success("Agreement termination submitted for approval");
     window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`;
     // navigate(`/agreement/${id}`);
 
   } catch (err) {
 
     console.error(err);
-    alert("Error terminating agreement");
+  alert("Error terminating agreement");
+   // toast.error(err);
 
   }
 };

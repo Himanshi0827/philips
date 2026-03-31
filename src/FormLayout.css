@@ -545,7 +545,11 @@ input[type=number] {
   flex:unset;
   border: 1px solid #ddd;
 }
-
+.lookup-dropdown
+{
+  max-height: 200px;
+  overflow-y:auto;
+}
 
 
 
