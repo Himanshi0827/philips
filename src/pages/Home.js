@@ -8,6 +8,7 @@ import { deleteAgreementLineItem } from "../api/api";
 import { queryAgreementLineItemsByAgreement, queryGetAgreementDetails } from "../api/queryAgreementLineItemsByAgreement"; //head
 import { updateAgreementLineItem } from "../api/api";
 import { getAgreementLineItemById } from "../api/api";
+import { toast } from "react-toastify";
 const PAGE_SIZE = 5;
 
 function Home() {
@@ -159,13 +160,14 @@ const handleDelete = async (id) => {
         prev.filter((item) => item.Id !== id)
       );
       setPopup(false);
+      toast.success("Agreement Line Item got deleted")
     } else {
       console.error(response);
-      alert(response?.Errors?.[0]?.Message || "Soft delete failed");
+     toast.error(response?.Errors?.[0]?.Message || "Delete Failed");
     }
   } catch (err) {
     console.error(err);
-    alert("Soft delete failed");
+      toast.error(" Delete Failed");
   }
 };
  
