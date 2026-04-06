@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import "../Dashboard.css";
 import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { getAgreementLineItems } from "../api/api";
+import { getAgreementLineItems, getAgreementById } from "../api/api";
 import { deleteAgreementLineItem } from "../api/api";
 import { queryAgreementLineItemsByAgreement, queryGetAgreementDetails } from "../api/queryAgreementLineItemsByAgreement"; //head
 import { updateAgreementLineItem } from "../api/api";
@@ -62,10 +62,13 @@ const agreementHeader = location.state?.agreementHeader || null;
   : Array.isArray(data)
   ? data
   : [];
-  console.log("ty",records[0].Agreement);
-const trying = await queryGetAgreementDetails(records[0].Agreement);
+  console.log("ty",records[0]?.Agreement);
+const trying = await queryGetAgreementDetails(agreementId);
+//const agreementvalue = await getAgreementById(agreementId);
+//console.log();
   console.log(trying);
   setAcc(trying);
+ //sessionStorage.setItem("agreementName",trying[0].Name);
  sessionStorage.setItem("agreementName",trying[0].Name);
 // const filtered_agreements = records.sort(
 //   (x, y) => new Date(y.CreatedDate) - new Date(x.CreatedDate)
