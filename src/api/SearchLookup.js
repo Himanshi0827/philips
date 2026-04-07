@@ -13,7 +13,7 @@ export const searchLookupRecords = async (criteria, objectName) => {
       ObjectName: objectName,
       Criteria: criteria,
       SearchType: "TypeAhead",
-  
+      limit :100,
       Skip: 0,
       Select: [],
       AdditionalTypeAheadFilterCriteria: "",
