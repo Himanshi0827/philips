@@ -77,9 +77,11 @@ console.log("valid3",data[0].StatusCategory);
     
 let payload = {
   ContractStartDate: agreement.ContractStartDate,
-  APTS_Extension_Reason_c: reason
+  APTS_Extension_Reason_c: reason,
+ StatusCategory: agreement.StatusCategory,
 };
-
+console.log("endDate",endDate);
+console.log("oldEndDate",oldEndDate);
 // VALIDITY
 if (isValidityScreen) {
 
@@ -90,32 +92,35 @@ if (isValidityScreen) {
 
 }
 
-// EXTENSION
-else if (endDate > oldEndDate) {
 
+// EXTENSION
+ if (endDate > oldEndDate) {
+console.log("EXTENSION");
   payload = {
     ...payload,
     ContractEndDate: endDate,
-    APTS_Extend_post_Save_action__c: "E",
-    Apttus__Status__c: "Being Extended",
+    APTS_Extend_post_Save_action_c: "E",
+   
+    Status: "Being Extended",
 
-    APTS_Extension_SAP_Status__c: "In Progress",
-    APTS_Last_Extended_on_Date__c: new Date().toISOString().split("T")[0]
+    APTS_Extension_SAP_Status_c: "In Progress",
+    APTS_Last_Extended_on_Date_c: new Date().toISOString().split("T")[0]
   };
 
 }
 
 // PREPONEMENT
-else if (endDate < oldEndDate) {
-
+ if (endDate < oldEndDate) {
+console.log("PREPONEMENT");
   payload = {
     ...payload,
     ContractEndDate: endDate,
-    APTS_Extend_post_Save_action__c: "P",
-    Apttus__Status__c: "Being Preponed",
-    Apttus_Approval__Approval_Status__c: "Approval Required",
-    APTS_Proposed_Preponement_Date__c: endDate,
-    APTS_Last_Extended_on_Date__c: new Date().toISOString().split("T")[0]
+    APTS_Extend_post_Save_action_c: "P",
+  
+    Status: "Being Preponed",
+    ApprovalStatus: "Approval Required",
+    APTS_Proposed_Preponement_Date_c: endDate,
+    APTS_Last_Extended_on_Date_c: new Date().toISOString().split("T")[0]
   };
 
 }
