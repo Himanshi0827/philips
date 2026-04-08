@@ -364,7 +364,7 @@ APTS_Not_Discountable_c: activeDiscountSource?.nonDiscountable || !activeDiscoun
             },
           }),
 
-          APTS_Discount_Type_c: discount.DiscountType,
+          APTS_Discount_Type_c: discount.DiscountType ||"None",
         };
         const ah = payload.agreementHeaderInfo;
         addIfValid(
@@ -415,6 +415,8 @@ APTS_Not_Discountable_c: activeDiscountSource?.nonDiscountable || !activeDiscoun
           info.ExpirationDate,
         );
         addIfValid(lineItemPayload, "Description", info.Description);
+        addIfValid(lineItemPayload, "APTS_Discount_Type_c", discount.DiscountType);
+
         addIfNumber(lineItemPayload, "ItemSequence", info.ItemSequence);
         addIfNumber(lineItemPayload, "LineNumber", info.LineNumber);
         addIfNumber(
@@ -517,6 +519,7 @@ APTS_Not_Discountable_c: activeDiscountSource?.nonDiscountable || !activeDiscoun
           "APTS_Volume_Threshold_5_c",
           discount.volumeT?.[4],
         );
+            
 
         return createAgreementLineItem(lineItemPayload);
         // try {
