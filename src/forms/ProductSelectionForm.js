@@ -8,7 +8,7 @@ import { getParentProduct } from "../api/GetParentProduct";
 import { getProductsByParent } from "../api/GetProductsByParent";
 import ParentProductLookup from "../components/ParentProductLookup";
 import {toast} from "react-toastify";
-
+import {queryAgreementLineItemsByAgreement} from "../api/queryAgreementLineItemsByAgreement";
 const isValid=(checkchild=[] ,checkingparent=[])=>
 {
 
@@ -58,7 +58,23 @@ const [product , setProduct]=useState([])
 
 const [children, setChildren] = useState([]);
 
+//validation
+const [existingALIs, setExistingALIs] = useState([]);
+useEffect(() => {
+  const fetchALI = async () => {
+    if (!data.agreementId) return;
 
+    try {
+      const res = await queryAgreementLineItemsByAgreement(data.agreementId);
+      setExistingALIs(res || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchALI();
+}, [data.agreementId]);
+//validation
 useEffect(() => {
   const refreshParentOptions = async () => {
     if (data.MatchProductsBy === "Product" && data.selectedProducts?.length > 0) {
@@ -215,6 +231,8 @@ const loadHierarchyData = async () => {
     const mg3 = await GetPicklist("APTS_MG3_Service_c");
     if (mg3?.Success) {
       setMg3List(mg3.Data.PicklistMetadata[0].PicklistEntries);
+      setSelectedMG3(mg3.Data.FieldMetadata[0]?.DefaultValue);
+      onChange({selectedMG3: mg3.Data.FieldMetadata[0]?.DefaultValue});
     }
  
     const products = await GetRecords("Product_Hierarchy_c");
@@ -392,6 +410,7 @@ const handleRemoveAG = (buId) => {
       if(res1.Success)
       {
         setLineType(res1.Data.PicklistMetadata[0].PicklistEntries);
+        onChange({"LineType":"Equipment"});
       }
       if(res2.Success)
       {
@@ -435,9 +454,17 @@ const handleRemoveAG = (buId) => {
   };
   console.log("Parent Product check ",data?.selectedParentProducts);
  
-   const handleAddRecord = (record) => {
+   const handleAddRecord = async (record) => {
     if (!record) return;
- 
+   // 🔴 CHECK IN EXISTING ALI
+  const alreadyInALI = existingALIs.some(
+    ali => ali.Product?.Id === record.Id
+  );
+
+  if (alreadyInALI) {
+    toast.error(`Product "${record.Name}" already exists in Agreement Line Items`);
+    return;
+  }
     // prevent duplicates
     //const exists = data.selectedRecords?.some(r => r.Id === record.Id);
     const exists = data.selectedProducts?.some(r => r.Id === record.Id);
@@ -491,14 +518,53 @@ const handleNext = () => {
   onComplete();
 };
  // Add this useEffect to sync Hierarchy selections automatically
-useEffect(() => {
-  if (data.MatchProductsBy === "Hierarchy" && selectedBUs.length > 0) {
-    buildHierarchySelectedRecords();
-    onChange({
-      Field: "Hierarchy_c"
+ //validation
+ useEffect(() => {
+  const validateHierarchy = async () => {
+    if (data.MatchProductsBy !== "Hierarchy" || selectedBUs.length === 0) return;
+
+    // 🔴 CHECK DUPLICATE IN ALI
+    const isDuplicate = existingALIs.some((ali) => {
+      return (
+        ali.Hierarchy_c?.Business_Unit_ID_c === selectedBUs[0]?.Business_Unit_ID_c &&
+        ali.Hierarchy_c?.Main_Article_Group_ID_c === selectedMAGs[0]?.Main_Article_Group_ID_c &&
+        ali.Hierarchy_c?.Article_Group_ID_c === selectedAGs[0]?.Article_Group_ID_c
+      );
     });
-  }
+
+    if (isDuplicate) {
+      toast.error("This Hierarchy (BU/MAG/AG) already exists in ALI");
+
+      // 🔴 RESET SELECTION (IMPORTANT)
+      setSelectedBUs([]);
+      setSelectedMAGs([]);
+      setSelectedAGs([]);
+
+      onChange({
+        selectedBUs: [],
+        selectedMAGs: [],
+        selectedAGs: []
+      });
+
+      return;
+    }
+
+    // ✅ NORMAL FLOW
+    buildHierarchySelectedRecords();
+    onChange({ Field: "Hierarchy_c" });
+  };
+
+  validateHierarchy();
 }, [selectedBUs, selectedMAGs, selectedAGs]);
+ //validation
+// useEffect(() => {
+//   if (data.MatchProductsBy === "Hierarchy" && selectedBUs.length > 0) {
+//     buildHierarchySelectedRecords();
+//     onChange({
+//       Field: "Hierarchy_c"
+//     });
+//   }
+// }, [selectedBUs, selectedMAGs, selectedAGs]);
   return (
     <div className="form-card">
       <div className="section-header">
@@ -517,7 +583,7 @@ useEffect(() => {
                 value={data.LineType}
                 onChange={handleChange}
               >
-                <option value="">Select</option>
+                {/* <option value="">Select</option> */}
                 {linetypes.map(linetype => (
                   <option key={linetype.Value}>
                   {linetype.Value}
@@ -561,7 +627,7 @@ useEffect(() => {
           value={selectedMG3}
           onChange={(e) => setSelectedMG3(e.target.value)}
         > */}
-          <option value="">Select</option>
+        {/* //  <option value="">Select</option> */}
           {mg3List.map(mg => (
             <option key={mg.Value} value={mg.Value}>
               {mg.Value}

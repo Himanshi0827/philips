@@ -90,7 +90,7 @@ function ProductList({
               <tr key={p.CompositeKey || p.Id || index}>
                 <td>
                   <button onClick={() => onOpenDiscount(index)}>⚙️</button>
-                  <button>📋</button>
+                  {/* <button>📋</button> */}
                 </td>
                 <td>{p.Name}</td>
                 <td>{p.ProductCode || "N/A"}</td>

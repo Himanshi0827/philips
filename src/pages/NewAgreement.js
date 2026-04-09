@@ -11,7 +11,7 @@ import AgreementHeaderInformationForm from "../forms/AgreementHeaderInformationF
 import InformationForm from "../forms/InformationForm";
 import BillingPlanForm from "../forms/BillingPlanForm";
 import { toast } from "react-toastify";
-
+import {queryAgreementLineItemsByAgreement}from "../api/queryAgreementLineItemsByAgreement";
 function NewAgreement() {
   const navigate = useNavigate();
   //head
@@ -176,6 +176,8 @@ useEffect(() => {
       alert("Agreement context missing. Please go back and reopen.");
       return;
     }
+    // 🔴 FETCH EXISTING ALI AGAIN (FINAL CHECK)
+const existingALI = await queryAgreementLineItemsByAgreement(id);
     const {
       selectedProducts,
       selectedParentProducts,
@@ -188,6 +190,29 @@ useEffect(() => {
 
     // --- CASE 1: MATCH BY PRODUCT ---
     if (MatchProductsBy === "Product") {
+  //     const duplicate = selectedProducts.some(sp =>
+  //   existingALI.some(ali => ali.Product?.Id === sp.Id)
+  // );
+  const duplicate = selectedProducts.some(sp =>existingALI.some(ali => ali.Product?.Id === sp.Id));
+    const duplicatevalues= existingALI.map(ali=> selectedProducts.filter(sp=>sp.Id === ali.Product?.Id));
+    
+  if (duplicate) {
+    duplicatevalues.forEach(item=>
+      { 
+        if(item.length >=1)
+        {
+          toast.error(`Agreement Line Item with matching criteria [Product Name- ${item[0].Name}] [ Product Code- ${item[0].ProductCode} ] is duplicated on this agreement. Please combine these commercial condition / price adjustment rules.`);
+        }
+      }); 
+    return;
+  }
+ 
+ 
+
+  // if (duplicate) {
+  //   toast.error("Agreement Line Item with the selected Product is duplicated on this agreement. Please combine these commercial condition / price adjustment rules.");
+  //   return;
+  // }
       requests = selectedProducts.map(async (childProduct) => {
         // 1. Find if this child has a selected parent
         const parentRecord = selectedParentProducts?.find(
@@ -315,6 +340,33 @@ APTS_Not_Discountable_c: activeDiscountSource?.nonDiscountable || !activeDiscoun
     }
     // --- CASE 2: MATCH BY HIERARCHY (Existing Logic) ---
     else {
+  //     const duplicate = existingALI.some(ali =>
+  //   selectedRecords.some(sr =>
+  //     ali.Hierarchy_c?.Id === sr.Id
+  //   )
+  // );
+const duplicate = existingALI.some(ali =>
+    selectedRecords.some(sr =>
+      ali.Hierarchy_c?.Id === sr.Id
+    )
+  );
+  const duplicatevalues = selectedRecords.map(sr => existingALI.filter(ali => sr.Id ===ali.Hierarchy_c?.Id));
+  console.log("Duplicates from hierarchy",duplicatevalues);
+ 
+  if (duplicate) {
+    duplicatevalues.forEach(item =>
+      {
+        if(item.length >=1)
+        {
+          toast.error(`${item[0].Code_c} are already present in the agreement with selected MG3. Please remove them or select different MG3 to proceed`);
+        }
+      })
+    return;
+  }
+  // if (duplicate) {
+  //   toast.error(" Hierarchy that you have selected is already present in the agreement with selected MG3. Please remove them or select different MG3 to proceed.");
+  //   return;
+  // }
       requests = selectedRecords.map(async(record) => {
         const discount = payload.discountPricing;
 
