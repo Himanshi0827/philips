@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getAgreementById, updateAgreement } from "../api/api";
 import {  useParams, useNavigate , useLocation } from "react-router-dom";
 import "../AgreementExtension.css";
+import { getPriceListById,updatePriceList } from "../api/PriceList";
 export default function AgreementExtension() {
  //const location = useLocation();//head
   const navigate = useNavigate();
@@ -44,18 +45,19 @@ const statusesToConsiderValidity = ["In Authoring","In Signatures"];
     const data = await getAgreementById(id);
 console.log("data",data);
     setAgreement(data[0]);
+    // console.log("agreement",agreement);
     setEndDate(data[0].ContractEndDate);
 
     const validity =
-      statusesToConsiderValidity.includes(data[0].StatusCategory) ;
+      statusesToConsiderValidity.includes(data[0].StatusCategory)&& data[0].APTS_Agreement_Inserted_Successfully_c===false  ;
     //   data.APTS_Agreement_Inserted_Successfully__c === false;
 
     setIsValidityScreen(validity);
 console.log("valid",validity);
 console.log("valid3",data[0].StatusCategory);
-    if (validity) {
+   // if (validity) {
       setStartDate(data[0].ContractStartDate);
-    }
+  //  }
   };
 
   const handleSave = async () => {
@@ -73,10 +75,11 @@ console.log("valid3",data[0].StatusCategory);
     }
 
     const oldEndDate = agreement.ContractEndDate;
-
-    
+  const priceListId = agreement.PriceList.Id;
+  console.log("price",priceListId)
+    let priceListPayload = null;
 let payload = {
-  ContractStartDate: agreement.ContractStartDate,
+ // ContractStartDate: agreement.ContractStartDate,
   APTS_Extension_Reason_c: reason,
  StatusCategory: agreement.StatusCategory,
 };
@@ -84,17 +87,24 @@ console.log("endDate",endDate);
 console.log("oldEndDate",oldEndDate);
 // VALIDITY
 if (isValidityScreen) {
-
-  payload = {
+if(startDate>=endDate){
+     alert("Effective Date can not be Equal or Greater than Expiration Date");
+     return;
+  }
+    payload = {
     ...payload,
-    ContractEndDate: endDate
-  };
-
-}
-
+    ContractEndDate: endDate,
+    ContractStartDate:startDate
+};
+// Prepare Price List Sync (Formatting to ISO for API)
+        priceListPayload = {
+          EffectiveDate: `${startDate}T23:59:59Z`,
+          ExpirationDate: `${endDate}T23:59:59Z`
+        };
+  }
 
 // EXTENSION
- if (endDate > oldEndDate) {
+else if (endDate > oldEndDate) {
 console.log("EXTENSION");
   payload = {
     ...payload,
@@ -105,12 +115,15 @@ console.log("EXTENSION");
 
     APTS_Extension_SAP_Status_c: "In Progress",
     APTS_Last_Extended_on_Date_c: new Date().toISOString().split("T")[0]
+   
   };
-
+priceListPayload = {
+          ExpirationDate: `${endDate}T23:59:59Z`
+        };
 }
 
 // PREPONEMENT
- if (endDate < oldEndDate) {
+else if (endDate < oldEndDate) {
 console.log("PREPONEMENT");
   payload = {
     ...payload,
@@ -119,13 +132,19 @@ console.log("PREPONEMENT");
   
     Status: "Being Preponed",
     ApprovalStatus: "Approval Required",
-    APTS_Proposed_Preponement_Date_c: endDate,
-    APTS_Last_Extended_on_Date_c: new Date().toISOString().split("T")[0]
+    APTS_Proposed_Preponement_Date_c: endDate
+   // APTS_Last_Extended_on_Date_c: new Date().toISOString().split("T")[0]
   };
 
 }
     try {
 console.log("final",payload);
+if (priceListPayload && priceListId) {
+        await updatePriceList(priceListId, priceListPayload);
+      }
+
+      // 2. Update Agreement
+     // await updateAgreement(id, agreementPayload);
       await updateAgreement(id, payload);
 
       alert("Agreement updated successfully");
@@ -161,7 +180,7 @@ return (
 
       <div className="form-container">
 
-        {isValidityScreen && (
+        {!isValidityScreen && (
           <div className="form-row">
             <label>Effective Date</label>
             <input
@@ -171,7 +190,20 @@ return (
             />
           </div>
         )}
+       
 
+        {isValidityScreen && (
+          <div className="form-row">
+            <label>Effective Date</label>
+            <input
+              type="date"
+              value={startDate || ""}
+             // disabled
+              onChange={(e) =>  setStartDate(e.target.value)}
+            />
+          </div>
+        )}
+       
         <div className="form-row">
           <label>Expiration Date</label>
           <input
