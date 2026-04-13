@@ -708,3 +708,21 @@
   background-color: #f0f4f9;
 }
 
+.empty-state {
+  text-align: center;
+  /* padding: 60px 20px; */
+  color: #f7f7f7;
+}
+
+.empty-image {
+  width: 180px;
+  margin-bottom: 20px;
+  opacity: 0.8;
+}
+
+.empty-state p {
+  margin-bottom: 20px;
+  background-color: #555;
+  padding: 20px;
+  
+}

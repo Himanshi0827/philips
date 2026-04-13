@@ -269,7 +269,10 @@ const handleDelete = async (id) => {
       </div>
 
       {/* Section Title */}
-      <div className="section-title">Agreement Line Items</div>
+       <div className="section-title">Agreement Line Items</div>
+      {filteredAgreements.length !== 0 &&(
+        <>
+     
 
       {/* Search */}
       <div className="table-toolbar">
@@ -284,6 +287,8 @@ const handleDelete = async (id) => {
 />
        
       </div>
+      </>
+     ) }
 
       {/* Loading / Error */}
       {loading && <div className="loader">Loading Agreement Line Items...</div>}
@@ -293,6 +298,13 @@ const handleDelete = async (id) => {
         <div className="table-container">
           {/* Table */}
           {!loading && (
+             <>
+    {filteredAgreements.length === 0 ? (
+      <div className="empty-state">
+        {/* <h3>No Agreement Line Items Found</h3> */}
+        <p>No Agreement Line Items found, Please create new Agreement Line Item!</p>
+      </div>
+    ) : (
             <table className="agreement-table">
               <thead>
                 <tr>
@@ -441,6 +453,9 @@ const handleDelete = async (id) => {
               </tbody>
             </table>
           )}
+            
+  </>
+)}
         </div>
         {/* BUTTON BAR */}
         <div className="table-footer pagination">
