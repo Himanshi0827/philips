@@ -1,0 +1,214 @@
+.members-container {
+  padding: 20px;
+  font-family: Arial;
+}
+
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  font-size: 24px;
+  font-weight: bold;
+  color: #0070d2;
+}
+
+.agreement {
+  margin-left: 10px;
+}
+
+.header-actions button {
+  margin-left: 10px;
+}
+
+.primary {
+  background: #0070d2;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+}
+
+.section-title {
+  margin-top: 20px;
+  font-size: 20px;
+  background: #0070d2;
+  color: white;
+  padding: 10px;
+}
+
+.toolbar {
+  margin: 10px 0;
+}
+
+.members-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.members-table th,
+.members-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.pagination {
+  margin-top: 10px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap; /* allows responsive wrap */
+  margin-bottom: 10px;
+}
+
+/* Search input */
+.toolbar input[type="text"] {
+  flex: 1;
+  min-width: 250px;
+  padding: 8px;
+}
+
+/* Checkbox section */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Lookup container */
+.lookup-container {
+  min-width: 300px;
+  flex: 1;
+}
+
+.form-container {
+  padding: 20px;
+}
+
+/* Header buttons */
+.form-header {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* Section title */
+.section-title {
+  background: #0070d2;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* GRID LAYOUT */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 columns */
+  gap: 20px;
+}
+
+/* Full width fields */
+.full-width {
+  grid-column: span 2;
+}
+
+/* Labels */
+.form-grid label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+/* Inputs */
+.form-grid input,
+.form-grid select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Checkbox */
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+}
+.table-container {
+  background: white;
+  border: 1px solid #d8dde6;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+.members-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+}
+.members-table thead {
+  background: #f3f3f3;
+}
+
+.members-table th {
+  text-align: left;
+  padding: 12px;
+  font-weight: 600;
+  color: #444;
+  border-bottom: 1px solid #d8dde6;
+}
+.members-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Hover effect like Salesforce */
+.members-table tbody tr:hover {
+  background-color: #f4f6f9;
+  cursor: pointer;
+}
+.icon-btn {
+  background: #f4f6f9;
+  border: 1px solid #d8dde6;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background: #e0e5ee;
+}
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border: 1px solid #d8dde6;
+  background: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.pagination button:hover {
+  background: #f4f6f9;
+}
+
+.pagination span {
+  font-size: 14px;
+}
+.pagination {
+  justify-content: center;
+  gap: 20px;
+}

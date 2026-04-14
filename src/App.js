@@ -11,7 +11,7 @@ import AgreementExtension from "./pages/AgreementExtension";
 import TerminateAgreement from "./pages/TerminateAgreement";
 import AgreementAmendAddendum from "./pages/AgreementAmendAddendum";
 //import ConfirmationPage from "./components/ConfirmationPage";
-
+import Membership from "./pages/Membership";
 
 function App() {
   return (
@@ -29,6 +29,7 @@ function App() {
         <Route path= "/extension/:agreementId" element={<AgreementExtension/>}/>
         <Route path= "/terminate/:agreementId" element={<TerminateAgreement/>}/>
         <Route path= "/amend/:agreementId" element={<AgreementAmendAddendum/>}/>
+        <Route path="/member/:agreementId" element={<Membership />} />
       </Routes>
     </BrowserRouter>
     </>
