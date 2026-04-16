@@ -152,6 +152,11 @@ export async function queryGetAgreementDetails(agreement_id) {
           "Name",
           "Account.Id",
           "Account.Name",
+          "RecordType" ,
+    "APTS_Sales_Area_c" ,
+    "Apttus_Market_c",
+    "StatusCategory"
+          
         ]
       })
     }

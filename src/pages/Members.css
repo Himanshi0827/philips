@@ -53,33 +53,23 @@
   padding: 8px;
 }
 
-.pagination {
-  margin-top: 10px;
-}
-
 .toolbar {
   display: flex;
   align-items: center;
   gap: 16px;
-  flex-wrap: wrap; /* allows responsive wrap */
+  flex-wrap: wrap; 
   margin-bottom: 10px;
 }
 
-/* Search input */
+
 .toolbar input[type="text"] {
   flex: 1;
   min-width: 250px;
   padding: 8px;
 }
 
-/* Checkbox section */
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
 
-/* Lookup container */
+
 .lookup-container {
   min-width: 300px;
   flex: 1;
@@ -87,9 +77,11 @@
 
 .form-container {
   padding: 20px;
+
+ 
 }
 
-/* Header buttons */
+
 .form-header {
   display: flex;
   justify-content: flex-end;
@@ -97,7 +89,7 @@
   margin-bottom: 10px;
 }
 
-/* Section title */
+
 .section-title {
   background: #0070d2;
   color: white;
@@ -106,48 +98,7 @@
   margin-bottom: 20px;
 }
 
-/* GRID LAYOUT */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* 2 columns */
-  gap: 20px;
-}
 
-/* Full width fields */
-.full-width {
-  grid-column: span 2;
-}
-
-/* Labels */
-.form-grid label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 14px;
-}
-
-/* Inputs */
-.form-grid input,
-.form-grid select {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-/* Checkbox */
-.checkbox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 22px;
-}
-.table-container {
-  background: white;
-  border: 1px solid #d8dde6;
-  border-radius: 6px;
-  overflow: hidden;
-  margin-top: 10px;
-}
 .members-table {
   width: 100%;
   border-collapse: separate;
@@ -170,7 +121,7 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
-/* Hover effect like Salesforce */
+
 .members-table tbody tr:hover {
   background-color: #f4f6f9;
   cursor: pointer;
@@ -186,29 +137,55 @@
 .icon-btn:hover {
   background: #e0e5ee;
 }
-.pagination {
+
+
+
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 28px;
+}
+
+/* Field wrapper (IMPORTANT) */
+.field {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
+  flex-direction: column;
 }
 
-.pagination button {
-  padding: 6px 12px;
-  border: 1px solid #d8dde6;
-  background: white;
-  cursor: pointer;
+/* Full width fields */
+.field.full {
+  grid-column: span 1;
+}
+
+/* Labels */
+.field label {
+  font-size: 13px;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+/* Inputs */
+.field input,
+.field select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #c9c9c9;
   border-radius: 4px;
+  font-size: 13px;
 }
 
-.pagination button:hover {
-  background: #f4f6f9;
+/* Disabled input */
+.field input:disabled {
+  background: #f4f4f4;
+  color: #777;
 }
 
-.pagination span {
-  font-size: 14px;
-}
-.pagination {
-  justify-content: center;
-  gap: 20px;
+/* Checkbox row (fix alignment issue) */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 26px;
+  justify-content: flex-start;
 }

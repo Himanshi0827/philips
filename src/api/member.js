@@ -70,3 +70,104 @@ export async function createMember(payload) {
 
   return response.json();
 }
+
+
+
+
+export async function getAccountById(id) {
+  try {
+    const CONTRACT_URL =
+      "https://preview-rls09.congacloud.com/api/data/v1/objects/Account";
+ 
+    const accessToken = getAccessToken();
+    const response = await fetch(`${CONTRACT_URL}/${id}`, {
+      method: "Get",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
+      },
+    });
+ 
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText);
+    }
+    const result = await response.json();
+    return result.Data;
+  } catch (err) {
+    console.error(err.message);
+  }
+}
+
+
+
+export async function queryGetmember(agreement_id) {
+  const token = getAccessToken();
+ console.log("agreement",agreement_id);
+  const response = await fetch(
+    "https://preview-rls09.congacloud.com/api/data/v1/query/APTS_Account_Contract_c",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        ObjectName: "APTS_Account_Contract_c",
+        Criteria: `APTS_Related_Agreement_c ='${agreement_id}'`,
+        Select: [
+          "*"
+        ]
+      })
+    }
+  );
+ 
+  if (!response.ok) {
+    throw new Error("Failed to bring members");
+  }
+   const result = await response.json();
+  console.log("result",result);
+  return result.Data;
+}
+
+
+
+export async function getAccountsByIds(ids = []) {
+  try {
+    if (!ids.length) return [];
+
+    const token = getAccessToken();
+
+    const formattedIds = ids.map(id => `'${id}'`).join(",");
+
+    const response = await fetch(
+      "https://preview-rls09.congacloud.com/api/data/v1/query/Account",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ObjectName: "Account",
+          Criteria: `Id IN (${formattedIds})`,
+          // Select: ["Id", "Name", "MP1_Customer_id_1_c"],
+          Select: ["*"],
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch accounts");
+    }
+
+    const result = await response.json();
+    return result.Data || [];
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}

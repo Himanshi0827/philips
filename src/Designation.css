@@ -1,0 +1,110 @@
+.page-container {
+    padding: 20px;
+    font-family: Arial;
+  }
+  .designation
+  {
+      background:#0070d2;
+      color:white;
+      padding:0.5px
+  }
+  .header {
+    background: #0070d2;
+    color: white;
+    /* padding: 10px; */
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .designation-header {
+ 
+    padding: 15px 0;
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .table-section table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .table-section th {
+    background: #0070d2;
+    color: white;
+    padding: 8px;
+  }
+  
+  .table-section td {
+    padding: 8px;
+    border: 1px solid #ddd;
+  }
+  
+  .footer {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .btn-primary {
+    background: #0070d2;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+  }
+  
+  .btn-secondary {
+    margin: 5px;
+    padding: 8px 16px;
+  }
+ 
+  .designation-table td
+  {
+      width: 20%;
+      text-align: center;
+  }
+  .designation-table th
+  {
+      width: 20%;
+  }
+ 
+  .select
+  {
+      width: 40%;
+  }
+  /* Container */
+.filter-container {
+    display: flex;
+    gap: 40px;
+    padding: 20px;
+    align-items: flex-start;
+  }
+  
+  /* Each field */
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 220px;
+  }
+  
+  /* Labels */
+  .filter-group label {
+    font-size: 13px;
+    margin-bottom: 5px;
+    color: #444;
+    font-weight: bold;
+  }
+  
+  /* Inputs & Selects */
+  .filter-group select,
+  .filter-group input {
+    height: 32px;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+  }
