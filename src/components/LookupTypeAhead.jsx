@@ -91,7 +91,7 @@ if(field?.AgreementId)
         onChange={handleChange}
         onFocus={() => inputValue.length >= 3 && setShowDropdown(true)}
       />
-{showDropdown && results.length > 0 && (
+{/* {showDropdown && results.length > 0 && (
   <ul className="lookup-dropdown">
     {results.map((r) => (
       <li key={r.Id} onClick={() => handleSelect(r)}>
@@ -110,8 +110,32 @@ if(field?.AgreementId)
       </li>
     ))}
   </ul>
-)}
+)} */}
+ {showDropdown && results.length > 0 && (
+  <ul className="lookup-dropdown">
+    {results.map((r) => (
+      <li
+        key={r.Id}
+        className="lookup-item"
+        onClick={() => handleSelect(r)}
+      >
+        <div className="lookup-row">
  
+
+          <div className="lookup-content">
+            <div className="lookup-title">
+              {r.Name}
+            </div>
+
+            <div className="lookup-subtext">
+              {r.Status || "In Effect"} • Expiry Date: {r.EndDate || "N/A"}
+            </div>
+          </div>
+        </div>
+      </li>
+    ))}
+  </ul>
+)}
      
     </div>
   );

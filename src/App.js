@@ -12,7 +12,8 @@ import TerminateAgreement from "./pages/TerminateAgreement";
 import AgreementAmendAddendum from "./pages/AgreementAmendAddendum";
 //import ConfirmationPage from "./components/ConfirmationPage";
 import Membership from "./pages/Membership";
-
+import CloneMembers from "./member/CloneMembers";
+import MemberDetail from "./member/MemberDetail";
 function App() {
   return (
     <>
@@ -30,6 +31,8 @@ function App() {
         <Route path= "/terminate/:agreementId" element={<TerminateAgreement/>}/>
         <Route path= "/amend/:agreementId" element={<AgreementAmendAddendum/>}/>
         <Route path="/member/:agreementId" element={<Membership />} />
+        <Route path="/clone-members/:agreementId" element={<CloneMembers />} />
+        <Route path="/member-detail/:memberId" element={<MemberDetail />} />
       </Routes>
     </BrowserRouter>
     </>

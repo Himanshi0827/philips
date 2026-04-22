@@ -171,3 +171,68 @@ export async function getAccountsByIds(ids = []) {
     return [];
   }
 }
+
+
+
+
+export async function queryGetOIT(member_id) {
+  const token = getAccessToken();
+ console.log("agreement",member_id);
+  const response = await fetch(
+    "https://preview-rls09.congacloud.com/api/data/v1/query/APTS_OIT_Track_Record_c",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        ObjectName: "APTS_OIT_Track_Record_c",
+        Criteria: `Agreement_Member_c.Id ='${member_id}'`,
+        Select: [
+          "*"
+        ]
+      })
+    }
+  );
+ 
+  if (!response.ok) {
+    throw new Error("Failed to bring members");
+  }
+   const result = await response.json();
+  console.log("result",result);
+  return result.Data;
+}
+
+
+
+export async function updateMember(id, payload) {
+  try {
+    const CONTRACT_URL =
+      "https://preview-rls09.congacloud.com/api/data/v1/objects/APTS_Account_Contract_c";
+ 
+    const accessToken = getAccessToken();
+    const response = await fetch(`${CONTRACT_URL}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
+      },
+      body: JSON.stringify(payload),
+    });
+ 
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData;
+      // const errorText = await response.text();
+      //throw new Error(errorText || "Failed to update APTS_Account_Contract_c");
+    }
+    const result = await response.json();
+    return result;
+  } catch (err) {
+    console.error(err.message);
+    throw err;
+  }
+}
