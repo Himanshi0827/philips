@@ -133,6 +133,7 @@ export async function queryCheckAgreementGroup(agreement_group_Id, name) {
 
 
 export async function queryGetAgreementDetails(agreement_id) {
+
   const token = getAccessToken();
  console.log("t",agreement_id);
   const response = await fetch(
@@ -161,7 +162,7 @@ export async function queryGetAgreementDetails(agreement_id) {
       })
     }
   );
- 
+ console.log("detial",response);
   if (!response.ok) {
     throw new Error("Failed to query line items");
   }
