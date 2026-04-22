@@ -24,7 +24,7 @@ function HierarchyLookupList({ records, onSelect,check }) {
         onBlur={()=>setStatus(false)}
       />
  
-      {status && <div className="lookup-dropdown">
+      {status && <div className="lookup-dropdownh">
         {filtered.map((r) => (
           <div
             key={r.Id}

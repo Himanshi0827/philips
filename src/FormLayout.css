@@ -454,6 +454,7 @@ input[type=number] {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
 }
  
 .list-item:hover {
@@ -551,6 +552,12 @@ input[type=number] {
   border: 1px solid #ddd;
 }
 .lookup-dropdown
+{
+  max-height: 200px;
+  overflow-y:auto;
+}
+
+.lookup-dropdownh
 {
   max-height: 200px;
   overflow-y:auto;

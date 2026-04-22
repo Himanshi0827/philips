@@ -237,6 +237,7 @@ const loadHierarchyData = async () => {
  
     const products = await GetRecords("Product_Hierarchy_c");
     setProduct(products.Data);
+    console.log("hierarchy",products.Data)
  
     // ADD THIS: Save the full product data to the parent so NewAgreement can use it for mapping
     onChange({ productData: products.Data });
@@ -255,6 +256,7 @@ const businessUnits = product.filter(
     ) &&
     !selectedBUs.some(bu => bu.Business_Unit_ID_c === p.Business_Unit_ID_c)
 );
+console.log("bu",businessUnits);
 const mainArticleGroups = product.filter(
   (p, index, self) =>
     selectedBUs.some(
