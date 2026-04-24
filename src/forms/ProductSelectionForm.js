@@ -568,7 +568,7 @@ const handleNext = () => {
   };
 
   validateHierarchy();
-}, [selectedBUs, selectedMAGs, selectedAGs]);
+}, [selectedBUs, selectedMAGs, selectedAGs,data.MG3]);
  //validation
 // useEffect(() => {
 //   if (data.MatchProductsBy === "Hierarchy" && selectedBUs.length > 0) {
