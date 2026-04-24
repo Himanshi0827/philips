@@ -4,7 +4,7 @@ import { searchLookupRecords } from "../api/SearchLookup";
 import { createMember,updateMember } from "../api/member"; // you will create this
 import { getPicklistOptions } from "./getPicklistOptions";
 import Designation from "./Designation";
-export default function CreateMembership({ mode,onBack , agreementDetails,existingRecord, member}) {
+export default function CreateMembership({ mode,onBack ,onSuccess, agreementDetails,existingRecord, member}) {
   console.log("details",agreementDetails);
   const agreementId = sessionStorage.getItem("agreementId");
 const [form, setForm] = useState({
@@ -52,9 +52,9 @@ useEffect(() => {
       member: member?.accountData || null,
 
       agreementGroup: existingRecord?.APTS_Agreement_Group_c || null,
-      memberType: existingRecord?.APTS_Member_Type__c || "",
+      memberType: existingRecord?.APTS_Member_Type_c || "",
 
-      startDate: existingRecord?.APTS_Start_Date_c || "",
+      startDate: existingRecord?.APTS_Start_Date_c|| "",
       endDate: existingRecord?.APTS_End_Date_c || "",
 
       oitValue: existingRecord?.APTS_OIT_Value_c || "",
@@ -135,19 +135,22 @@ const handleSave = async () => {
 
     if (mode === "modal-edit") {
       console.log("id",existingRecord?.Id );
+      console.log("payload edit",payload );
       await updateMember(existingRecord?.Id ,payload);
       alert("Updated successfully");
     } else {
+      console.log("payload create",payload );
       await createMember(payload);
       alert("Created successfully");
     }
-
+onSuccess && onSuccess();
     onBack();
 
   } catch (err) {
     console.error(err);
   }
 };
+
 //   const handleSave = async () => {
 //     console.log("group",form.agreementGroup?.Id);
 //     console.log("group",form.agreementGroup?.Name);
@@ -205,7 +208,7 @@ const handleSave = async () => {
     agreementDetails?.StatusCategory === "In Effect";
 
   // 👇 SWITCH UI HERE
-  if (isGPOFramework) {
+  if (mode === "page" && isGPOFramework) {
     return <Designation />;
   }
 
@@ -306,12 +309,22 @@ const handleSave = async () => {
   {/* Row 3 */}
   <div className="field full">
     <label>Start Date</label>
-    <input type="date" onChange={(e) => setForm({ ...form, startDate: e.target.value })} />
+    <input
+  type="date"
+  value={formatDate(form.startDate)}
+  onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+/>
+    {/* <input type="date" onChange={(e) => setForm({ ...form, startDate: e.target.value })} /> */}
   </div>
 
   <div className="field full">
     <label>End Date</label>
-    <input type="date" onChange={(e) => setForm({ ...form, endDate: e.target.value })} />
+    <input
+  type="date"
+  value={formatDate(form.endDate)}
+  onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+/>
+    {/* <input type="date" onChange={(e) => setForm({ ...form, endDate: e.target.value })} /> */}
   </div>
 
   {/* Row 4 */}
@@ -369,12 +382,22 @@ const handleSave = async () => {
   {/* Row 6 */}
   <div className="field full">
     <label>OIT start date</label>
-    <input type="date" onChange={(e) => setForm({ ...form, oitStartDate: e.target.value })} />
+    <input
+  type="date"
+  value={formatDate(form.oitStartDate)}
+  onChange={(e) => setForm({ ...form, oitStartDate: e.target.value })}
+/>
+    {/* <input type="date" onChange={(e) => setForm({ ...form, oitStartDate: e.target.value })} /> */}
   </div>
 
   <div className="field full">
     <label>OIT end date</label>
-    <input type="date" onChange={(e) => setForm({ ...form, oitEndDate: e.target.value })} />
+    <input
+  type="date"
+  value={formatDate(form.oitEndDate)}
+  onChange={(e) => setForm({ ...form, oitEndDate: e.target.value })}
+/>
+    {/* <input type="date" onChange={(e) => setForm({ ...form, oitEndDate: e.target.value })} /> */}
   </div>
 
   {/* Row 7 */}
@@ -382,6 +405,7 @@ const handleSave = async () => {
     <label>External Identifier</label>
     <input
       type="text"
+        value={form.externalId}
       onChange={(e) => setForm({ ...form, externalId: e.target.value })}
     />
   </div>
@@ -389,15 +413,22 @@ const handleSave = async () => {
   <div className="field full">
     <label>Locked Until date</label>
     <input
+  type="date"
+  value={formatDate(form.lockedUntil)}
+  onChange={(e) => setForm({ ...form, lockedUntil: e.target.value })}
+/>
+    {/* <input
       type="date"
       onChange={(e) => setForm({ ...form, lockedUntil: e.target.value })}
-    />
+    /> */}
   </div>
 
   {/* Row 8 (Checkbox row like screenshot) */}
   <div className="checkbox-container">
     <input
       type="checkbox"
+        checked={form.autoTierReview}
+      // value={formatDate(form.autoTierReview)}
       onChange={(e) =>
         setForm({ ...form, autoTierReview: e.target.checked })
       }
@@ -408,6 +439,7 @@ const handleSave = async () => {
   <div className="checkbox-container">
     <input
       type="checkbox"
+        checked={form.lockedForTier}
       onChange={(e) =>
         setForm({ ...form, lockedForTier: e.target.checked })
       }

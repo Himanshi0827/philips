@@ -333,3 +333,25 @@ tr:hover {
 .add-member-btn:hover {
   background-color: #f5f5f5;
 }
+
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.field-row label {
+  font-weight: 600;
+  min-width: 160px;
+}
+
+.field-row span {
+  color: #333;
+}
+
+.center-btn {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}

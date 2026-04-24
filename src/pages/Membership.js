@@ -165,6 +165,7 @@ console.log("stat",visible);
        
         <CreateMembership
   onBack={() => setShowCreate(false)}
+    onSuccess={loadMembers}
   agreementDetails={agreementDetails}
   mode="page"
 />

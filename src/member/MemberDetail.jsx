@@ -20,6 +20,7 @@ const [selectedAgm, setSelectedAgm] = useState(null);
   }, [memberId]);
 
 const handleEdit = (agm) => {
+  console.log("jadhj",agm);
   setSelectedAgm(agm);   // pass full row
   setShowModal(true);
 };
@@ -88,32 +89,32 @@ const loadDetails = async () => {
       {/* MEMBER DETAILS */}
       <div className="card">
         <div className="grid">
-          <div>
+          <div className="field-row">
             <label>Member Name:</label>
             <span>{member?.accountData?.Name}</span>
           </div>
 
-          <div>
+          <div className="field-row">
             <label>Related Agreement:</label>
             <span>{agreementDetails?.Name}</span>
           </div>
 
-          <div>
+          <div className="field-row">
             <label>Member Type:</label>
-            <span>{member?.APTS_Member_Type__c}</span>
+            <span>{member?.APTS_Member_Type_c}</span>
           </div>
 
-          <div>
+          <div className="field-row">
             <label>Agreement Customer:</label>
             <span>{agreementDetails?.Customer_Name__c}</span>
           </div>
 
-          <div>
+          <div className="field-row">
             <label>Designated GPO:</label>
             <span>{member?.Designated_GPO__r?.Name}</span>
           </div>
 
-          <div>
+          <div className="field-row">
             <label>ERP Deletion Flag:</label>
             <span>{member?.ERP_Delete__c ? "Yes" : "No"}</span>
           </div>
@@ -131,7 +132,8 @@ const loadDetails = async () => {
 
         {/* <button className="primary">Add New Agreement Group Member</button> */}
 <div className="card-body">
-  <button
+  <div className="center-btn">
+     <button
   className="primary"
   onClick={() => {
     setSelectedAgm(null); // new record
@@ -140,6 +142,8 @@ const loadDetails = async () => {
 >
   Add New Agreement Group Member
 </button>
+  </div>
+ 
     {/* <button className="primary">
       Add New Agreement Group Member
     </button> */}
@@ -161,6 +165,7 @@ const loadDetails = async () => {
   mode={selectedAgm ? "modal-edit" : "modal-create"}
   onBack={() => setShowModal(false)}
   agreementDetails={agreementDetails}
+  onSuccess={loadDetails} 
   member={member}               // fixed account
   existingRecord={selectedAgm}  // edit case
 />

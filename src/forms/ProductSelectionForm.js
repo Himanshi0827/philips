@@ -57,7 +57,17 @@ const [product , setProduct]=useState([])
 //try
 
 const [children, setChildren] = useState([]);
-
+const defaultValue= (value)=>
+{
+  if(value ==="LineType")
+  {
+    onChange({"LineType":"Equipment"});
+  }
+  if (value ==="MG3")
+  {
+    onChange({"MG3":"None"});
+  }
+}
 //validation
 const [existingALIs, setExistingALIs] = useState([]);
 useEffect(() => {
@@ -232,7 +242,8 @@ const loadHierarchyData = async () => {
     if (mg3?.Success) {
       setMg3List(mg3.Data.PicklistMetadata[0].PicklistEntries);
       setSelectedMG3(mg3.Data.FieldMetadata[0]?.DefaultValue);
-      onChange({selectedMG3: mg3.Data.FieldMetadata[0]?.DefaultValue});
+
+      // onChange({selectedMG3: mg3.Data.FieldMetadata[0]?.DefaultValue});
     }
  
     const products = await GetRecords("Product_Hierarchy_c");
@@ -412,7 +423,7 @@ const handleRemoveAG = (buId) => {
       if(res1.Success)
       {
         setLineType(res1.Data.PicklistMetadata[0].PicklistEntries);
-        onChange({"LineType":"Equipment"});
+        // onChange({"LineType":"Equipment"});
       }
       if(res2.Success)
       {
@@ -582,7 +593,8 @@ const handleNext = () => {
               <select 
               // className="custom-select"
                 name="LineType"
-                value={data.LineType}
+                // value={data.LineType}
+                value={data.LineType!==""? data.LineType:defaultValue("LineType")}
                 onChange={handleChange}
               >
                 {/* <option value="">Select</option> */}
@@ -617,13 +629,21 @@ const handleNext = () => {
     <tr>
       <td className="label">MG3</td>
       <td>
-        <select
+        {/* <select
   value={selectedMG3}
   onChange={(e) => {
     const val = e.target.value;
     setSelectedMG3(val);
     onChange({ selectedMG3: val }); // Save to parent!
   }}
+> */}
+<select
+        name="MG3"
+        value={data.MG3!==""? data.MG3: defaultValue("MG3")}
+        onChange={handleChange}
+    // const val = e.target.value;
+    // setSelectedMG3(val);
+    // onChange({ MG3: val }); // Save to parent!}
 >
         {/* <select
           value={selectedMG3}

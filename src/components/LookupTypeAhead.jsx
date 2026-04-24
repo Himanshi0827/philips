@@ -119,6 +119,7 @@ if(field?.AgreementId)
         className="lookup-item"
         onClick={() => handleSelect(r)}
       >
+         {field.isProductLookup ? (
         <div className="lookup-row">
  
 
@@ -126,12 +127,26 @@ if(field?.AgreementId)
             <div className="lookup-title">
               {r.Name}
             </div>
+            <div className="product-meta">
+              {r.ConfigurationType} • BG: {r.BG_Code} • BU: {r.BU_Code}
+            </div>
+
+           
+          </div>
+        </div>
+          ) : (
+      
+          <div className="lookup-content">
+            <div className="lookup-title">
+              {r.Name}
+            </div>
+           
 
             <div className="lookup-subtext">
               {r.Status || "In Effect"} • Expiry Date: {r.EndDate || "N/A"}
             </div>
           </div>
-        </div>
+        )}
       </li>
     ))}
   </ul>

@@ -61,6 +61,7 @@ if (!id) {
     productSelection: {
       LineType: "",
       MatchProductsBy: "",
+      MG3:"",
       Field: "", // API field name (MPG/Product/etc)
       selectedRecords: [], // [{ Id, Name }, { Id, Name }]
       selectedProducts: [],
@@ -345,12 +346,19 @@ APTS_Not_Discountable_c: activeDiscountSource?.nonDiscountable || !activeDiscoun
   //     ali.Hierarchy_c?.Id === sr.Id
   //   )
   // );
+// const duplicate = existingALI.some(ali =>
+//     selectedRecords.some(sr =>
+//       ali.Hierarchy_c?.Id === sr.Id
+//     )
+//   );
 const duplicate = existingALI.some(ali =>
     selectedRecords.some(sr =>
-      ali.Hierarchy_c?.Id === sr.Id
+      ali.Hierarchy_c?.Id === sr.Id &&
+      ali.APTS_MG3_Service_c=== payload.productSelection.MG3
     )
   );
-  const duplicatevalues = selectedRecords.map(sr => existingALI.filter(ali => sr.Id ===ali.Hierarchy_c?.Id));
+  const duplicatevalues = selectedRecords.map(sr => existingALI.filter(ali => sr.Id ===ali.Hierarchy_c?.Id &&
+    ali.APTS_MG3_Service_c === payload.productSelection.MG3));
   console.log("Duplicates from hierarchy",duplicatevalues);
  
   if (duplicate) {
@@ -453,7 +461,14 @@ const duplicate = existingALI.some(ali =>
           !!ah.ExcludefromContractP;
         lineItemPayload.APTS_Inherit_hierarchy_discount_c =
           !!ah.InheritHdiscount;
+const ps = payload.productSelection;
 
+
+addIfValid(
+  lineItemPayload,
+  "APTS_MG3_Service_c",   // ⚠️ use correct API name
+  ps.MG3
+);
         // 3. Information Section (Cleaned)
         const info = payload.information;
         addIfValid(
@@ -572,7 +587,7 @@ const duplicate = existingALI.some(ali =>
           discount.volumeT?.[4],
         );
             
-
+console.log("finally",lineItemPayload);
         return createAgreementLineItem(lineItemPayload);
         // try {
         //   const result =  await createAgreementLineItem(lineItemPayload);
