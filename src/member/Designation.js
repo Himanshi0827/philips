@@ -120,20 +120,84 @@
 
 
 
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import "../Designation.css"
-import { createMember,updateMember } from "../api/member"; 
+import { useNavigate, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import MemberSearch from "../components/MemberSearch";
+import { createMember,updateMember,getAccounts } from "../api/member"; 
+import { queryGetAgreementDetails } from "../api/queryAgreementLineItemsByAgreement"; 
  import LookupTypeAhead from "../components/LookupTypeAhead";
 import { searchLookupRecords } from "../api/SearchLookup";
 export default function Designation() {
+  const location = useLocation();
+const agreementId = sessionStorage.getItem("agreementId");
   const [market, setMarket] = useState("North America");
   const [salesArea, setSalesArea] = useState("United States");
-  const [member, setMember] = useState("Global Smiles Foundation");
+  const [member, setMember] = useState(null);
+  // const [member, setMember] = useState("Global Smiles Foundation");
  const [selectedGPO, setSelectedGPO] = useState(null);
-  const [showDesignationHeader, setShowDesignationHeader] = useState(true);
+ const showDesignationHeader = !!member?.Id;
+//  const [showDesignationHeader, setShowDesignationHeader] = useState(true);
  const [rows, setRows] = useState([]);
-  const [effectiveDate, setEffectiveDate] = useState("2026-04-15");
+  // const [effectiveDate, setEffectiveDate] = useState("2026-04-15");
+  const today = new Date().toISOString().split("T")[0];
+const [effectiveDate, setEffectiveDate] = useState(today);
   const [tier, setTier] = useState("Tier 1");
+   const [Acc,setAcc] = useState(null);
+  const [options, setOptions] = useState([]);
+const [designated, setDesignated] = useState(null);
+const [showCheckBox, setShowCheckBox] = useState(false);
+useEffect(() => {
+   loadData();
+   console.log("account",Acc);
+   if (Acc && Acc.length > 0) {
+    const accRecord = Acc[0]?.Account;
+
+    if (accRecord) {
+      setSelectedGPO({
+        Id: accRecord.Id,
+        Name: accRecord.Name
+      });
+    }
+  }
+  if (!member?.Name) return;
+
+  const load = async () => {
+    const data = await getAccounts({
+      filters: {
+        Market_c: "North America",
+        Country_c: "United States",
+        Inactive_Flag_c: false,
+        Golden_Record_Key_c: { notNull: true },
+        Name: member.Name // ✅ EXACT MATCH
+      }
+    });
+console.log("dataoption",data);
+    const mapped = data.map(rec => ({
+      label: `${rec.Designated_GPO_c?.Name || "No GPO"} ${
+        rec.Designated_GPO_c ? "(Designated)" : ""
+      }`,
+      value: rec.Id
+    }));
+ console.log("hdshe",mapped);
+    setOptions(mapped);
+     console.log("hdshe",options);
+  };
+
+  load();
+}, [member],[Acc]);
+   const loadData = async () => {
+      try {       
+const trying = await queryGetAgreementDetails(agreementId);
+  console.log(trying);
+  setAcc(trying);
+
+
+      } catch (err) {
+        console.error(err);
+      } 
+    };
  const handleAddRow = () => {
   if (!member || !selectedGPO) {
     alert("Select Member and GPO");
@@ -208,12 +272,19 @@ const handleSubmit = async () => {
  
   <div className="filter-group">
     <label>Select Member</label>
-    <LookupTypeAhead
+    <MemberSearch
+  value={member}
+  onChange={(rec) => {
+    setMember(rec);
+  }}
+  type="MEMBER"
+/>
+    {/* <LookupTypeAhead
   field={{ DisplayName: "Member", LookupObjectName: "Account" }}
   value={member}
   onChange={(rec) => setMember(rec)}
   searchFn={searchLookupRecords}
-/>
+/> */}
     {/* <input type="text" value="Global Smiles Foundation" /> */}
   </div>
 </div>
@@ -232,7 +303,35 @@ const handleSubmit = async () => {
             <th>Add New GPO Membership</th>
             <tbody>
               <tr>
-                <td>The list below shows all existing Membership records. The selected one is the currently designated one. If none of them are selected, then the member is not designated to any GPO.</td>
+                <td>The list below shows all existing Membership records. The selected one is the currently designated one. If none of them are selected, then the member is not designated to any GPO.
+                  {options.length > 0 && (
+  <div>
+   
+    {options.map(opt => (
+      <label key={opt.value}>
+        <input
+          type="radio"
+          name="designation"
+          value={opt.value}
+          onChange={(e) => {
+            const val = e.target.value;
+            setDesignated(val);
+
+            const selected = options.find(o => o.value === val);
+
+            if (selected.label.includes("Designated")) {
+              setShowCheckBox(true);
+            } else {
+              setShowCheckBox(false);
+            }
+          }}
+        />
+        {opt.label}
+      </label>
+    ))}
+  </div>
+)}
+                </td>
                 <td><input
                 type="date"
                 value={effectiveDate}
@@ -248,17 +347,24 @@ const handleSubmit = async () => {
 You can create new membership records and designate the member to the select GPO.
 <div className="filter-group">
   <label>Select GPO</label>
-  <LookupTypeAhead
+  {/* <LookupTypeAhead
     field={{ DisplayName: "GPO", LookupObjectName: "Account" }}
     value={selectedGPO}
     onChange={(rec) => setSelectedGPO(rec)}
     searchFn={searchLookupRecords}
-  />
+  /> */}
+  <MemberSearch
+  value={selectedGPO}
+  onChange={setSelectedGPO}
+  type="GPO"
+/>
 </div>
 </td>
               </tr>
             </tbody>
           </table>
+          <div className="button-container"> <button className="btn-primary" onClick={handleAddRow}>Submit Designated Change Request</button></div>
+           
         </div>
         </>
       )}
@@ -318,11 +424,11 @@ You can create new membership records and designate the member to the select GPO
  
       {/* FOOTER ACTIONS */}
       <div className="footer">
-        <button className="btn-primary">Submit Designated Change Request</button>
+      
  
         <div style={{ marginTop: "10px" }}>
           {/* <button className="btn-secondary">Designate</button> */}
-          <button className="btn-secondary" onClick={handleAddRow}>
+          <button className="btn-secondary" >
   Designate
 </button>
 

@@ -22,7 +22,7 @@ function EditBillingPlanForm({ data, onChange, onComplete }) {
 
   return (
     <div className="form-card">
-      <div className="section-header">Billing Plan</div>
+      {/* <div className="section-header">Billing Plan</div> */}
   <table className="data-table billing-table">
         <thead>
           <tr>

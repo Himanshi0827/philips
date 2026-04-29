@@ -73,6 +73,7 @@
 
 .lookup-container {
   min-width: 300px;
+  position: relative;
   flex: 1;
 }
 
@@ -355,3 +356,10 @@ tr:hover {
   justify-content: center;
   margin-bottom: 15px;
 }
+
+/* 
+
+.lookup-container {
+  position: relative;
+  width: 300px;
+} */

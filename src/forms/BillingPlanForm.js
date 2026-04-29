@@ -78,7 +78,7 @@ function BillingPlanForm({ data, product, onComplete, onSubmit, onChange, onChan
  
   return (
     <div className="form-card">
-      <div className="section-header">Select Billing Plan</div>
+      {/* <div className="section-header">Select Billing Plan</div> */}
  
       <table className="data-table billing-table">
         <thead>

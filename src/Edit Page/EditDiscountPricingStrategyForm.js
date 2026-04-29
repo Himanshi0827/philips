@@ -277,9 +277,9 @@ const handleDiscountChange=(e)=>
  
 return (
   <div className="form-card">
-    <div className="section-header">
+    {/* <div className="section-header">
       Discount Pricing Strategy
-    </div>
+    </div> */}
     <table className="form-table">
       <tbody>
  

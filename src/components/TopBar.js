@@ -19,7 +19,7 @@ function TopBar({
   const isAgreementCompleted = completedTabs.includes("Agreement Group");
   const isProductCompleted = completedTabs.includes("Product Selection");
   const isDiscountCompleted = completedTabs.includes("Discount Pricing Strategy");
-  const isBillingCompleted = completedTabs.includes("Billing Plan");
+  const isBillingCompleted = completedTabs.includes("Select Billing Plan");
 
   return (
     <>
@@ -81,7 +81,7 @@ function TopBar({
               )}
 
               {/* FINAL STEP */}
-              {activeTab === "Billing Plan" && (
+              {activeTab === "Select Billing Plan" && (
                 <button
                   className="btn success"
                   disabled={!isBillingCompleted}

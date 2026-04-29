@@ -695,7 +695,7 @@ console.log("finally",lineItemPayload);
     "Discount Pricing Strategy",
     "Agreement Header Information",
     "Information",
-    "Billing Plan",
+    "Select Billing Plan",
   ];
 
   const [activeTab, setActiveTab] = useState(tabs[0]);
@@ -900,7 +900,7 @@ case "Product Selection":
           />
         );
 
-      case "Billing Plan":
+      case "Select Billing Plan":
         return (
           <BillingPlanForm
             onComplete={markCompletedAndNext}
@@ -936,7 +936,7 @@ case "Product Selection":
           completedTabs={completedTabs}
           onAddProduct={() => setActiveTab("Product Selection")}
           onAddDiscount={() => setActiveTab("Discount Pricing Strategy")}
-          onAddBilling={() => setActiveTab("Billing Plan")}
+          onAddBilling={() => setActiveTab("Select Billing Plan")}
           onSubmitAgreement={handleFinalSubmit}
           agreementId={agreementId}
         />

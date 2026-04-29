@@ -131,6 +131,7 @@ const totalPages = Math.ceil((filteredAgreements?.length || 0) / PAGE_SIZE);
   const start = (page - 1) * PAGE_SIZE;
   return filteredAgreements.slice(start, start + PAGE_SIZE);
 }, [filteredAgreements, page, viewAll]);
+console.log("item",visibleRows);
   // const visibleRows = useMemo(() => {
   //   if (viewAll) return agreements;
 
@@ -316,8 +317,26 @@ const handleDelete = async (id) => {
                   <th>Match Products By</th>
                   <th>Code</th>
                   <th>Matching</th>
+
+
+                  <th>Parent Product</th>
+                  <th>Parent Product  Code</th>
+                  <th>Pricing Family</th>
+                  {/* <th>Related Service</th> */}
+
+
                   <th>Billing Plan</th>
+
+
+                  <th>Exclude From Contract Pricelists</th>
+
+
                   <th>MG3</th>
+
+                  <th>Not Discountable</th>
+                  <th>Quote Type</th>
+                  <th>Service Plan Type</th>
+
                   <th>Tier 1</th>
                   <th>Tier 2</th>
                   <th>Tier 3</th>
@@ -356,6 +375,7 @@ const handleDelete = async (id) => {
                       <button
                         className="icon-btn"
                         onClick={() => handleEdit(item.Id)}
+                        
                       >
                         ✎
                       </button>
@@ -418,8 +438,29 @@ const handleDelete = async (id) => {
                           : ""}
                     </td>
 
+
+                       <td>{item.APTS_Parent_Product_c}</td>
+                  <td>{item.Parent_Product_Code_c}</td>
+                  <td>{item.Pricing_Family_c}</td>
+                  {/* <td>Related Service</td> */}
+
+
                     <td>{item.APTS_BillingPlan_c}</td>
+
+
+                    <td>{item.APTS_Exclude_From_Contract_Pricelists_c== true
+                        ? "True"
+                        :"False"}</td>
+
                     <td>{item.APTS_MG3_Service_c}</td>
+
+
+                  <td>{item.APTS_Not_Discountable_c== true
+                        ? "True"
+                        :"False"}</td>
+                  <td>{item.APTS_Quote_Type_c}</td>
+                  <td>{item.APTS_Service_Plan_Type_c}</td>
+
                     <td>{item.APTS_Discount_Tier_1_c}</td>
                     <td>{item.APTS_Discount_Tier_2_c}</td>
                     <td>{item.APTS_Discount_Tier_3_c}</td>

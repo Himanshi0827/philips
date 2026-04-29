@@ -21,9 +21,9 @@ function EditInformationForm({ data, onChange, onComplete }) {
   return (
     <div className="form-card">
 
-      <div className="section-header">
+      {/* <div className="section-header">
         Information
-      </div>
+      </div> */}
 
       <div className="two-column">
 

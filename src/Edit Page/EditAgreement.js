@@ -53,7 +53,7 @@ const agreementName =sessionStorage.getItem("agreementName") ;
     "Discount Pricing Strategy",
     "Agreement Header Information",
     "Information",
-    "Billing Plan",
+    "Select Billing Plan",
   ];
 
   const [activeTab, setActiveTab] = useState(tabs[0]);
@@ -205,7 +205,7 @@ const agreementName =sessionStorage.getItem("agreementName") ;
           />
         );
 
-      case "Billing Plan":
+      case "Select Billing Plan":
         return (
           <EditBillingPlanForm
             data={agreement}

@@ -70,15 +70,28 @@ function EditAgreementHeaderInformationForm({ data, onChange, onComplete, agreem
             disabled 
           />
         </div>
+ <div className="toggle-row" style={{paddingTop:"15px"}}>
+          <label>Exclude Administration Fees</label>
+          <label className="switch">
+                    <input  type="checkbox" 
+            checked={!!agreementHeader?.APTS_Exclude_Administration_Fees_c} 
+            disabled 
+                     />
+                  <span className="slider"></span>
+                  </label>
+        
 
-        <div className="field toggle-field">
+
+         
+        </div>
+        {/* <div className="field toggle-field">
           <label>Exclude Administration Fees</label>
           <input 
             type="checkbox" 
             checked={!!agreementHeader?.APTS_Exclude_Administration_Fees_c} 
             disabled 
           />
-        </div>
+        </div> */}
 
         <div className="field">
           <label>Administration Fee Payment Schedule</label>
@@ -213,7 +226,7 @@ function EditAgreementHeaderInformationForm({ data, onChange, onComplete, agreem
           />
         </div>
 
-        <div className="field toggle-field">
+        {/* <div className="field toggle-field">
           <label>Exclude Administration Fees</label>
           <input
             type="checkbox"
@@ -222,9 +235,31 @@ function EditAgreementHeaderInformationForm({ data, onChange, onComplete, agreem
               onChange("APTS_Exclude_GPO_Administration_Fees_c", e.target.checked)
             }
           />
+        </div> */}
+<div className="toggle-row" style={{paddingTop:"15px"}}>
+          <label>Exclude Administration Fees</label>
+          <label className="switch">
+                    <input  type="checkbox"
+            checked={!!data.APTS_Exclude_GPO_Administration_Fees_c}
+            onChange={(e) =>
+              onChange("APTS_Exclude_GPO_Administration_Fees_c", e.target.checked)}
+                     />
+                  <span className="slider"></span>
+                  </label>
+         
         </div>
-
-        <div className="field toggle-field">
+ <div className="toggle-row" style={{paddingTop:"15px"}}>
+          <label>Inherit hierarchy discounts</label>
+             <label className="switch">
+                    <input  type="checkbox"
+            checked={!!data.APTS_Inherit_hierarchy_discount_c}
+            onChange={(e) =>
+              onChange("APTS_Inherit_hierarchy_discount_c", e.target.checked)
+            }
+                     />
+                  <span className="slider"></span>
+                  </label></div>
+        {/* <div className="field toggle-field">
           <label>Inherit hierarchy discounts</label>
           <input
             type="checkbox"
@@ -233,9 +268,22 @@ function EditAgreementHeaderInformationForm({ data, onChange, onComplete, agreem
               onChange("APTS_Inherit_hierarchy_discount_c", e.target.checked)
             }
           />
+        </div> */}
+<div className="toggle-row" style={{paddingTop:"15px"}}>
+          <label>Exclude From Contract Pricelists</label>
+           <label className="switch">
+                    <input  type="checkbox"
+            checked={!!data.APTS_Exclude_From_Contract_Pricelists_c}
+            onChange={(e) =>
+              onChange("APTS_Exclude_From_Contract_Pricelists_c", e.target.checked)
+            }
+                     />
+                  <span className="slider"></span>
+                  </label>
+          
+         
         </div>
-
-        <div className="field toggle-field">
+        {/* <div className="field toggle-field">
           <label>Exclude From Contract Pricelists</label>
           <input
             type="checkbox"
@@ -244,7 +292,7 @@ function EditAgreementHeaderInformationForm({ data, onChange, onComplete, agreem
               onChange("APTS_Exclude_From_Contract_Pricelists_c", e.target.checked)
             }
           />
-        </div>
+        </div> */}
       </div>
 
       {error && (

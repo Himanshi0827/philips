@@ -79,7 +79,8 @@ if (!agreementHeader) {
 
       <div className="two-column">
         <div className="field">
-          <label>Administration Fee %</label>
+          <label>Admini
+            stration Fee %</label>
           {/* head */}
           <input
   type="number"
@@ -90,14 +91,21 @@ if (!agreementHeader) {
           {/* <input type="number" value="3" disabled /> */}
         </div>
 
-        <div className="field toggle-field">
+        {/* <div className="field toggle-field"> */}
+          <div className="toggle-row" style={{paddingTop:"15px"}}>
           <label>Exclude Administration Fees</label>
+          <label className="switch">
+                    <input type="checkbox"  checked={!!agreementHeader?.APTS_Exclude_Administration_Fees_c}
+  disabled
+                     />
+                  <span className="slider"></span>
+                  </label>
           {/* head */}
-          <input
+          {/* <input
   type="checkbox"
   checked={!!agreementHeader?.APTS_Exclude_Administration_Fees_c}
   disabled
-/>
+/> */}
 
 
           {/* <input type="checkbox" disabled /> */}
@@ -238,34 +246,67 @@ if (!agreementHeader) {
             onChange={handleChange}
           />
         </div>
-
-        <div className="field toggle-field">
+{/* 
+        <div className="field toggle-field"> */}
+          <div className="toggle-row" style={{paddingTop:"15px"}}>
           <label>Exclude Administration Fees</label>
-          <input type="checkbox" name="ExcludedAF" checked={!!data?.ExcludedAF} onChange={(e)=>
+          <label className="switch">
+                    <input type="checkbox"   
+                    name="ExcludedAF" 
+                    checked={!!data?.ExcludedAF} onChange={(e)=>
+          {
+            onChange({[e.target.name]:e.target.checked});
+            console.log(e.target.name,e.target.checked);}}
+                     />
+                  <span className="slider"></span>
+                  </label>
+          {/* <input type="checkbox" name="ExcludedAF" checked={!!data?.ExcludedAF} onChange={(e)=>
           {
             onChange({[e.target.name]:e.target.checked});
             console.log(e.target.name,e.target.checked);
-          }}/>
+          }}/> */}
          
         </div>
 
-        <div className="field toggle-field">
+        {/* <div className="field toggle-field"> */}
+      <div className="toggle-row" style={{paddingTop:"15px"}}>
           <label>Inherit hierarchy discounts</label>
-          <input type="checkbox" name="InheritHdiscount" checked={!!data?.InheritHdiscount} onChange={(e)=>
+             <label className="switch">
+                    <input type="checkbox"   
+                   name="InheritHdiscount" checked={!!data?.InheritHdiscount} onChange={(e)=>
+          {
+            onChange({[e.target.name]:e.target.checked});
+            console.log(e.target.name,e.target.checked);
+          }}
+                     />
+                  <span className="slider"></span>
+                  </label>
+          {/* <input type="checkbox" name="InheritHdiscount" checked={!!data?.InheritHdiscount} onChange={(e)=>
           {
             onChange({[e.target.name]:e.target.checked});
             console.log(e.target.name,e.target.checked);
           }}/>
-         
+          */}
         </div>
 
-        <div className="field toggle-field">
+        {/* <div className="field toggle-field"> */}
+         <div className="toggle-row" style={{paddingTop:"15px"}}>
           <label>Exclude From Contract Pricelists</label>
-          <input type="checkbox" name="ExcludefromContractP" checked={!!data?.ExcludefromContractP} onChange={(e)=>
+           <label className="switch">
+                    <input type="checkbox"   
+                   name="ExcludefromContractP" checked={!!data?.ExcludefromContractP} onChange={(e)=>
           {
             onChange({[e.target.name]:e.target.checked});
             console.log(e.target.name,e.target.checked);
-          }}/>
+          }}
+                     />
+                  <span className="slider"></span>
+                  </label>
+          {/* <input type="checkbox" name="ExcludefromContractP" checked={!!data?.ExcludefromContractP} onChange={(e)=>
+          {
+            onChange({[e.target.name]:e.target.checked});
+            console.log(e.target.name,e.target.checked);
+          }}/> */}
          
         </div>
       </div>

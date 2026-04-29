@@ -1,12 +1,20 @@
 function Sidebar({ activeTab, completedTabs, onSelect }) {
   const tabs = [
-    { key: "Agreement Group", icon: "📦" },
-    { key: "Product Selection", icon: "🧾" },
-    { key: "Discount Pricing Strategy", icon: "💲" },
-    { key: "Agreement Header Information", icon: "📄" },
-    { key: "Information", icon: "ℹ️" },
-    { key: "Billing Plan", icon: "💳" },
-  ];
+  { key: "Agreement Group", label: "Agreement Group", icon: "📦" },
+  { key: "Product Selection", label: "Product Selection", icon: "🧾" },
+  { key: "Discount Pricing Strategy", label: "Discount Pricing Strategy", icon: "💲" },
+  { key: "Agreement Header Information", label: "Agreement Header Information", icon: "📄" },
+  { key: "Information", label: "Information", icon: "ℹ️" },
+  { key: "Select Billing Plan", label: "Billing Plan", icon: "💳" }, // 👈 changed here
+];
+  // const tabs = [
+  //   { key: "Agreement Group", icon: "📦" },
+  //   { key: "Product Selection", icon: "🧾" },
+  //   { key: "Discount Pricing Strategy", icon: "💲" },
+  //   { key: "Agreement Header Information", icon: "📄" },
+  //   { key: "Information", icon: "ℹ️" },
+  //   { key: "Select Billing Plan", icon: "💳" },
+  // ];
 
   return (
     <div className="sidebar">
@@ -35,7 +43,7 @@ function Sidebar({ activeTab, completedTabs, onSelect }) {
             }}
           >
             <span className="icon">{tab.icon}</span>
-            <span>{tab.key}</span>
+            <span>{tab.label}</span>
           </div>
         );
       })}

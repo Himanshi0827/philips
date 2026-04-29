@@ -46,8 +46,12 @@
     text-align: center;
     margin-top: 20px;
   }
-  
+    .button-container {
+    text-align: center;
+    margin-top: 20px;
+  }
   .btn-primary {
+   
     background: #0070d2;
     color: white;
     padding: 10px 20px;

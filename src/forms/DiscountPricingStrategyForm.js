@@ -59,9 +59,9 @@ const openParentDiscountPopup = (index) => {
     <>
     <div className="form-card Discount">
     <div className="form-card">
-      <div className="section-header">
+      {/* <div className="section-header">
         Discount Pricing Strategy
-      </div>
+      </div> */}
       {prev.MatchProductsBy==='Product' &&
       (
         <>

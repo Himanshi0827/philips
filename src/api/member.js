@@ -132,7 +132,37 @@ export async function queryGetmember(agreement_id) {
   return result.Data;
 }
 
+export async function getFilteredAccounts() {
+  try {
+    const token = await getAccessToken();
 
+    const response = await fetch(
+      "https://preview-rls09.congacloud.com/api/data/v1/query/Account",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ObjectName: "Account",
+          Criteria: `
+           Market_c = 'North America'  AND Country_c = 'United States'  AND MP1_Customer_id_1_c != null    AND Inactive_Flag_c = false   AND ERP_Account_Group_c = '0001 - SOLD TO PARTY'
+          `,
+          Select: ["*"],
+        }),
+      }
+    );
+
+    const result = await response.json();
+    return result.Data || [];
+
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
 
 export async function getAccountsByIds(ids = []) {
   try {
@@ -236,3 +266,126 @@ export async function updateMember(id, payload) {
     throw err;
   }
 }
+
+
+
+
+
+
+
+
+
+
+export async function getAccounts({
+  filters = {},
+  likeFields = [],
+  searchText = ""
+}) {
+  try {
+    const token = await getAccessToken();
+
+    const criteria = buildCriteria(filters);
+
+    const response = await fetch(
+      "https://preview-rls09.congacloud.com/api/data/v1/query/Account",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ObjectName: "Account",
+          Criteria: criteria,
+          Select: ["*"],
+        }),
+      }
+    );
+
+    const result = await response.json();
+    let data = result.Data || [];
+
+    // ✅ CLIENT SIDE SEARCH (WORKS ALWAYS)
+    if (searchText) {
+      const lower = searchText.toLowerCase();
+
+      data = data.filter(rec =>
+        likeFields.some(field =>
+          (rec[field] || "")
+            .toString()
+            .toLowerCase()
+            .includes(lower)
+        )
+      );
+    }
+
+    return data;
+
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+}
+
+// export async function getAccounts({ filters = {}, likeFields = [], searchText = "" }) {
+//   try {
+//     const token = await getAccessToken();
+
+//     let criteria = buildCriteria(filters);
+
+//     // 🔍 Add search condition
+//     if (searchText && likeFields.length) {
+//       const likeClause = likeFields
+//         .map(field => `${field} LIKE '%${searchText}%'`)
+//         .join(" OR ");
+
+//       criteria += ` AND (${likeClause})`;
+//     }
+
+//     const response = await fetch(
+//       "https://preview-rls09.congacloud.com/api/data/v1/query/Account",
+//       {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//           Accept: "application/json",
+//           Authorization: `Bearer ${token}`,
+//         },
+//         body: JSON.stringify({
+//           ObjectName: "Account",
+//           Criteria: criteria,
+//           Select: ["*"],
+//         }),
+//       }
+//     );
+
+//     const result = await response.json();
+//     return result.Data || [];
+//   } catch (err) {
+//     console.error(err);
+//     return [];
+//   }
+// }
+
+
+export const buildCriteria = (filters = {}) => {
+  const clauses = [];
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value === null || value === undefined || value === "") return;
+
+    // ✅ HANDLE NOT NULL
+    if (typeof value === "object" && value.notNull) {
+      clauses.push(`${key} != null`);
+    }
+    else if (typeof value === "string") {
+      clauses.push(`${key} = '${value}'`);
+    } 
+    else {
+      clauses.push(`${key} = ${value}`);
+    }
+  });
+
+  return clauses.join(" AND ");
+};

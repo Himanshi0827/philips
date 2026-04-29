@@ -580,9 +580,9 @@ const handleNext = () => {
 // }, [selectedBUs, selectedMAGs, selectedAGs]);
   return (
     <div className="form-card">
-      <div className="section-header">
+      {/* <div className="section-header">
         Product Selection
-      </div>
+      </div> */}
  
       <table className="form-table">
         <tbody>
