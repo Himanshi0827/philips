@@ -406,7 +406,7 @@ const handleDelete = async (id) => {
                     </td>
 
 
-                       <td>{item.APTS_Parent_Product_c.Name}</td>
+                       <td>{item.APTS_Parent_Product_c?.Name}</td>
                   <td>{item.Parent_Product_Code_c}</td>
                   <td>{item.Pricing_Family_c}</td>
              
