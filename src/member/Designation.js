@@ -4,7 +4,7 @@ import "../Designation.css"
 import {  useLocation } from "react-router-dom";
 
 import MemberSearch from "../components/MemberSearch";
-import { getAccounts,getMembershipAgreements ,createGPODesignateChange} from "../api/member"; 
+import { getAccounts,getMembershipAgreements ,createGPODesignateChange,getRetryRecords, UpdateGPODesignateChange} from "../api/member"; 
 import {getAgreementById} from "../api/api";
 import { queryGetAgreementDetails } from "../api/queryAgreementLineItemsByAgreement"; 
 
@@ -27,6 +27,9 @@ const [effectiveDate, setEffectiveDate] = useState(today);
 const [designated, setDesignated] = useState(null);
 const [showCheckBox, setShowCheckBox] = useState(false);
 const [showConfirm, setShowConfirm] = useState(false);
+const [retryRecords, setRetryRecords] = useState([]);
+const [showRetry, setShowRetry] = useState(false);
+
 const clearForm = () => {
   setRows([]);
   setMember(null);
@@ -36,6 +39,24 @@ const clearForm = () => {
   setOptions([]);
   setDesignated(null);
   setShowCheckBox(false);
+};
+useEffect(() => {
+  loadRetryRecords();
+}, []);
+
+const loadRetryRecords = async () => {
+  try {
+    const data = await getRetryRecords();
+console.log("retry data", data);
+    if (data.length > 0) {
+      setRetryRecords(data);
+      setShowRetry(true);
+    } else {
+      setShowRetry(false);
+    }
+  } catch (e) {
+    console.error(e);
+  }
 };
 useEffect(() => {
    loadData();
@@ -106,30 +127,80 @@ const trying = await queryGetAgreementDetails(agreementId);
   setRows((prev) => [...prev, newRow]);
 };
 
+// const checkMembershipAgreements = async (memberId, newGpoId) => {
+//   try {
+//     // Step 1: Get contracts by member
+//     const contracts = await getMembershipAgreements(memberId);
+// console.log("contracts", contracts);
+// console.log("contractsData", contracts[0].APTS_Related_Agreement_c);
+// console.log("contracts length", contracts.length);
+//     if (contracts.length === 0) return 0;
+
+
+//     const agreements = await getAgreementById(contracts[0].APTS_Related_Agreement_c);
+// console.log("agreements", agreements);
+//     const today = new Date();
+
+//     // Step 4: Apply Apex-like filters
+//     const validAgreements = agreements.filter(agr => {
+//       return (
+//         new Date(agr.ContractEndDate) > today &&
+//         agr.APTS_Member_SAP_Status_c === "In Progress" && // adjust if needed
+//         agr.Account === newGpoId &&
+//         agr.Status === "Activated" &&
+//         agr.StatusCategory === "In Effect"
+//       );
+//     });
+
+//     return validAgreements.length;
+
+//   } catch (e) {
+//     console.error("Error in membership check", e);
+//     return 0;
+//   }
+// };
+
 const checkMembershipAgreements = async (memberId, newGpoId) => {
   try {
-    // Step 1: Get contracts by member
     const contracts = await getMembershipAgreements(memberId);
 console.log("contracts", contracts);
-console.log("contractsData", contracts[0].APTS_Related_Agreement_c);
-console.log("contracts length", contracts.length);
-    if (contracts.length === 0) return 0;
+    if (!contracts || contracts.length === 0) return 0;
 
+    let allAgreements = [];
 
-    const agreements = await getAgreementById(contracts[0].APTS_Related_Agreement_c);
-console.log("agreements", agreements);
-    const today = new Date();
+    //  Step 1: Fetch ALL agreements
+    for (let contract of contracts) {
+      if (contract.APTS_Related_Agreement_c) {
+        const agr = await getAgreementById(
+          contract.APTS_Related_Agreement_c
+        );
+console.log("agr for contract", contract.Id, agr);
+        if (agr && agr.length > 0) {
+          allAgreements.push(...agr);
+        }
+      }
+    }
 
-    // Step 4: Apply Apex-like filters
-    const validAgreements = agreements.filter(agr => {
+    const todayDate = new Date();
+
+    //  Step 2: Apply EXACT same conditions as LWC/Apex
+    const validAgreements = allAgreements.filter((agr) => {
       return (
-        new Date(agr.ContractEndDate) > today &&
-        agr.APTS_Member_SAP_Status_c === "In Progress" && // adjust if needed
-        agr.Account === newGpoId &&
+        console.log("Checking agreement", agr.Id, ),
+        agr.ContractEndDate &&
+        new Date(agr.ContractEndDate) > todayDate &&
+
+        agr.APTS_Member_SAP_Status_c === "In Progress" &&
+
+        //  IMPORTANT: handle both cases (Id or direct value)
+        (agr.Account === newGpoId || agr.Account?.Id === newGpoId) &&
+
         agr.Status === "Activated" &&
         agr.StatusCategory === "In Effect"
       );
     });
+
+    console.log("Valid agreements after filter:", validAgreements);
 
     return validAgreements.length;
 
@@ -168,6 +239,38 @@ const handleConfirmYes = async () => {
     toast.error("Failed to create designation");
   }
 };
+const handleRetry = async () => {
+  try {
+    const today = new Date().toISOString().split("T")[0];
+
+    for (let rec of retryRecords) {
+      let updatedDate = rec.APTS_Start_date_c;
+
+      // Fix past date
+      if (updatedDate && updatedDate < today) {
+        updatedDate = today;
+      }
+
+      const payload = {
+        APTS_Start_date_c: updatedDate,
+        APTS_Status_c: "Not Processed",
+        APTS_Error_Message_c: null
+      };
+
+      await UpdateGPODesignateChange(rec.Id, payload);
+    }
+
+    toast.success("Records are submitted");
+
+    // Refresh state
+    setRetryRecords([]);
+    setShowRetry(false);
+
+  } catch (e) {
+    console.error(e);
+    toast.error("Retry failed");
+  }
+};
   return (
     <div className="page-container">
       
@@ -175,7 +278,23 @@ const handleConfirmYes = async () => {
       <div className="header" style={{justifyContent:"center"}}>Designation Page</div>
  
       {/* FILTER SECTION */}
+
       <div className="filter-container">
+        {showRetry && (
+  <div style={{ marginBottom: "10px" }}>
+    <span style={{ fontWeight: "bold" }}>
+      Retry Failed Designation:
+    </span>
+
+    <button
+      className="btn-primary"
+      style={{ marginLeft: "10px" }}
+      onClick={handleRetry}
+    >
+      Retry
+    </button>
+  </div>
+)}
   <div className="filter-group">
     <label>Filter By Market</label>
     <select>

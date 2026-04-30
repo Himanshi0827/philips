@@ -20,6 +20,7 @@ export default function Membership() {
   const [showCreate, setShowCreate] = useState(false);
   const [agreementDetails, setAgreementDetails] = useState(null);
   const [viewAll, setViewAll] = useState(false);
+  const [includeExpired, setIncludeExpired] = useState(false);
 const navigate = useNavigate();
   useEffect(() => {
     loadMembers();
@@ -113,6 +114,21 @@ setMembers(groupedMembers);
   
   const filtered = useMemo(() => {
   let data = members;
+ const today = new Date();
+
+  // Filter expired members (ONLY when checkbox is unchecked)
+  if (!includeExpired) {
+    data = data.filter((m) => {
+      const endDate = m?.APTS_End_Date_c
+        ? new Date(m.APTS_End_Date_c)
+        : null;
+
+      return !endDate || endDate >= today; 
+      // include if:
+      // - no end date OR
+      // - end date is today or future
+    });
+  }
 
   //  Search
   if (search) {
@@ -134,7 +150,7 @@ setMembers(groupedMembers);
 }
 
   return data;
-}, [members, search, agreementGroup]);
+}, [members, search, agreementGroup, includeExpired]);
   
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
 
@@ -214,9 +230,20 @@ console.log("stat",visible);
 
             {/* Include Expired */}
             <div className="checkbox-container">
+  <input
+    type="checkbox"
+    checked={includeExpired}
+    onChange={(e) => {
+      setIncludeExpired(e.target.checked);
+      setPage(1);
+    }}
+  />
+  <label>Include Expired Members</label>
+</div>
+            {/* <div className="checkbox-container">
               <input type="checkbox" />
               <label>Include Expired Members</label>
-            </div>
+            </div> */}
 
             {/* RIGHT: Agreement Group Lookup */}
             <div className="lookup-container">

@@ -391,3 +391,70 @@ console.log("createGPODesignateChange response", response);
 
   return response.json();
 }
+
+
+export async function UpdateGPODesignateChange(id,payload) {
+    try {
+    const CONTRACT_URL =
+      "https://preview-rls09.congacloud.com/api/data/v1/objects/APTS_GPO_Designation_Changes_c";
+       const accessToken = getAccessToken();
+    const response = await fetch(`${CONTRACT_URL}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+     
+      },
+      body: JSON.stringify(payload),
+    });
+ 
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData;
+    
+    }
+    const result = await response.json();
+    return result;
+  } catch (err) {
+    console.error(err.message);
+    throw err;
+  }
+}
+
+
+export async function getRetryRecords() {
+
+  const token = getAccessToken();
+   const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const formattedDate = sevenDaysAgo.toISOString();
+  const response = await fetch(
+    "https://preview-rls09.congacloud.com/api/data/v1/query/APTS_GPO_Designation_Changes_c",
+     {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        ObjectName: "APTS_GPO_Designation_Changes_c",
+        Criteria: `
+          APTS_Status_c = 'Error'
+          AND CreatedDate > '${formattedDate}'
+        `,
+        Select: [
+          "Id",
+          "APTS_Start_date_c",
+          "APTS_Error_Message_c",
+          "APTS_Status_c"
+        ]
+      })
+    }
+  );
+
+  const result = await response.json();
+  return result.Data || [];
+}
+
+ 
