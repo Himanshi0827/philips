@@ -4,22 +4,15 @@ import {  useParams, useNavigate , useLocation } from "react-router-dom";
 import "../AgreementExtension.css";
 import { getPriceListById,updatePriceList } from "../api/PriceList";
 export default function AgreementExtension() {
- //const location = useLocation();//head
+
   const navigate = useNavigate();
 
-// const id =
-//   location.state?.agreementId ||
-//   "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
-
-// const agreementName =
-//   location.state?.agreementName ||
-//   "Philips Trial";
-const { agreementId } = useParams();   // 👈 from URL
+const { agreementId } = useParams();   
 const location = useLocation();
  
 const id =
-  agreementId ||                      // ✅ FIRST priority (URL)
-  location.state?.agreementId ||     // fallback (navigation)
+  agreementId ||                      
+  location.state?.agreementId ||  
   null;
  
 if (!id) {
@@ -45,19 +38,19 @@ const statusesToConsiderValidity = ["In Authoring","In Signatures"];
     const data = await getAgreementById(id);
 console.log("data",data);
     setAgreement(data[0]);
-    // console.log("agreement",agreement);
+    
     setEndDate(data[0].ContractEndDate);
 
     const validity =
       statusesToConsiderValidity.includes(data[0].StatusCategory)&& data[0].APTS_Agreement_Inserted_Successfully_c===false  ;
-    //   data.APTS_Agreement_Inserted_Successfully__c === false;
+
 
     setIsValidityScreen(validity);
 console.log("valid",validity);
 console.log("valid3",data[0].StatusCategory);
-   // if (validity) {
+
       setStartDate(data[0].ContractStartDate);
-  //  }
+
   };
 
   const handleSave = async () => {
@@ -79,7 +72,7 @@ console.log("valid3",data[0].StatusCategory);
   console.log("price",priceListId)
     let priceListPayload = null;
 let payload = {
- // ContractStartDate: agreement.ContractStartDate,
+ 
   APTS_Extension_Reason_c: reason,
  StatusCategory: agreement.StatusCategory,
 };
@@ -133,7 +126,7 @@ console.log("PREPONEMENT");
     Status: "Being Preponed",
     ApprovalStatus: "Approval Required",
     APTS_Proposed_Preponement_Date_c: endDate
-   // APTS_Last_Extended_on_Date_c: new Date().toISOString().split("T")[0]
+   
   };
 
 }
@@ -144,12 +137,10 @@ if (priceListPayload && priceListId) {
       }
 
       // 2. Update Agreement
-     // await updateAgreement(id, agreementPayload);
       await updateAgreement(id, payload);
 
       alert("Agreement updated successfully");
  window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`;
-    //   navigate(`/agreement/${id}`);
 
     } catch (err) {
 
@@ -162,14 +153,19 @@ if (priceListPayload && priceListId) {
   if (!agreement) return <div>Loading...</div>;
 return (
   <div className="agreement-page">
+<div className="top-header">
+        <div className="header-left">
+          <span className="brand">Agreement Extension</span>
+         
+       
+        </div>
 
-    <div className="header">
-      <h1>Agreement Extension</h1>
-      <div className="header-buttons">
-        <button className="btn primary" onClick={handleSave}>Save</button>
+        <div className="header-actions">
+          <button className="btn primary" onClick={handleSave}>Save</button>
         <button className="btn" onClick={() => window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`}>Cancel</button>
+      
+        </div>
       </div>
-    </div>
 
     <div className="section">
 
@@ -198,7 +194,6 @@ return (
             <input
               type="date"
               value={startDate || ""}
-             // disabled
               onChange={(e) =>  setStartDate(e.target.value)}
             />
           </div>

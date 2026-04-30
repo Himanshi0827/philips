@@ -40,10 +40,7 @@ function InformationForm({ data,onChange,onComplete }) {
 
   return (
     <div className="form-card">
-      {/* <div className="section-header">
-        Information
-      </div> */}
-
+  
       <div className="two-column">
         <div className="field">
           <label>Activation Date</label>

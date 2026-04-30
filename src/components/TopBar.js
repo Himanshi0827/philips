@@ -1,3 +1,4 @@
+
 import { Navigate, useNavigate } from "react-router-dom";
 function TopBar({
   title,
@@ -10,7 +11,9 @@ function TopBar({
   onAddProduct,
   onAddDiscount,
   onAddBilling,
-  onSubmitAgreement
+  onSubmitAgreement,
+    isClone = false,
+  hasSelection = false
 })
 
 {
@@ -20,82 +23,95 @@ function TopBar({
   const isProductCompleted = completedTabs.includes("Product Selection");
   const isDiscountCompleted = completedTabs.includes("Discount Pricing Strategy");
   const isBillingCompleted = completedTabs.includes("Select Billing Plan");
-
+const isAfterDiscount =
+  [
+    "Discount Pricing Strategy",
+    "Agreement Header Information",
+    "Information",
+    "Select Billing Plan",
+  ].includes(activeTab);
   return (
     <>
       <div className="app-header">
         <div className="header-left">
           <span className="logo">PHILIPS</span>
-          {mode === "agreement" && (
+       
             <span className="agreement-title">
               Agreement: {agreementHeader}
             </span>
-          )}
+          
         </div>
 
         <div className="header-right">
           <button
              onClick={() => navigate(`/${agreementId}`)}
-            //  onClick={() => navigate("/")}
+   
             className="btn secondary"
           >
             Back to List
           </button>
-
           {mode === "agreement" ? (
-            <>
-              {/* STEP 1 */}
-              {activeTab === "Agreement Group" && (
-  <button
-    className="btn primary"
-    disabled={!isAgreementCompleted}
-    onClick={() => {
-      onAddProduct();
-    }}
-  >
-    Add Product
-  </button>
-)}
-             
+  <>
+    {/* STEP 1 */}
+    {activeTab === "Agreement Group" && (
+      <button
+        className="btn primary"
+        disabled={!isAgreementCompleted}
+        onClick={onAddProduct}
+      >
+        Add Product
+      </button>
+    )}
 
-              {/* STEP 2 */}
-              {activeTab === "Product Selection" && (
-                <button
-                  className="btn primary"
-                  disabled={!isProductCompleted}
-                  onClick={onAddDiscount}
-                >
-                  Add Discount
-                </button>
-              )}
+    {/* STEP 2 */}
+    {activeTab === "Product Selection" && (
+      <button
+        className="btn primary"
+        disabled={!isProductCompleted}
+        onClick={onAddDiscount}
+      >
+        Add Discount
+      </button>
+    )}
 
-              {/* STEP 3 */}
-              {activeTab === "Discount Pricing Strategy" && (
-                <button
-                  className="btn primary"
-                  disabled={!isDiscountCompleted}
-                  onClick={onAddBilling}
-                >
-                  Add Billing
-                </button>
-              )}
+    {/*  SHOW ADD BILLING FROM DISCOUNT ONWARDS */}
+    {[
+      "Discount Pricing Strategy",
+      "Agreement Header Information",
+      "Information",
+    ].includes(activeTab) && (
+      <button
+        className="btn primary"
+        disabled={!isDiscountCompleted}
+        onClick={onAddBilling}
+      >
+        Add Billing
+      </button>
+    )}
 
-              {/* FINAL STEP */}
-              {activeTab === "Select Billing Plan" && (
-                <button
-                  className="btn success"
-                  disabled={!isBillingCompleted}
-                  onClick={onSubmitAgreement}
-                >
-                  Create Agreement Line Items
-                </button>
-              )}
-            </>
-          ):(
+    {/*  FINAL BUTTON AVAILABLE AFTER DISCOUNT STEP */}
+    {isAfterDiscount && (
+      <button
+        className="btn success"
+        disabled={!isBillingCompleted}
+        onClick={onSubmitAgreement}
+      >
+        Create Agreement Line Items
+      </button>
+    )}
+  </>
+) : isClone ? (
+  hasSelection && (
+    <button className="btn primary" onClick={onSave}>
+      Clone Agreement Line Items
+    </button>
+  )
+) : (
   <button className="btn primary" onClick={onSave}>
     Save Agreement Line Items
   </button>
 )}
+
         </div>
       </div>
 

@@ -11,13 +11,11 @@ import {toast} from "react-toastify";
  
 function CloneAgreementLineItems() {
   const navigate=useNavigate();
- // const location = useLocation();
- 
-  const { agreementId } = useParams();   // 👈 from URL
+  const { agreementId } = useParams();   //  from URL
 const location = useLocation();
  
 const targetAgreementId =
-  agreementId ||                      // ✅ FIRST priority (URL)
+  agreementId ||                      //  FIRST priority (URL)
   location.state?.agreementId ||     // fallback (navigation)
   null;
  
@@ -25,15 +23,10 @@ if (!targetAgreementId) {
   console.error("Agreement ID not found in URL or state");
 }
 
-// const agreementName =
-//   location.state?.agreementName;
+
 const agreementName =sessionStorage.getItem("agreementName") ;
-  //  ||
-  // "Philips Trial";
- // const targetAgreementId = location.state?.targetAgreementId;
  const targetAgreementName = sessionStorage.getItem("agreementName");
   const [sourceAgreement, setSourceAgreement] = useState(null);
-  // const [sourceGroup, setSourceGroup] = useState(null);
   const [targetGroup, setTargetGroup] = useState(null);
 const [sourceGroup, setSourceGroup] = useState([]);
  
@@ -109,9 +102,6 @@ const handleClone = async () => {
 console.log("item",itemsToClone);
     const groupMapping = {};
 
-    /* ==============================
-       STEP 1: Prepare Groups (FINAL)
-    ============================== */
 
     if (cloneGroupSameAsSource) {
       const uniqueGroups = [
@@ -125,7 +115,7 @@ console.log("item",itemsToClone);
       for (const groupName of uniqueGroups) {
         const key = groupName.toLowerCase().trim();
 
-        // 🔹 STEP 1A — check existing
+        //  STEP 1A — check existing
         const existingCheck = await queryCheckAgreementGroup(
           targetAgreementId,
           groupName
@@ -135,7 +125,7 @@ console.log("item",itemsToClone);
           existingCheck?.[0]?.Id ||
           existingCheck?.find(g => g?.Name === groupName)?.Id;
 
-        // 🔹 STEP 1B — create if not exists
+        //  STEP 1B — create if not exists
         if (!groupId) {
           console.log("Creating missing group:", groupName);
 
@@ -146,7 +136,7 @@ console.log("item",itemsToClone);
 
           await createAgreementGroup(newGroupPayload);
 
-          // 🔥 STEP 1C — RE-QUERY (your requested fix)
+          //  STEP 1C — RE-QUERY (your requested fix)
           const requery = await queryCheckAgreementGroup(
             targetAgreementId,
             groupName
@@ -170,10 +160,6 @@ console.log("item",itemsToClone);
 
       console.log("Final groupMapping =", groupMapping);
     }
-
-    /* ==============================
-       STEP 2: Clone Line Items
-    ============================== */
 
     for (let item of itemsToClone) {
       let finalGroupId;
@@ -265,12 +251,13 @@ console.log("item",itemsToClone);
   return (<div className="clone-container">
  
   <TopBar
-    title="Clone Agreement Line Items"
-    onSave={handleClone}
-    agreementHeader={agreementName}
-    agreementId={agreementId}
-  />
- 
+  title="Clone Agreement Line Items"
+  onSave={handleClone}
+  agreementHeader={agreementName}
+  agreementId={agreementId}
+  isClone={true}
+  hasSelection={selectedItems.length > 0}
+/>
   <div className="clone-card">
     <div className="clone-grid">
  
@@ -321,8 +308,7 @@ onChange={(record) => {
   });
 }}
  
-            // value={sourceGroup}
-            // onChange={(record) => setSourceGroup(record)}
+      
             searchFn={searchLookupRecords}
           />
           </div>
@@ -377,24 +363,19 @@ onChange={(record) => {
     </div>
   </div>
  {sourceAgreement&&(
-//   {sourceGroup && (
+
     <div className="clone-table-wrapper">
       <table className="clone-table">
         <thead>
           <tr>
-            {/* <th></th>
-            <th>Name</th>
-            <th>Line Type</th>
-            <th>Discount Type</th>
-            <th></th> */}
+            
             <th></th>
               <th>Name</th>
               <th>Agreement Group</th>
               <th>Line Type</th>
               <th>Discount Type</th>
               <th>Match Products By</th>
-              {/* <th>Code</th>
-              <th>Matching</th> */}
+              
               <th>Billing Plan</th>
               <th>MG3</th>
               <th>Tier 1</th>
@@ -425,7 +406,7 @@ onChange={(record) => {
         group => group.Id === li.APTS_Agreement_Group_c?.Id
       );
     })
-            // .filter(li => li.APTS_Agreement_Group_c?.Id === sourceGroup?.Id)
+           
             .map(item => (
               <tr key={item.Id}>
                 <td>
@@ -470,9 +451,7 @@ onChange={(record) => {
                     <td>{item.APTS_Scaled_Discount_Amount_Tier_4_c?.Value}</td>
                     <td>{item.APTS_Scaled_Discount_Amount_Tier_5_c?.Value}</td>
  
-                {/* <td>{item.Name}</td>
-                <td>{item.Line_Type_c}</td>
-                <td>{item.APTS_Discount_Type_c}</td> */}
+               
               </tr>
             ))}
         </tbody>

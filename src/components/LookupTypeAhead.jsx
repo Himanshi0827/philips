@@ -76,7 +76,7 @@ if(field?.AgreementId)
     const val = e.target.value;
     setInputValue(val);
  
-    // 🔹 Clear selected value if user edits text
+    //  Clear selected value if user edits text
     if (value) {
       onChange(null);
     }
@@ -91,26 +91,7 @@ if(field?.AgreementId)
         onChange={handleChange}
         onFocus={() => inputValue.length >= 3 && setShowDropdown(true)}
       />
-{/* {showDropdown && results.length > 0 && (
-  <ul className="lookup-dropdown">
-    {results.map((r) => (
-      <li key={r.Id} onClick={() => handleSelect(r)}>
-        {field.isProductLookup ? (
-          <div className="product-result">
-            <div className="product-title">
-              <strong>{r.Name}</strong> • {r.ProductCode}
-            </div>
-            <div className="product-meta">
-              {r.ConfigurationType} • BG: {r.BG_Code} • BU: {r.BU_Code}
-            </div>
-          </div>
-        ) : (
-          r.Name
-        )}
-      </li>
-    ))}
-  </ul>
-)} */}
+
  {showDropdown && results.length > 0 && (
   <ul className="lookup-dropdown">
     {results.map((r) => (

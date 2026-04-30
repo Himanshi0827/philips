@@ -6,7 +6,8 @@
   {
       background:#0070d2;
       color:white;
-      padding:0.5px
+      padding:5px;
+       margin: 10px;
   }
   .header {
     background: #0070d2;
@@ -112,3 +113,79 @@
     width: 100%;
     box-sizing: border-box;
   }
+
+
+
+
+
+
+
+
+
+
+
+
+  /* BACKGROUND OVERLAY */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4); /* dim background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* MODAL BOX */
+.modal-box {
+  background: white;
+  width: 420px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* HEADER */
+.modal-box h3 {
+  background: #2c6faa;
+  color: white;
+  margin: 0;
+  padding: 12px;
+  text-align: center;
+}
+
+/* BODY */
+.modal-box p {
+  padding: 20px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* BUTTON SECTION */
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 15px;
+}
+
+/* BUTTON STYLING */
+.modal-actions button {
+  min-width: 80px;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

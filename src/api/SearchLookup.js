@@ -22,7 +22,7 @@ export const searchLookupRecords = async (criteria, objectName) => {
       headers: {
         Accept: "application/json",
         Authorization: `Bearer ${token}`,
-        // "User-Id": "6cfff136-e62b-d435-133d-455fb809c836",
+      
         "Content-Type": "application/json",
       },
     },

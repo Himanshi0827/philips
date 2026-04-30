@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import LookupTypeAhead from "../components/LookupTypeAhead";
 import { searchLookupRecords } from "../api/SearchLookup";
-import { createMember,updateMember } from "../api/member"; // you will create this
+import { createMember,updateMember } from "../api/member"; 
 import { getPicklistOptions } from "./getPicklistOptions";
 import Designation from "./Designation";
 export default function CreateMembership({ mode,onBack ,onSuccess, agreementDetails,existingRecord, member}) {
@@ -24,30 +24,18 @@ const [form, setForm] = useState({
   autoTierReview: false,
   lockedForTier: false
 });
-  // const [form, setForm] = useState({
-  //   member: null,
-  //   agreement: null,
-  //   agreementGroup: null,
-  //   startDate: "",
-  //   endDate: "",
-  //   syncToSAP: "Yes",
-  //   externalId: "",
-  //   excludeCommitment: false
-  // });
+ 
 const [memberTypes, setMemberTypes] = useState([]);
 const [volumeTiers, setVolumeTiers] = useState([]);
 const [syncOptions, setSyncOptions] = useState([]);
 
-// useEffect(() => {
-//   loadPicklists();
-  
-// }, []);
+
 
 useEffect(() => {
   loadPicklists();
 
   if (mode === "modal-edit" && existingRecord) {
-    // ✅ EDIT MODE
+    //  EDIT MODE
     setForm({
       member: member?.accountData || null,
 
@@ -78,7 +66,7 @@ useEffect(() => {
     });
 
   } else if (mode === "modal-create" && member) {
-    // ✅ NEW GROUP MEMBER (same account)
+    //  NEW GROUP MEMBER (same account)
     setForm((prev) => ({
       ...prev,
       member: member?.accountData || member
@@ -106,7 +94,7 @@ const loadPicklists = async () => {
 const handleSave = async () => {
   try {
     const payload = {
-      // Id: existingRecord?.Id, // only for update
+      
   ...(mode === "modal-edit" && { Id: existingRecord?.Id }),
       Name: form.member?.Name || "New Member",
       APTS_Member_c: form.member?.Id,
@@ -151,63 +139,13 @@ onSuccess && onSuccess();
   }
 };
 
-//   const handleSave = async () => {
-//     console.log("group",form.agreementGroup?.Id);
-//     console.log("group",form.agreementGroup?.Name);
-//     try {
-//       const payload = {
-//   Name: form.member?.Name || "New Member",
-
-//   APTS_Member_c: form.member?.Id,
-//   APTS_Related_Agreement_c: agreementId,
-//   APTS_Agreement_Group_c: {Id:form.agreementGroup?.Id, Name:form.agreementGroup?.Name},
-
-//   APTS_Member_Type_c: form.memberType,
-//   APTS_Start_Date_c: form.startDate,
-//   APTS_End_Date_c: form.endDate,
-
-//   APTS_OIT_Value_c: Number(form.oitValue),
-//   APTS_Current_over_achievement_c: Number(form.currentOverAchievement),
-
-//   APTS_Volume_Tier_c: form.volumeTier,
-//   APTS_Sync_to_SAP_c: form.syncToSAP,
-
-//   APTS_OIT_start_date_c: form.oitStartDate,
-//   APTS_OIT_end_date_c: form.oitEndDate,
-
-//   APTS_External_Identifier_c: form.externalId,
-//   APTS_Locked_Until_date_c: form.lockedUntil,
-
-//   APTS_Automatic_Tier_Review_c: form.autoTierReview,
-//   APTS_locked_for_tier_changes_c: form.lockedForTier
-// };
-//       // const payload = {
-//       //   Name:"him",
-//       //   APTS_Member__c: form.member?.Id,
-//       //   APTS_Related_Agreement__c: agreementId,
-//       //   APTS_Agreement_Group__c: form.agreementGroup?.Id,
-//       //   APTS_Start_Date__c: form.startDate,
-//       //   APTS_End_Date__c: form.endDate,
-//       //   APTS_Sync_To_SAP__c: form.syncToSAP === "Yes",
-//       //   APTS_External_Identifier__c: form.externalId,
-//       //   APTS_Excluded_From_Commitment__c: form.excludeCommitment
-//       // };
-// console.log("member",payload);
-//       await createMember(payload);
-//       alert("Member created successfully");
-//       onBack();
-//     } catch (err) {
-//       console.error(err);
-//       alert("Error creating member: ",err);
-//     }
-//   };
  const isGPOFramework =
     agreementDetails?.RecordType === "GPO Framework" &&
     agreementDetails?.APTS_Sales_Area_c === "United States" &&
     agreementDetails?.Apttus_Market_c === "North America" &&
     agreementDetails?.StatusCategory === "In Effect";
 
-  // 👇 SWITCH UI HERE
+  //  SWITCH UI HERE
   if (mode === "page" && isGPOFramework) {
     return <Designation />;
   }
@@ -216,22 +154,7 @@ onSuccess && onSuccess();
     <div className="members-container">
 
       {/* HEADER */}
-      {/* <div className="top-header">   
-        <div className="header-left">
-          <span className="brand">PHILIPS</span>
-          <span className="agreement">
- |  Agreement: {agreementDetails?.Name || "Loading..."}
-</span>
-         
-        </div>
-      <div className="header-actions">
-
-        <button onClick={onBack}>Back To List</button>
-        <button className="primary" onClick={handleSave}>
-          Save New Member
-        </button>
-      </div>
-</div> */}
+      
 {mode === "page" && (
   <div className="top-header">
     <div className="header-left">
@@ -263,12 +186,7 @@ onSuccess && onSuccess();
   searchFn={searchLookupRecords}
   disabled={mode !== "page"}   // 👈 key line
 />
-    {/* <LookupTypeAhead
-      field={{ DisplayName: "Member", LookupObjectName: "Account" }}
-      value={form.member}
-      onChange={(rec) => setForm({ ...form, member: rec })}
-      searchFn={searchLookupRecords}
-    /> */}
+   
   </div>
 
   <div className="field full">
@@ -314,7 +232,7 @@ onSuccess && onSuccess();
   value={formatDate(form.startDate)}
   onChange={(e) => setForm({ ...form, startDate: e.target.value })}
 />
-    {/* <input type="date" onChange={(e) => setForm({ ...form, startDate: e.target.value })} /> */}
+   
   </div>
 
   <div className="field full">
@@ -324,7 +242,7 @@ onSuccess && onSuccess();
   value={formatDate(form.endDate)}
   onChange={(e) => setForm({ ...form, endDate: e.target.value })}
 />
-    {/* <input type="date" onChange={(e) => setForm({ ...form, endDate: e.target.value })} /> */}
+  
   </div>
 
   {/* Row 4 */}
@@ -387,7 +305,7 @@ onSuccess && onSuccess();
   value={formatDate(form.oitStartDate)}
   onChange={(e) => setForm({ ...form, oitStartDate: e.target.value })}
 />
-    {/* <input type="date" onChange={(e) => setForm({ ...form, oitStartDate: e.target.value })} /> */}
+ 
   </div>
 
   <div className="field full">
@@ -397,7 +315,7 @@ onSuccess && onSuccess();
   value={formatDate(form.oitEndDate)}
   onChange={(e) => setForm({ ...form, oitEndDate: e.target.value })}
 />
-    {/* <input type="date" onChange={(e) => setForm({ ...form, oitEndDate: e.target.value })} /> */}
+   
   </div>
 
   {/* Row 7 */}
@@ -417,10 +335,7 @@ onSuccess && onSuccess();
   value={formatDate(form.lockedUntil)}
   onChange={(e) => setForm({ ...form, lockedUntil: e.target.value })}
 />
-    {/* <input
-      type="date"
-      onChange={(e) => setForm({ ...form, lockedUntil: e.target.value })}
-    /> */}
+   
   </div>
 
   {/* Row 8 (Checkbox row like screenshot) */}
@@ -428,7 +343,6 @@ onSuccess && onSuccess();
     <input
       type="checkbox"
         checked={form.autoTierReview}
-      // value={formatDate(form.autoTierReview)}
       onChange={(e) =>
         setForm({ ...form, autoTierReview: e.target.checked })
       }

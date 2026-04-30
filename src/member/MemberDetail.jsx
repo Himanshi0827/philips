@@ -126,11 +126,7 @@ const loadDetails = async () => {
   Agreement Group Members
 </div>
       <div className="card">
-        {/* <h3>Agreement Group Members</h3> */}
-        
-
-
-        {/* <button className="primary">Add New Agreement Group Member</button> */}
+       
 <div className="card-body">
   <div className="center-btn">
      <button
@@ -143,10 +139,7 @@ const loadDetails = async () => {
   Add New Agreement Group Member
 </button>
   </div>
- 
-    {/* <button className="primary">
-      Add New Agreement Group Member
-    </button> */}
+
 
     {showModal && (
   <div className="modal-overlay">
@@ -206,17 +199,7 @@ const loadDetails = async () => {
     </tr>
   ))}
 </tbody>
-            {/* <tbody>
-  {agmList.map((a) => (
-    <tr key={a.Id}>
-      <td>{a?.APTS_Agreement_Group_c?.Name}</td>
-      <td>{a?.APTS_Volume_Tier_c || "-"}</td>
-      <td>{a?.APTS_Start_Date_c || "-"}</td>
-      <td>{a?.APTS_End_Date_c || "-"}</td>
-     <td>{a?.APTS_End_Date_c ? "false" : "true"}</td>
-    </tr>
-  ))}
-</tbody> */}
+            
           </table>
         ) : (
           <p>No Agreement Groups for this member</p>
@@ -228,7 +211,7 @@ const loadDetails = async () => {
   OIT Track Record
 </div>
       <div className="card">
-        {/* <h3>OIT Track Record</h3> */}
+     
 
 <div className="card-body"></div>
         {oitList.length > 0 ? (

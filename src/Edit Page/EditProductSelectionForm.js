@@ -2,9 +2,7 @@ function ProductSelectionForm({ data,onProductsChange , onChange,onComplete }) {
 
   return (
     <div className="form-card">
-      {/* <div className="section-header">
-        Product Selection
-      </div> */}
+  
  
       <table className="form-table">
         <tbody>

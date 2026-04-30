@@ -3,7 +3,6 @@ import { GetPicklist } from "../api/GetPicklist";
 
 function EditBillingPlanForm({ data, onChange, onComplete }) {
   const [billingOptions, setBillingOptions] = useState([]);
-//   const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -22,7 +21,6 @@ function EditBillingPlanForm({ data, onChange, onComplete }) {
 
   return (
     <div className="form-card">
-      {/* <div className="section-header">Billing Plan</div> */}
   <table className="data-table billing-table">
         <thead>
           <tr>
@@ -35,7 +33,6 @@ function EditBillingPlanForm({ data, onChange, onComplete }) {
          <tr>
               <td>{data.APTS_Match_Products_By_c==='Hierarchy'? data?.Matching_c 
                   :data.APTS_Match_Products_By_c==='Product'?data.Product.Name:''}</td>
-            {/* <td>{data?.Matching_c} {data?.Code_c}</td> */}
             <td><div className="field">
         <label>Billing Plan *</label>
         <select

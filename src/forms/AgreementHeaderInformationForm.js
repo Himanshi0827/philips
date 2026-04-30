@@ -39,7 +39,6 @@ function AgreementHeaderInformationForm({ data,onChange,onComplete ,agreementHea
 
   const [error, setError] = useState("");
 
-//head
 const handleChange = (e) => {
   const { name, value } = e.target;
 
@@ -48,7 +47,6 @@ const handleChange = (e) => {
   });
 };
 
-//head
   const handleNext = () => {
 
     // Minimal required validation
@@ -63,7 +61,7 @@ const handleChange = (e) => {
     }
 
     setError("");
-    onComplete(); // ✅ mark tab completed & move to next tab
+    onComplete(); //  mark tab completed & move to next tab
   };
 if (!agreementHeader) {
   return <div>Loading agreement header...</div>;
@@ -88,10 +86,8 @@ if (!agreementHeader) {
   disabled
 />
 
-          {/* <input type="number" value="3" disabled /> */}
         </div>
 
-        {/* <div className="field toggle-field"> */}
           <div className="toggle-row" style={{paddingTop:"15px"}}>
           <label>Exclude Administration Fees</label>
           <label className="switch">
@@ -100,53 +96,41 @@ if (!agreementHeader) {
                      />
                   <span className="slider"></span>
                   </label>
-          {/* head */}
-          {/* <input
-  type="checkbox"
-  checked={!!agreementHeader?.APTS_Exclude_Administration_Fees_c}
-  disabled
-/> */}
-
-
-          {/* <input type="checkbox" disabled /> */}
+     
         </div>
 
         <div className="field">
           <label>Administration Fee Payment Schedule</label>
-           {/* head */}
+    
            <input
   type="text"
   value={agreementHeader?.APTS_GPO_Admin_fee_payment_schedule_c || ""}
   disabled
 />
 
-          {/* <input type="text" value="Monthly" disabled /> */}
         </div>
 
         <div className="field">
           <label>Administration Fee is calculated on</label>
-           {/* head */}
+    
            <input
   type="text"
   value={agreementHeader?.APTS_GPO_Admin_fee_based_on_c || ""}
   disabled
 />
 
-          {/* <input type="text" value="Ship to invoice date" disabled /> */}
         </div>
 
         <div className="field full">
      
           <label>Default Country Pricelist Update Rule</label>
 
-                {/* head */}
                 <input
   type="text"
   value={agreementHeader?.APTS_Country_pricelist_update_rule_c || ""}
   disabled
 />
 
-          {/* <input type="text" value="Falling Ceiling" disabled /> */}
         </div>
       </div>
 
@@ -246,8 +230,7 @@ if (!agreementHeader) {
             onChange={handleChange}
           />
         </div>
-{/* 
-        <div className="field toggle-field"> */}
+
           <div className="toggle-row" style={{paddingTop:"15px"}}>
           <label>Exclude Administration Fees</label>
           <label className="switch">
@@ -260,15 +243,9 @@ if (!agreementHeader) {
                      />
                   <span className="slider"></span>
                   </label>
-          {/* <input type="checkbox" name="ExcludedAF" checked={!!data?.ExcludedAF} onChange={(e)=>
-          {
-            onChange({[e.target.name]:e.target.checked});
-            console.log(e.target.name,e.target.checked);
-          }}/> */}
          
         </div>
 
-        {/* <div className="field toggle-field"> */}
       <div className="toggle-row" style={{paddingTop:"15px"}}>
           <label>Inherit hierarchy discounts</label>
              <label className="switch">
@@ -281,15 +258,9 @@ if (!agreementHeader) {
                      />
                   <span className="slider"></span>
                   </label>
-          {/* <input type="checkbox" name="InheritHdiscount" checked={!!data?.InheritHdiscount} onChange={(e)=>
-          {
-            onChange({[e.target.name]:e.target.checked});
-            console.log(e.target.name,e.target.checked);
-          }}/>
-          */}
+         
         </div>
 
-        {/* <div className="field toggle-field"> */}
          <div className="toggle-row" style={{paddingTop:"15px"}}>
           <label>Exclude From Contract Pricelists</label>
            <label className="switch">
@@ -302,11 +273,7 @@ if (!agreementHeader) {
                      />
                   <span className="slider"></span>
                   </label>
-          {/* <input type="checkbox" name="ExcludefromContractP" checked={!!data?.ExcludefromContractP} onChange={(e)=>
-          {
-            onChange({[e.target.name]:e.target.checked});
-            console.log(e.target.name,e.target.checked);
-          }}/> */}
+        
          
         </div>
       </div>
@@ -317,11 +284,6 @@ if (!agreementHeader) {
         </div>
       )}
 
-      {/* <div style={{ marginTop: "20px", textAlign: "right" }}>
-        <button className="btn primary" onClick={handleNext}>
-           Add Billing
-        </button>
-      </div> */}
     </div>
   );
 }

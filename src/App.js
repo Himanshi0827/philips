@@ -10,7 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import AgreementExtension from "./pages/AgreementExtension";
 import TerminateAgreement from "./pages/TerminateAgreement";
 import AgreementAmendAddendum from "./pages/AgreementAmendAddendum";
-//import ConfirmationPage from "./components/ConfirmationPage";
+
 import Membership from "./pages/Membership";
 import CloneMembers from "./member/CloneMembers";
 import MemberDetail from "./member/MemberDetail";
@@ -26,7 +26,7 @@ function App() {
         <Route path="/callback" element={<Callback />} />
         <Route path="/clone/:agreementId" element={<CloneAgreementLineItems />} />
         <Route path="/newALIfromquote" element={<NewALIfromQuotes />} />
-        {/* <Route path="/confirmation" element={<ConfirmationPage/>} /> */}
+      
         <Route path= "/extension/:agreementId" element={<AgreementExtension/>}/>
         <Route path= "/terminate/:agreementId" element={<TerminateAgreement/>}/>
         <Route path= "/amend/:agreementId" element={<AgreementAmendAddendum/>}/>

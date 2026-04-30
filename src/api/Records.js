@@ -18,7 +18,7 @@ export async function GetRecords(Objects) {
     }
     console.log("Success");
 
-    // const result = await response.json();
+  
     return response.json();
   } catch (err) {
     console.log(err.message);

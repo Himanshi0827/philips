@@ -47,7 +47,7 @@ const openParentDiscountPopup = (index) => {
  
   const handleNext = () => {
     setError("");
-    onComplete(); // ✅ mark tab completed & go to next
+    onComplete(); //  mark tab completed & go to next
   };
  const saveParentDiscount = (discountType, index) => {
   const parents = [...prev.selectedParentProducts];
@@ -59,9 +59,7 @@ const openParentDiscountPopup = (index) => {
     <>
     <div className="form-card Discount">
     <div className="form-card">
-      {/* <div className="section-header">
-        Discount Pricing Strategy
-      </div> */}
+      
       {prev.MatchProductsBy==='Product' &&
       (
         <>
@@ -144,11 +142,7 @@ const openParentDiscountPopup = (index) => {
         </div>
       )}
  
-      {/* <div style={{ marginTop: "20px", textAlign: "right" }}>
-        <button className="btn primary" onClick={handleNext}>
-          Add Billing
-        </button>
-      </div> */}
+     
     </div>
     </>
   );

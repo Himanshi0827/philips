@@ -1,43 +1,23 @@
-// src/api/api.js
-// import { UserManager, Log } from "oidc-client-ts";
+
 import { UserManager, Log, WebStorageStateStore } from "oidc-client-ts";
 const API_URL =
   "https://preview-rls09.congacloud.com/api/data/v1/objects/AgreementLineItem";
  const userManager = new UserManager({
   authority: "https://login-rlspreview.congacloud.com/api/v1/auth",
-  //client_id:import.meta.env.client_id,
+
   client_id:"e77fc3cf-b8d0-4c60-a5e0-e0cbf614247f",
-// "user-id": "d3076209-7f2f-7a9b-d78d-adfaeda55713",
- // "access-control-allow-origin" : "*",
- // "organization-id":"8ade1b2b-41fb-4045-88c3-05c70b474cd6",
- // "organization-fid":"org-001157-8ade1b2b-41fb-4045-88c3-05c70b474cd6",
-  
-  //client_id: "05d7c408-393e-42c1-bc4a-3741caa0e131",
+
   redirect_uri: `${window.location.origin}/callback`,
   response_type: "code",
   scope: "openid",
   userStore: new WebStorageStateStore({ store: window.localStorage }),
 });
-// const userManager = new UserManager({
-//   authority: "https://login-rlspreview.congacloud.com/api/v1/auth",
-//   client_id:"e77fc3cf-b8d0-4c60-a5e0-e0cbf614247f",
-//   //client_id: "05d7c408-393e-42c1-bc4a-3741caa0e131",
-//   redirect_uri: "https://localhost:3000/callback",
-//   response_type: "code",
-//   scope: "openid",
-// });
- 
+
+
 Log.setLogger(console);
- 
+
 Log.setLevel(Log.DEBUG);
- 
-/* ---------------- AUTH ---------------- */
- 
-// Login
-// export function login() {
-//   userManager.signinRedirect();
-// }
- 
+
 export function login() {
   const currentPath = window.location.pathname + window.location.search;
 
@@ -65,7 +45,6 @@ export function getAccessToken() {
   return user.access_token;
 }
  
-// / --
 /* ---------------- API CALL ---------------- */
  
 export async function getAgreementLineItems() {
@@ -75,7 +54,6 @@ export async function getAgreementLineItems() {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
-      // "user-id": "83cdd1a7-25f8-c8e4-2ecb-e33c1cd9a2cf",
     },
   });
  
@@ -105,8 +83,7 @@ export async function createAgreementLineItem(lineagreement) {
     });
  
     if (!response.ok) {
-      // const errorText = await response.text();
-      // throw new Error(errorText);
+
       const errorData = await response.json();
       throw errorData;
     }
@@ -132,7 +109,7 @@ export async function getAgreementLineItemById(id) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
+      
       },
     });
  
@@ -158,7 +135,7 @@ export async function updateAgreementLineItem(id, payload) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
+       
       },
       body: JSON.stringify(payload),
     });
@@ -166,8 +143,6 @@ export async function updateAgreementLineItem(id, payload) {
     if (!response.ok) {
       const errorData = await response.json();
       throw errorData;
-      // const errorText = await response.text();
-      //throw new Error(errorText || "Failed to update agreement");
     }
     const result = await response.json();
     return result;
@@ -212,7 +187,6 @@ export async function getAgreementById(id) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
       },
     });
  
@@ -229,7 +203,7 @@ export async function getAgreementById(id) {
  
 export async function createAgreementGroup(agreementgroup) {
   try {
-    // const payload = {"Description":"tru","ListPrice":2026,"Product":{"Id":"ec90cf92-6e6b-46e3-b17a-f06456516267","Name":"Trial Product"},"NetPrice":5000,"Agreement":"a1cdb476-909d-484c-b686-8852a7f994f9","DeltaPrice":78,"Name":"Trial 2026"}
+   
     const payload = agreementgroup;
     console.log(payload);
     const CONTRACT_URL =
@@ -242,14 +216,13 @@ export async function createAgreementGroup(agreementgroup) {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${accessToken}`,
-        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
+      
       },
       body: JSON.stringify(payload),
     });
  
     if (!response.ok) {
-      // const errorText = await response.text();
-      // throw new Error(errorText);
+    
       const errorData = await response.json();
       throw errorData;
     }
@@ -274,7 +247,7 @@ export async function getProductById(id) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
+        
       },
     });
  
@@ -301,7 +274,7 @@ export async function updateAgreement(id, payload) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
+       
       },
       body: JSON.stringify(payload),
     });
@@ -309,8 +282,7 @@ export async function updateAgreement(id, payload) {
     if (!response.ok) {
       const errorData = await response.json();
       throw errorData;
-      // const errorText = await response.text();
-      //throw new Error(errorText || "Failed to update agreement");
+     
     }
     const result = await response.json();
     return result;
@@ -332,13 +304,12 @@ export async function getAmendAgreement(id) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
+      
       },
     });
  
     if (!response.ok) {
-      // const errorText = await response.text();
-      // throw new Error(errorText);
+      
       const errorData = await response.json();
       throw errorData;
     }
@@ -364,7 +335,7 @@ export async function SubmitForApproval(body) {
         "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${accessToken}`,
-        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
+        
       },
       body: JSON.stringify(payload),
     });
@@ -401,8 +372,7 @@ export async function SubmitForApproval(body) {
     });
  
     if (!response.ok) {
-      // const errorText = await response.text();
-      // throw new Error(errorText);
+      
       const errorData = await response.json();
       throw errorData;
     }

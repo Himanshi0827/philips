@@ -32,7 +32,7 @@ function HierarchyLookupList({ records, onSelect,check }) {
             onClick={() => onSelect(r)}
             onMouseDown={(e)=>
               {
-                // e.preventDefault();
+           
                 onSelect(r);
               }}
           >

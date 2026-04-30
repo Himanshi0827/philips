@@ -54,8 +54,6 @@ const [selectedProducts, setSelectedProducts]=useState(data.selectedProducts ||[
  
  
 const [product , setProduct]=useState([])
-//try
-
 const [children, setChildren] = useState([]);
 const defaultValue= (value)=>
 {
@@ -68,7 +66,6 @@ const defaultValue= (value)=>
     onChange({"MG3":"None"});
   }
 }
-//validation
 const [existingALIs, setExistingALIs] = useState([]);
 useEffect(() => {
   const fetchALI = async () => {
@@ -84,7 +81,7 @@ useEffect(() => {
 
   fetchALI();
 }, [data.agreementId]);
-//validation
+
 useEffect(() => {
   const refreshParentOptions = async () => {
     if (data.MatchProductsBy === "Product" && data.selectedProducts?.length > 0) {
@@ -123,8 +120,7 @@ useEffect(() => {
         setShowParentLookup(true);
         setParentOptions(finalOptions);
         
-        // Note: console.log(parentOptions) here will still show old data.
-        // Check your UI or use a separate useEffect to log parentOptions.
+      
       } else {
         setShowParentLookup(false);
       }
@@ -170,7 +166,6 @@ const handleProductSelect = async (record) => {
 };
 
 
-//try
 useEffect(() => {
   if (data.MatchProductsBy === "Hierarchy") {
  
@@ -242,8 +237,6 @@ const loadHierarchyData = async () => {
     if (mg3?.Success) {
       setMg3List(mg3.Data.PicklistMetadata[0].PicklistEntries);
       setSelectedMG3(mg3.Data.FieldMetadata[0]?.DefaultValue);
-
-      // onChange({selectedMG3: mg3.Data.FieldMetadata[0]?.DefaultValue});
     }
  
     const products = await GetRecords("Product_Hierarchy_c");
@@ -324,40 +317,6 @@ useEffect(()=>
 
 },[data?.selectedProducts,data?.selectedParentProducts])
  
-// const checkerFunc=(parent)=>
-// {
-  // const unique= new Set(data.selectedProducts.map(c=>c.Id));
-  // console.log(unique);
-  // const parents=[...data.selectedParentProducts.filter(p=>p.Id !== parent?.Id),parent];
-  // console.log(unique.has(parent.ChildId));
-  // console.log(parents);
-  // const check=parents.every((p)=> unique.has(p.ChildId));
-  // console.log("Trying until I lose!!",check);
-  // if(check)
-  // {
-  //   onProductsChange(parents);
-  // }
-  // else 
-  // {
-  //   onProductsChange(parents);
-  // }
-  // setCheckParent(check);
-//   const product=data?.selectedProducts??[];
-//   const currentparent=data?.selectedParentProducts?? [];
-//   const selected_parents=[...currentparent,parent];
-//   const parentChilds= new Set( selected_parents.map(p=>p.ChildId));
-//   const result=product.every(child=> parentChilds.has(child.Id));
-//   console.log("Trying parent",result);
-//   if(result)
-//   {
-//     onProductsChange(selected_parents);
-//   }
-//   else{
-//     onProductsChange([]);
-//   }
-//   setCheckParent(result);
-// }
-
  
 const handleSelectBU = (record) => {
   const newList = [...selectedBUs, record]; // Create the new list first
@@ -412,7 +371,7 @@ const handleRemoveAG = (buId) => {
   // 3. Notify parent component
   onChange({ selectedAGs: updatedList });
 };
-//end
+
   useEffect(()=>
   {
   const handleAgreement = async ()=>
@@ -423,7 +382,6 @@ const handleRemoveAG = (buId) => {
       if(res1.Success)
       {
         setLineType(res1.Data.PicklistMetadata[0].PicklistEntries);
-        // onChange({"LineType":"Equipment"});
       }
       if(res2.Success)
       {
@@ -469,7 +427,6 @@ const handleRemoveAG = (buId) => {
  
    const handleAddRecord = async (record) => {
     if (!record) return;
-   // 🔴 CHECK IN EXISTING ALI
   const alreadyInALI = existingALIs.some(
     ali => ali.Product?.Id === record.Id
   );
@@ -479,7 +436,7 @@ const handleRemoveAG = (buId) => {
     return;
   }
     // prevent duplicates
-    //const exists = data.selectedRecords?.some(r => r.Id === record.Id);
+
     const exists = data.selectedProducts?.some(r => r.Id === record.Id);
     if (exists) return;
     const newProducts=[...selectedProducts,record];
@@ -492,11 +449,11 @@ const handleRemoveAG = (buId) => {
     console.log(record.Configuration);
     if(record.Configuration==="Option")
     {
-      // toast.warning(`Please select atleast 1 Parent Product for Option product [${record.Name}. • ${record.ProductCode}] to enable Create Button`);
+
       onProductsChange([]);
     }
     else if((record.Configuration==="Bundle" || record.Configuration==="Standalone") && checkParent){
-      // onProductsChange(newProducts);
+      
       console.log("bundle check ",checkParent);
       onProductsChange(newProducts);
     }
@@ -530,13 +487,12 @@ const handleNext = () => {
  
   onComplete();
 };
- // Add this useEffect to sync Hierarchy selections automatically
- //validation
+
  useEffect(() => {
   const validateHierarchy = async () => {
     if (data.MatchProductsBy !== "Hierarchy" || selectedBUs.length === 0) return;
 
-    // 🔴 CHECK DUPLICATE IN ALI
+  
     const isDuplicate = existingALIs.some((ali) => {
       return (
         ali.Hierarchy_c?.Business_Unit_ID_c === selectedBUs[0]?.Business_Unit_ID_c &&
@@ -548,7 +504,6 @@ const handleNext = () => {
     if (isDuplicate) {
       toast.error("This Hierarchy (BU/MAG/AG) already exists in ALI");
 
-      // 🔴 RESET SELECTION (IMPORTANT)
       setSelectedBUs([]);
       setSelectedMAGs([]);
       setSelectedAGs([]);
@@ -562,27 +517,16 @@ const handleNext = () => {
       return;
     }
 
-    // ✅ NORMAL FLOW
     buildHierarchySelectedRecords();
     onChange({ Field: "Hierarchy_c" });
   };
 
   validateHierarchy();
 }, [selectedBUs, selectedMAGs, selectedAGs,data.MG3]);
- //validation
-// useEffect(() => {
-//   if (data.MatchProductsBy === "Hierarchy" && selectedBUs.length > 0) {
-//     buildHierarchySelectedRecords();
-//     onChange({
-//       Field: "Hierarchy_c"
-//     });
-//   }
-// }, [selectedBUs, selectedMAGs, selectedAGs]);
+
   return (
     <div className="form-card">
-      {/* <div className="section-header">
-        Product Selection
-      </div> */}
+     
  
       <table className="form-table">
         <tbody>
@@ -591,13 +535,13 @@ const handleNext = () => {
             <td className="label">Line Type</td>
             <td>
               <select 
-              // className="custom-select"
+              
                 name="LineType"
-                // value={data.LineType}
+             
                 value={data.LineType!==""? data.LineType:defaultValue("LineType")}
                 onChange={handleChange}
               >
-                {/* <option value="">Select</option> */}
+             
                 {linetypes.map(linetype => (
                   <option key={linetype.Value}>
                   {linetype.Value}
@@ -629,27 +573,14 @@ const handleNext = () => {
     <tr>
       <td className="label">MG3</td>
       <td>
-        {/* <select
-  value={selectedMG3}
-  onChange={(e) => {
-    const val = e.target.value;
-    setSelectedMG3(val);
-    onChange({ selectedMG3: val }); // Save to parent!
-  }}
-> */}
+        
 <select
         name="MG3"
         value={data.MG3!==""? data.MG3: defaultValue("MG3")}
         onChange={handleChange}
-    // const val = e.target.value;
-    // setSelectedMG3(val);
-    // onChange({ MG3: val }); // Save to parent!}
+    
 >
-        {/* <select
-          value={selectedMG3}
-          onChange={(e) => setSelectedMG3(e.target.value)}
-        > */}
-        {/* //  <option value="">Select</option> */}
+       
           {mg3List.map(mg => (
             <option key={mg.Value} value={mg.Value}>
               {mg.Value}
@@ -812,8 +743,7 @@ const handleNext = () => {
   </tr>
 )}
  
-        
-{/* {data.selectedRecords?.length > 0 && data.MatchProductsBy === "Product" && ( */}
+ 
   {data.selectedProducts?.length > 0 && data.MatchProductsBy === "Product" && (
   <tr className="manual-selection-row">
     <td className="label"> Selected Product</td>
@@ -848,8 +778,7 @@ const handleNext = () => {
         records={parentOptions}
         onSelect={(parent) => {
       const current = data.selectedParentProducts || [];
-      // checkerFunc(parent);
-  // Allow selection if this specific Parent-Child pair isn't already there
+    
   if (!current.some(p => p.Id === parent.Id && p.ChildId === parent.ChildId)) {
     onChange({
       selectedParentProducts: [...current, parent]
@@ -884,8 +813,7 @@ const handleNext = () => {
                   selectedParentProducts: data.selectedParentProducts.filter(x => x.Id !== p.Id)
                 });
                 const update=data.selectedParentProducts.filter(x=>x.Id!==p.Id);
-                // onProductsChange(update);
-                // checkerFunc(update);
+              
                 onProductsChange(update);
               }
               }

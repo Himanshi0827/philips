@@ -81,12 +81,6 @@ function AgreementGroupForm({ data,onChange,onComplete }) {
           {error}
         </div>
       )}
-
-      {/* <div style={{ marginTop: "20px", textAlign: "right" }}>
-        <button className="btn primary" onClick={handleNext}>
-        Add Product
-        </button>
-      </div> */}
     </div>
   );
 }

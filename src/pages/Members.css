@@ -183,7 +183,7 @@
   color: #777;
 }
 
-/* Checkbox row (fix alignment issue) */
+
 .checkbox-container {
   display: flex;
   align-items: center;
@@ -200,10 +200,10 @@
 
 .card {
   background: white;
-  /* border-radius: 6px; */
+
   padding: 16px;
   margin-bottom: 20px;
-  /* border: 1px solid #ddd; */
+  
 }
 .card-body {
   padding: 15px;
@@ -357,9 +357,3 @@ tr:hover {
   margin-bottom: 15px;
 }
 
-/* 
-
-.lookup-container {
-  position: relative;
-  width: 300px;
-} */

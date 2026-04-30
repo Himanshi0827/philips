@@ -7,14 +7,7 @@ function Sidebar({ activeTab, completedTabs, onSelect }) {
   { key: "Information", label: "Information", icon: "ℹ️" },
   { key: "Select Billing Plan", label: "Billing Plan", icon: "💳" }, // 👈 changed here
 ];
-  // const tabs = [
-  //   { key: "Agreement Group", icon: "📦" },
-  //   { key: "Product Selection", icon: "🧾" },
-  //   { key: "Discount Pricing Strategy", icon: "💲" },
-  //   { key: "Agreement Header Information", icon: "📄" },
-  //   { key: "Information", icon: "ℹ️" },
-  //   { key: "Select Billing Plan", icon: "💳" },
-  // ];
+
 
   return (
     <div className="sidebar">

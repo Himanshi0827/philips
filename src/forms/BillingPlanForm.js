@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
-//import { useNavigate } from "react-router-dom";
 import { GetPicklist } from "../api/GetPicklist"; 
  
 function BillingPlanForm({ data, product, onComplete, onSubmit, onChange, onChangeProduct }) {
- // const navigate = useNavigate();
   const [billingOptions, setBillingOptions] = useState([]);
   const [error, setError] = useState("");
   const [billingList, setBillingList] = useState([]);
@@ -68,18 +66,13 @@ function BillingPlanForm({ data, product, onComplete, onSubmit, onChange, onChan
       isAllSelected = product.selectedProducts.every(p => p.BillingPlan && p.BillingPlan !== "");
     }
  
-    // if (!isAllSelected) {
-    //   setError("Error: One or more items are missing a selected Billing Plan.");
-    //   return;
-    // }
     setError("");
     onSubmit();
   };
  
   return (
     <div className="form-card">
-      {/* <div className="section-header">Select Billing Plan</div> */}
- 
+   
       <table className="data-table billing-table">
         <thead>
           <tr>
@@ -152,9 +145,7 @@ function BillingPlanForm({ data, product, onComplete, onSubmit, onChange, onChan
  
       {error && <div className="error-text" style={{ color: "red", marginTop: "12px" }}>{error}</div>}
  
-      {/* <div style={{ marginTop: "20px", textAlign: "right" }}>
-        <button className="btn primary" onClick={handleSave}>Submit Agreement</button>
-      </div> */}
+    
     </div>
   );
 }

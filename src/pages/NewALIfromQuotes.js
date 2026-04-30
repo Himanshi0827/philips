@@ -39,7 +39,7 @@ export default function NewALIfromQuotes() {
   const [showConfirmScreen, setShowConfirmScreen] = useState(false);
   const [hasDuplicateData, setHasDuplicateData] = useState(false);
   const [selectedproposals, setSelectedProposals] = useState([]);
- 
+ const agreementName =sessionStorage.getItem("agreementName") ;
   const handleCheckDuplicates = async () => {
     try {
       if (SelectedItems.length === 0) {
@@ -132,8 +132,7 @@ const payload = {
   APTS_Agreement_Group_c: {
               Id: selected_agreement_g.Id,
             },
- // APTS_Agreement_Group_c: { Id: selected_agreement_g.Id },
-  
+
   // Dates: Ensure these are valid strings
   StartDate: contractStart, 
   APTS_Expiration_Date_c: contractEnd,
@@ -164,26 +163,23 @@ else if (adjType === "Net Price Override") {
   payload.APTS_Discount_Type_c = "Net Price Override";
   payload.APTS_NPO_Tier_1_c = Number(qli.APTS_Offered_Price_c_c?.Value || 0);
 }
-        
-        
 
         await createAgreementLineItem(payload);
       }
     }
       toast.success("ALI process completed successfully!");
-     // navigate("/");
+ 
      navigate(`/${acc.state?.Id}`);
     } catch (err) {
       console.error(err);
       toast.error("Error confirming ALIs");
     }
   };
-  //qli
+  
   useEffect(() => {
     const loadProposalItems = async () => {
       try {
-        // const data=await queryGetProposal(acc.state?.AccountId);
-        // setProposals(data);
+       
         const data = await queryGetProposal(
           acc.state.AccountId,
           fromdate,
@@ -217,17 +213,11 @@ else if (adjType === "Net Price Override") {
  
   const navigate = useNavigate();
   const handleback = () => {
-   // navigate("/");
+
    navigate(`/${acc.state?.Id}`);
    console.log("agre",acc.state?.Id);
   };
-  // const toggleSelectItem= (item) =>
-  // {
-  //   setSelectedItems(prev=>
-  //     prev.includes(item.Id)?
-  //     prev.filter(id => id !==item.Id)
-  //     : [...prev,item] );
-  // }
+ 
   const toggleSelectItem = (item) => {
     setSelectedItems((prev) => {
       const exists = prev.find((i) => i.Id === item.Id);
@@ -261,7 +251,7 @@ else if (adjType === "Net Price Override") {
       console.error(err);
     }
   };
-  //try
+  
   const handleAddAli = async () => {
     try {
       // 1. Validation
@@ -314,11 +304,7 @@ else if (adjType === "Net Price Override") {
  
       toast.success(`${SelectedItems.length} Agreement Line Items created!`);
 
-      // 4. Navigate back or refresh
-      // navigate("/", {
-      //   state: { agreementId: targetAgreementId, agreementName: accountname },
-      // });
-
+    
        navigate(`/${acc.state?.Id}`, {
         state: { agreementId: targetAgreementId, agreementName: accountname },
       });
@@ -327,93 +313,29 @@ else if (adjType === "Net Price Override") {
       toast.error("Error creating Agreement Line Items.");
     }
   };
-//   const handleConfirmAli = async () => {
-//   try {
-//     // 1. Fetch the full Agreement record to get Start/End Dates and Record Type
-//     const agreement = await getAgreementById(acc.state?.Id);
-    
-//     const contractStart = agreement.ContractStartDate;
-//     const contractEnd = agreement.ContractEndDate;
-//     // Check if the record type is "Transaction Contract"
-//     const isTransactionContract = agreement.RecordType?.Name === "Transaction Contract";
 
-//     for (const row of duplicateData) {
-//       const qli = row.qli;
-
-//       // Handle Expiration of old ALI if user chose to override with QLI
-//       if (row.duplicateAli && row.selectedOption === "QLI") {
-//         const yesterday = new Date();
-//         yesterday.setDate(yesterday.getDate() - 1);
-//         await updateAgreementLineItem(row.duplicateAli.Id, {
-//           APTS_Expiration_Date_c: yesterday.toISOString().split("T")[0],
-//         });
-//       }
-
-//       // Create New ALI if no duplicate exists OR user picked QLI option
-//       if (!row.duplicateAli || row.selectedOption === "QLI") {
-        
-//         // Base Payload with standard mappings
-//         let payload = {
-//           Name: qli.Name,
-//           Agreement: acc.state?.Id,
-//           Product: { Id: qli.Product?.Id },
-//           APTS_Agreement_Group_c: { Id: selected_agreement_g?.Id },
-          
-//           // Date Mappings
-//           StartDate: contractStart, // Activation Date
-//           APTS_Expiration_Date_c: contractEnd,
-//           EndDate:contractEnd,
-//           // Fixed Mappings
-//           APTS_BillingPlan_c: qli.APTS_BillingPlan_c,
-//           APTS_Proposal_Line_Item_c: qli.Id,
-//           APTS_Match_Products_By_c: "Product",
-//           Line_Type_c: "Equipment",
-//         };
-
-//         // Conditional Quantity Mapping
-//         if (isTransactionContract) {
-//           payload.Quantity = qli.Quantity; 
-//         }
-
-//         // Logic for Discount Type vs Net Price Override
-//         const adjType = qli.Apttus_QPConfig__AdjustmentType__c;
-        
-//         if (adjType === "Discount %") {
-//           const stratDisc = qli.APTS_Strategic_Discount_Amount_c_c?.Value || 0;
-//           const contDisc = qli.APTS_Contract_Discount_Amount_c?.Value || 0;
-          
-//           payload.APTS_Discount_Type_c = "Tier Discount";
-//           payload.APTS_Discount_Tier_1_c = stratDisc + contDisc;
-//         } 
-//         else if (adjType === "Net Price Override") {
-//           payload.APTS_Discount_Type_c = "NPO Discount";
-//           payload.APTS_NPO_Tier_1_c = qli.APTS_Offered_Price_c_c?.Value || 0;
-//         }
-
-//         await createAgreementLineItem(payload);
-//       }
-//     }
-
-//     toast.success("ALI process completed successfully!");
-//     navigate("/");
-//   } catch (err) {
-//     console.error(err);
-//     toast.error("Error confirming ALIs");
-//   }
-// };
-  //try
   return (
     <div className="ali-page">
       {/* HEADER */}
-      <div className="ali-header">
-        PHILIPS | Agreement Premier Healthcare Alliance
+
+         <div className="top-header">
+        <div className="header-left">
+          <span className="brand">PHILIPS</span>
+          <span className="agreement">
+   | Agreement: {agreementName}
+</span>
+       
+        </div>
+
+        <div className="header-actions">
+        
+        </div>
       </div>
- 
-      {/* SCROLLABLE BODY */}
+     
       {!showConfirmScreen && (
         <>
           <div className="ali-body">
-            <div style={{ display: "flex" }}>
+            <div style={{ display: "flex" , padding: "20px"}}>
               <div style={{ display: "flex", paddingRight: "50px" }}>
                 <label>Customer:</label>
                 <div style={{ fontWeight: "bold", paddingLeft: "10px" }}>
@@ -426,6 +348,7 @@ else if (adjType === "Net Price Override") {
                   Add to Agreement Group:{" "}
                 </label>
               </div>
+              <div className="filter-group">
               <select
                 value={selected_agreement_g?.Id}
                 onChange={(e) => {
@@ -442,6 +365,7 @@ else if (adjType === "Net Price Override") {
                   </option>
                 ))}
               </select>
+              </div>
             </div>
  
             {/* SECTION 1 */}

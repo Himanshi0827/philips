@@ -1,23 +1,21 @@
 import { useState, useEffect } from "react";
 import { getAgreementById, updateAgreement,SubmitForApproval } from "../api/api";
 import {useParams, useNavigate, useLocation } from "react-router-dom";
-//import "./AgreementExtension.css";
+
 import { toast } from "react-toastify";
 
 export default function TerminateAgreement() {
 
-  //const location = useLocation();
+
   const navigate = useNavigate();
 
-  // const id =
-  //   location.state?.agreementId ||
-  //   "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
-const { agreementId } = useParams();   // 👈 from URL
+
+const { agreementId } = useParams();   
 const location = useLocation();
  
 const id =
-  agreementId ||                      // ✅ FIRST priority (URL)
-  location.state?.agreementId ||     // fallback (navigation)
+  agreementId ||                      
+  location.state?.agreementId ||    
   null;
  
 if (!id) {
@@ -36,35 +34,6 @@ if (!id) {
     setAgreement(data[0]);
   };
 
-  // const handleTerminate = async () => {
-
-  //   if (!terminationReason) {
-  //     alert("Termination Reason is required");
-  //     return;
-  //   }
-
-  //   const payload = {
-  //     TerminationComments: terminationReason,
-  //     StatusCategory: "In Effect",
-  //     Status: "Being Terminated",
-  //     ApprovalStatus: "Approval Required"
-  //   };
-
-  //   try {
-
-  //     await updateAgreement(id, payload);
-
-  //     alert("Agreement termination initiated");
-
-  //     navigate(`/agreement/${id}`);
-
-  //   } catch (err) {
-
-  //     console.error(err);
-  //     alert("Error terminating agreement");
-
-  //   }
-  // };
 
   const handleTerminate = async () => {
 
@@ -95,15 +64,15 @@ if (!id) {
     await SubmitForApproval(approvalPayload);
 
   alert("Agreement termination submitted for approval");
-     // toast.success("Agreement termination submitted for approval");
+  
     window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`;
-    // navigate(`/agreement/${id}`);
+    
 
   } catch (err) {
 
     console.error(err);
   alert("Error terminating agreement");
-   // toast.error(err);
+  
 
   }
 };
@@ -112,12 +81,15 @@ if (!id) {
 
   return (
     <div className="agreement-page">
+<div className="top-header">
+        <div className="header-left">
+          <span className="brand">Terminate Agreement</span>
+         
+       
+        </div>
 
-      <div className="header">
-        <h1>Terminate Agreement</h1>
-
-        <div className="header-buttons">
-          <button className="btn primary" onClick={handleTerminate}>
+        <div className="header-actions">
+         <button className="btn primary" onClick={handleTerminate}>
             Continue
           </button>
 
@@ -126,6 +98,7 @@ if (!id) {
           </button>
         </div>
       </div>
+     
 
       <div className="section">
 

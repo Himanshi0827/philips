@@ -1,146 +1,24 @@
-// import React, { useState } from "react";
-// import "../Designation.css"
- 
-// export default function Designation() {
-//   const [market, setMarket] = useState("North America");
-//   const [salesArea, setSalesArea] = useState("United States");
-//   const [member, setMember] = useState("Global Smiles Foundation");
- 
-//   const [showDesignationHeader, setShowDesignationHeader] = useState(true);
- 
-//   const [effectiveDate, setEffectiveDate] = useState("2026-04-15");
-//   const [tier, setTier] = useState("Tier 1");
- 
-//   return (
-//     <div className="page-container">
-      
-//       {/* HEADER */}
-//       <div className="header" style={{justifyContent:"center"}}>Designation Page</div>
- 
-//       {/* FILTER SECTION */}
-//       <div className="filter-container">
-//   <div className="filter-group">
-//     <label>Filter By Market</label>
-//     <select>
-//       <option>North America</option>
-//     </select>
-//   </div>
- 
-//   <div className="filter-group">
-//     <label>Filter By Sales Area</label>
-//     <select>
-//       <option>United States</option>
-//     </select>
-//   </div>
- 
-//   <div className="filter-group">
-//     <label>Select Member</label>
-//     <input type="text" value="Global Smiles Foundation" />
-//   </div>
-// </div>
- 
-//       {/* CONDITIONAL DESIGNATION HEADER */}
-//       {showDesignationHeader && (
-//         <>
-//         <div className="designation">
-//         <p>Designation Form Header</p>
-//         </div>
-//         <div className="designation-header">
-//           <table className="designation-table">
-//             <th>Existing Membership </th>
-//             <th>Effective Date</th>
-//             <th>Order Intake Volume Tier</th>
-//             <th>Add New GPO Membership</th>
-//             <tbody>
-//               <tr>
-//                 <td>The list below shows all existing Membership records. The selected one is the currently designated one. If none of them are selected, then the member is not designated to any GPO.</td>
-//                 <td><input
-//                 type="date"
-//                 value={effectiveDate}
-//                 onChange={(e) => setEffectiveDate(e.target.value)}
-//               /></td>
-//               <td>
-//               <select value={tier} onChange={(e) => setTier(e.target.value)} className="select">
-//                 <option>Tier 1</option>
-//                 <option>Tier 2</option>
-//               </select>
-//               </td>
-//               <td>
-// You can create new membership records and designate the member to the select GPO.</td>
-//               </tr>
-//             </tbody>
-//           </table>
-//         </div>
-//         </>
-//       )}
- 
-//       {/* TABLE SECTION */}
-//       { showDesignationHeader &&
-//       <>
-//       <div className="table-section">
-//         <h4>Designated Form Request</h4>
- 
-//         <table>
-//           <thead>
-//             <tr>
-//               <th>Member Account</th>
-//               <th>Designated GPO</th>
-//               <th>Effective Date</th>
-//               <th>Order Intake Volume Tier</th>
-//               <th>Delete</th>
-//             </tr>
-//           </thead>
- 
-//           <tbody>
-//             {/* Dynamic rows later */}
-//             <tr>
-//               <td colSpan="5" style={{ textAlign: "center" }}>
-//                 No Data
-//               </td>
-//             </tr>
-//           </tbody>
-//         </table>
-//       </div>
- 
-//       {/* FOOTER ACTIONS */}
-//       <div className="footer">
-//         <button className="btn-primary">Submit Designated Change Request</button>
- 
-//         <div style={{ marginTop: "10px" }}>
-//           <button className="btn-secondary">Designate</button>
-//           <button className="btn-secondary">Clear Form</button>
-//         </div>
-//       </div>
-//       </>
-//   }
-//     </div>
-//   );
-// }
-
-
-
 
 import React, { useState,useEffect } from "react";
 import "../Designation.css"
-import { useNavigate, useLocation } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import {  useLocation } from "react-router-dom";
+
 import MemberSearch from "../components/MemberSearch";
-import { createMember,updateMember,getAccounts } from "../api/member"; 
+import { getAccounts,getMembershipAgreements ,createGPODesignateChange} from "../api/member"; 
+import {getAgreementById} from "../api/api";
 import { queryGetAgreementDetails } from "../api/queryAgreementLineItemsByAgreement"; 
- import LookupTypeAhead from "../components/LookupTypeAhead";
-import { searchLookupRecords } from "../api/SearchLookup";
+
+import { toast } from "react-toastify";
 export default function Designation() {
-  const location = useLocation();
+
 const agreementId = sessionStorage.getItem("agreementId");
-  const [market, setMarket] = useState("North America");
-  const [salesArea, setSalesArea] = useState("United States");
   const [member, setMember] = useState(null);
-  // const [member, setMember] = useState("Global Smiles Foundation");
+
  const [selectedGPO, setSelectedGPO] = useState(null);
  const showDesignationHeader = !!member?.Id;
-//  const [showDesignationHeader, setShowDesignationHeader] = useState(true);
+
  const [rows, setRows] = useState([]);
-  // const [effectiveDate, setEffectiveDate] = useState("2026-04-15");
+
   const today = new Date().toISOString().split("T")[0];
 const [effectiveDate, setEffectiveDate] = useState(today);
   const [tier, setTier] = useState("Tier 1");
@@ -148,6 +26,17 @@ const [effectiveDate, setEffectiveDate] = useState(today);
   const [options, setOptions] = useState([]);
 const [designated, setDesignated] = useState(null);
 const [showCheckBox, setShowCheckBox] = useState(false);
+const [showConfirm, setShowConfirm] = useState(false);
+const clearForm = () => {
+  setRows([]);
+  setMember(null);
+  setSelectedGPO(null);
+  setEffectiveDate(today);
+  setTier("Tier 1");
+  setOptions([]);
+  setDesignated(null);
+  setShowCheckBox(false);
+};
 useEffect(() => {
    loadData();
    console.log("account",Acc);
@@ -170,7 +59,7 @@ useEffect(() => {
         Country_c: "United States",
         Inactive_Flag_c: false,
         Golden_Record_Key_c: { notNull: true },
-        Name: member.Name // ✅ EXACT MATCH
+        Name: member.Name // EXACT MATCH
       }
     });
 console.log("dataoption",data);
@@ -217,35 +106,66 @@ const trying = await queryGetAgreementDetails(agreementId);
   setRows((prev) => [...prev, newRow]);
 };
 
-const validateDesignation = () => {
-  const isCFA = false; // call API
+const checkMembershipAgreements = async (memberId, newGpoId) => {
+  try {
+    // Step 1: Get contracts by member
+    const contracts = await getMembershipAgreements(memberId);
+console.log("contracts", contracts);
+console.log("contractsData", contracts[0].APTS_Related_Agreement_c);
+console.log("contracts length", contracts.length);
+    if (contracts.length === 0) return 0;
 
-  if (isCFA) {
-    const proceed = window.confirm(
-      "Member belongs to CFA. Continue will remove existing assignments."
-    );
-    return proceed;
+
+    const agreements = await getAgreementById(contracts[0].APTS_Related_Agreement_c);
+console.log("agreements", agreements);
+    const today = new Date();
+
+    // Step 4: Apply Apex-like filters
+    const validAgreements = agreements.filter(agr => {
+      return (
+        new Date(agr.ContractEndDate) > today &&
+        agr.APTS_Member_SAP_Status_c === "In Progress" && // adjust if needed
+        agr.Account === newGpoId &&
+        agr.Status === "Activated" &&
+        agr.StatusCategory === "In Effect"
+      );
+    });
+
+    return validAgreements.length;
+
+  } catch (e) {
+    console.error("Error in membership check", e);
+    return 0;
   }
-
-  return true;
 };
-
-const handleSubmit = async () => {
+const handleConfirmYes = async () => {
   try {
     for (let r of rows) {
-      await createMember({
-        APTS_Member_c: r.memberId,
-        APTS_Designation_GPO_c: r.gpoId,
-        APTS_Start_Date_c: r.effectiveDate,
-        APTS_Volume_Tier_c: r.tier
-      });
+      const payload = {
+        Name: `Change Designation - ${r.memberName} to ${r.gpoName}`,
+        APTS_Member_Account_c:{Id: r.memberId,Name: r.memberName},
+        APTS_Designated_GPO_c: {Id: r.gpoId, Name: r.gpoName},
+        APTS_Start_date_c: r.effectiveDate,
+        APTS_Order_Intake_Volume_Tier_c: r.tier,
+        APTS_Un_designate_c: showCheckBox && designated === r.memberId ? true : false,
+        APTS_Customer_MP1_Id_c: member.MP1_Customer_id_1_c,
+        APTS_Status_c: "Not Processed"
+      };
+
+      await createGPODesignateChange(payload);
     }
 
-    alert("Designation submitted!");
-    setRows([]);
+    toast.success("GPO Designation Change Created!");
+
+    //  Clear everything
+    clearForm();
+
+    // close modal
+    setShowConfirm(false);
 
   } catch (e) {
     console.error(e);
+    toast.error("Failed to create designation");
   }
 };
   return (
@@ -276,24 +196,20 @@ const handleSubmit = async () => {
   value={member}
   onChange={(rec) => {
     setMember(rec);
+    console.log("selected member", rec);
+    console.log("member", member);
   }}
   type="MEMBER"
 />
-    {/* <LookupTypeAhead
-  field={{ DisplayName: "Member", LookupObjectName: "Account" }}
-  value={member}
-  onChange={(rec) => setMember(rec)}
-  searchFn={searchLookupRecords}
-/> */}
-    {/* <input type="text" value="Global Smiles Foundation" /> */}
+   
   </div>
 </div>
  
       {/* CONDITIONAL DESIGNATION HEADER */}
       {showDesignationHeader && (
         <>
-        <div className="designation">
-        <p>Designation Form Header</p>
+        <div className="designation" >
+     Designation Form Header
         </div>
         <div className="designation-header">
           <table className="designation-table">
@@ -347,12 +263,7 @@ const handleSubmit = async () => {
 You can create new membership records and designate the member to the select GPO.
 <div className="filter-group">
   <label>Select GPO</label>
-  {/* <LookupTypeAhead
-    field={{ DisplayName: "GPO", LookupObjectName: "Account" }}
-    value={selectedGPO}
-    onChange={(rec) => setSelectedGPO(rec)}
-    searchFn={searchLookupRecords}
-  /> */}
+  
   <MemberSearch
   value={selectedGPO}
   onChange={setSelectedGPO}
@@ -363,12 +274,68 @@ You can create new membership records and designate the member to the select GPO
               </tr>
             </tbody>
           </table>
-          <div className="button-container"> <button className="btn-primary" onClick={handleAddRow}>Submit Designated Change Request</button></div>
+          <div className="button-container">
+          <button
+  className="btn-primary"
+  onClick={async () => {
+    if (!member || !selectedGPO) {
+      toast.error("Select Member and GPO");
+      return;
+    }
+
+    if (effectiveDate < today) {
+      toast.error("Please select future date");
+      return;
+    }
+console.log("memberId", member.Id);
+console.log("selectedGPOId", selectedGPO.Id);
+    const count = await checkMembershipAgreements(
+      member.Id,
+      selectedGPO.Id
+    );
+console.log("valid agreement count", count);
+    if (count > 0) {
+      console.log("Existing valid agreements found:", count);
+      toast.error(
+        "Member SAP status In Progress. Please try after sometime"
+      );
+      return;
+    }
+
+    //  Only after validation
+    handleAddRow();
+  }}
+>
+  Submit Designated Change Request
+</button></div>
            
         </div>
         </>
       )}
- 
+ {showConfirm && (
+  <div className="modal-overlay">
+    <div className="modal-box">
+      <h3>Confirmation</h3>
+      <p>Are you sure that you want to add/change the GPO Designation?</p>
+
+      <div className="modal-actions">
+        <button
+          className="btn-primary"
+          onClick={handleConfirmYes}
+        >
+          Yes
+        </button>
+
+        <button
+          className="btn-secondary"
+          onClick={() => setShowConfirm(false)}
+        >
+          No
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       {/* TABLE SECTION */}
       { showDesignationHeader &&
       <>
@@ -386,14 +353,7 @@ You can create new membership records and designate the member to the select GPO
             </tr>
           </thead>
  
-          {/* <tbody>
         
-            <tr>
-              <td colSpan="5" style={{ textAlign: "center" }}>
-                No Data
-              </td>
-            </tr>
-          </tbody> */}
           <tbody>
   {rows.length === 0 ? (
     <tr>
@@ -426,19 +386,24 @@ You can create new membership records and designate the member to the select GPO
       <div className="footer">
       
  
-        <div style={{ marginTop: "10px" }}>
-          {/* <button className="btn-secondary">Designate</button> */}
-          <button className="btn-secondary" >
+        <div style={{ margin: "10px" }}>
+         
+          <button
+className="btn-primary"
+disabled={rows.length === 0}
+  onClick={() => setShowConfirm(true)}
+>
   Designate
 </button>
-
+       
 <button
-  className="btn-secondary"
-  onClick={() => setRows([])}
+ className="btn-primary"
+  onClick={clearForm}
+  style={{ margin: "10px" }}
 >
   Clear Form
 </button>
-          {/* <button className="btn-secondary">Clear Form</button> */}
+
         </div>
       </div>
       </>

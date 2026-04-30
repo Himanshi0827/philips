@@ -7,14 +7,13 @@ import { toast } from "react-toastify";
  
 export default function AgreementAmendAddendum() {
  
-    // const location = useLocation();
     const navigate = useNavigate();
  
-    const { agreementId } = useParams();   // 👈 from URL
+    const { agreementId } = useParams();   //  from URL
     const location = useLocation();
  
     const id =
-        agreementId ||                      // ✅ FIRST priority (URL)
+        agreementId ||                      //  FIRST priority (URL)
         location.state?.agreementId ||     // fallback (navigation)
         null;
  
@@ -64,8 +63,7 @@ export default function AgreementAmendAddendum() {
     };
  
     const handleContinue = async () => {
-        //  if(agreementType==="Amendment")
-        // {
+       
         try {
  
             if (isDealAgreement && !pppValue) {
@@ -73,7 +71,7 @@ export default function AgreementAmendAddendum() {
                 return;
             }
  
-            // 1️⃣ Clone Agreement
+            // 1️ Clone Agreement
             let newAgreementId;
  
             try {
@@ -119,7 +117,7 @@ export default function AgreementAmendAddendum() {
                 return;
  
             }
-            // // 2️⃣ Fetch old groups
+            //  Fetch old groups
             let oldGroups;
  
             try {
@@ -137,7 +135,7 @@ export default function AgreementAmendAddendum() {
  
             const groupMapping = {};
             let status = false;
-            // 3️⃣ Create new groups
+            // Create new groups
             for (const grp of oldGroups) {
  
                 try {
@@ -165,7 +163,7 @@ export default function AgreementAmendAddendum() {
             console.log("Group Mapping", groupMapping);
  
  
-            // 4️⃣ Fetch old line items
+            //  Fetch old line items
             let oldLineItems;
  
             try {
@@ -180,7 +178,7 @@ export default function AgreementAmendAddendum() {
                 return;
             }
             let final_status = false;
-            // 5️⃣ Clone line items
+            //  Clone line items
             for (const line of oldLineItems) {
  
                 try {
@@ -211,7 +209,7 @@ export default function AgreementAmendAddendum() {
                 toast.success("AgreementLineItems are Amended successfully");
             }
             window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`;
-            // navigate(`/agreement/${newAgreementId}`);
+           
         } catch (err) {
             alert("Unexpected error: " + getErrorMessage(err));
             console.error(err);
@@ -221,20 +219,24 @@ export default function AgreementAmendAddendum() {
  
     return (
         <div className="agreement-page">
- 
-            <div className="header">
-                <h1>Agreement changes: Amendment or Addendum</h1>
- 
-                <div className="header-buttons">
-                    <button className="btn primary" onClick={handleContinue}>
+ <div className="top-header">
+        <div className="header-left">
+          <span className="brand">Agreement changes: Amendment or Addendum</span>
+         
+       
+        </div>
+
+        <div className="header-actions">
+         <button className="btn primary" onClick={handleContinue}>
                         Continue
           </button>
  
                     <button className="btn" onClick={() => window.location.href = `https://preview-rls09.congacloud.com/clm/detail/${id}`}>
                         Cancel
           </button>
-                </div>
-            </div>
+        </div>
+      </div>
+           
  
             <div className="section">
  
@@ -247,6 +249,7 @@ export default function AgreementAmendAddendum() {
  
                     <div className="form-row">
                         <label>Select applicable agreement changes type</label>
+                        <div className="filter-group">
  
                         <select
                             value={agreementType}
@@ -255,6 +258,7 @@ export default function AgreementAmendAddendum() {
                             <option value="Amendment">Amendment</option>
                             <option value="Addendum">Addendum</option>
                         </select>
+                        </div>
                     </div>
  
                     {isDealAgreement && (

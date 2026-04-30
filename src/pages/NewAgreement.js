@@ -14,23 +14,18 @@ import { toast } from "react-toastify";
 import {queryAgreementLineItemsByAgreement}from "../api/queryAgreementLineItemsByAgreement";
 function NewAgreement() {
   const navigate = useNavigate();
-  //head
-  // const location = useLocation();
-  // // 🔥 STATIC DEV MODE (remove later)
-  // const agreementId =
-  //   location.state?.agreementId || "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
-const { agreementId } = useParams();   // 👈 from URL
+ 
+const { agreementId } = useParams();   //  from URL
 const location = useLocation();
  
 const id =
-  agreementId ||                      // ✅ FIRST priority (URL)
+  agreementId ||                      //  FIRST priority (URL)
   location.state?.agreementId ||     // fallback (navigation)
   null;
  
 if (!id) {
   console.error("Agreement ID not found in URL or state");
 }
-  // const agreementName = location.state?.agreementName ;
   const agreementName =sessionStorage.getItem("agreementName") ;
   const [agreementHeader, setAgreementHeader] = useState([]);
   useEffect(() => {
@@ -48,9 +43,7 @@ if (!id) {
     fetchAgreement();
   }, [id]);
 
-  // const agreementId = location.state?.agreementId;
-  // const agreementHeader = location.state?.agreementHeader;
-  //head
+
   const [payload, setPayload] = useState({
     agreementGroup: {
       AgreementLineItemName: "",
@@ -62,8 +55,8 @@ if (!id) {
       LineType: "",
       MatchProductsBy: "",
       MG3:"",
-      Field: "", // API field name (MPG/Product/etc)
-      selectedRecords: [], // [{ Id, Name }, { Id, Name }]
+      Field: "", 
+      selectedRecords: [], 
       selectedProducts: [],
       selectedParentProducts: [],
     },
@@ -106,12 +99,7 @@ if (!id) {
     }));
   };
 
-  // const addIfNumber = (obj, fieldName, value) => {
-  //   if (value !== "" && value !== null && value !== undefined) {
-  //     obj[fieldName] = Number(value);
-  //   }
-  // };
-  //head
+
   const getHeaderValue = (formValue, agreementValue) => {
     if (formValue !== "" && formValue !== null && formValue !== undefined) {
       return formValue;
@@ -120,7 +108,7 @@ if (!id) {
   };
 
   const addIfValid = (obj, fieldName, value) => {
-    // Only add the key if value is not empty string, null, or undefined
+
     if (value !== "" && value !== null && value !== undefined) {
       obj[fieldName] = value;
     }
@@ -136,7 +124,7 @@ if (!id) {
     }
   };
 
-// Inside NewAgreement.js
+
 useEffect(() => {
   const ps = payload.productSelection;
   let isValidFlag = false;
@@ -146,8 +134,7 @@ useEffect(() => {
   } 
   else if (ps.MatchProductsBy === "Product") {
     const hasBaseProducts = ps.selectedProducts?.length > 0;
-    
-    // 🔥 FIX: Check if every "Option" has a selected parent
+  
     const options = ps.selectedProducts.filter(p => p.Configuration === "Option");
     const allOptionsHaveParents = options.every(opt => 
       ps.selectedParentProducts?.some(parent => parent.ChildId === opt.Id)
@@ -171,13 +158,13 @@ useEffect(() => {
   payload.productSelection.MatchProductsBy
 ]);
 
-  //head
+ 
   const handleFinalSubmit = async () => {
     if (!id) {
       alert("Agreement context missing. Please go back and reopen.");
       return;
     }
-    // 🔴 FETCH EXISTING ALI AGAIN (FINAL CHECK)
+    //  FETCH EXISTING ALI AGAIN (FINAL CHECK)
 const existingALI = await queryAgreementLineItemsByAgreement(id);
     const {
       selectedProducts,
@@ -191,9 +178,7 @@ const existingALI = await queryAgreementLineItemsByAgreement(id);
 
     // --- CASE 1: MATCH BY PRODUCT ---
     if (MatchProductsBy === "Product") {
-  //     const duplicate = selectedProducts.some(sp =>
-  //   existingALI.some(ali => ali.Product?.Id === sp.Id)
-  // );
+
   const duplicate = selectedProducts.some(sp =>existingALI.some(ali => ali.Product?.Id === sp.Id));
     const duplicatevalues= existingALI.map(ali=> selectedProducts.filter(sp=>sp.Id === ali.Product?.Id));
     
@@ -207,13 +192,7 @@ const existingALI = await queryAgreementLineItemsByAgreement(id);
       }); 
     return;
   }
- 
- 
 
-  // if (duplicate) {
-  //   toast.error("Agreement Line Item with the selected Product is duplicated on this agreement. Please combine these commercial condition / price adjustment rules.");
-  //   return;
-  // }
       requests = selectedProducts.map(async (childProduct) => {
         // 1. Find if this child has a selected parent
         const parentRecord = selectedParentProducts?.find(
@@ -223,7 +202,7 @@ const existingALI = await queryAgreementLineItemsByAgreement(id);
         console.log("ex", payload.agreementHeaderInfo.ExcludefromContractP);
         console.log("ex", payload.agreementHeaderInfo.InheritHdiscount);
         // 2. Determine which discount to use
-        // Priority: Parent Discount (if exists) > Child Discount
+    
         const hasParentDiscount =
           parentRecord?.Discounts && parentRecord.Discounts.length > 0;
         const hasChildDiscount =
@@ -237,14 +216,10 @@ const existingALI = await queryAgreementLineItemsByAgreement(id);
        console.log('non discountable',childProduct?.nonDiscountable);
         const lineItemPayload = {
           Name: payload.agreementGroup.AgreementLineItemName,
-          Agreement: id, //head
-          //Agreement: "a1cdb476-909d-484c-b686-8852a7f994f9", // Static ID from your code
-        //  APTS_Not_Discountable_c: childProduct?.nonDiscountable|| false,
-        
-//APTS_Not_Discountable_c: activeDiscountSource?.nonDiscountable ||payload.discountPricing.nonDiscountable|| false,
+          Agreement: id,
+         
 APTS_Not_Discountable_c: activeDiscountSource?.nonDiscountable || !activeDiscountSource?.IsDiscountable ||payload.discountPricing.nonDiscountable|| false,
-         // APTS_Not_Discountable_c:payload.discountPricing.nonDiscountable ||false,
-          // Product IDs
+         
           Product: { Id: childProduct.Id, Name: childProduct.Name },
           ...(parentRecord && {
             APTS_Parent_Product_c: {
@@ -258,7 +233,7 @@ APTS_Not_Discountable_c: activeDiscountSource?.nonDiscountable || !activeDiscoun
             Name: payload.agreementGroup.agreementGroup.Name,
           },
 
-          // APTS_BillingPlan_c: childProduct.BillingPlan || "",
+       
           Line_Type_c: payload.productSelection.LineType,
           APTS_Match_Products_By_c: MatchProductsBy,
 
@@ -326,31 +301,13 @@ APTS_Not_Discountable_c: activeDiscountSource?.nonDiscountable || !activeDiscoun
         mapDiscountsToPayload(lineItemPayload, discountType, discounts);
         // Helper to map tiered data from the structured objects we built in previous steps
         mapDiscountsToPayload(lineItemPayload, discountType, discounts);
-        // try {
-        //   const result =  await createAgreementLineItem(lineItemPayload);
-        //   console.log("resultshgdwy", result);
-        //   if (result.Success) {
-        //     toast.success("Agreement line item created successfully");
-        //   }
-        // } catch (err) {
-        //   toast.error(err.Errors[0].Message);
-        // }
-
+    
          return createAgreementLineItem(lineItemPayload);
       });
     }
     // --- CASE 2: MATCH BY HIERARCHY (Existing Logic) ---
     else {
-  //     const duplicate = existingALI.some(ali =>
-  //   selectedRecords.some(sr =>
-  //     ali.Hierarchy_c?.Id === sr.Id
-  //   )
-  // );
-// const duplicate = existingALI.some(ali =>
-//     selectedRecords.some(sr =>
-//       ali.Hierarchy_c?.Id === sr.Id
-//     )
-//   );
+ 
 const duplicate = existingALI.some(ali =>
     selectedRecords.some(sr =>
       ali.Hierarchy_c?.Id === sr.Id &&
@@ -371,14 +328,11 @@ const duplicate = existingALI.some(ali =>
       })
     return;
   }
-  // if (duplicate) {
-  //   toast.error(" Hierarchy that you have selected is already present in the agreement with selected MG3. Please remove them or select different MG3 to proceed.");
-  //   return;
-  // }
+
       requests = selectedRecords.map(async(record) => {
         const discount = payload.discountPricing;
 
-        // 1️⃣ Find the full Product data from the productSelection list
+        //  Find the full Product data from the productSelection list
         // to access its BU, MAG, and AG names
         const productDetail = payload.productSelection.productData?.find(
           (p) => p.Id === record.Id,
@@ -387,7 +341,7 @@ const duplicate = existingALI.some(ali =>
         let selectedBillingPlan = "";
 
         if (productDetail) {
-          // 2️⃣ Determine which "Key" in the billingPlan state matches this product.
+          //  Determine which "Key" in the billingPlan state matches this product.
           // We check in order: Article Group -> Main Article Group -> Business Unit
           // This matches the logic you used to build the list in BillingPlanForm.
 
@@ -404,10 +358,9 @@ const duplicate = existingALI.some(ali =>
 
         const lineItemPayload = {
           Name: payload.agreementGroup.AgreementLineItemName,
-          // Agreement: "a1cdb476-909d-484c-b686-8852a7f994f9",
+  
           Agreement: id, //head
-          // 3️⃣ Assign the mapped Billing Plan
-          // APTS_BillingPlan_c: selectedBillingPlan || "",
+        
           APTS_Not_Discountable_c:payload.discountPricing.non_Disc_Hierarchy ||false,
 
           APTS_Agreement_Group_c: {
@@ -466,7 +419,7 @@ const ps = payload.productSelection;
 
 addIfValid(
   lineItemPayload,
-  "APTS_MG3_Service_c",   // ⚠️ use correct API name
+  "APTS_MG3_Service_c",   
   ps.MG3
 );
         // 3. Information Section (Cleaned)
@@ -589,33 +542,9 @@ addIfValid(
             
 console.log("finally",lineItemPayload);
         return createAgreementLineItem(lineItemPayload);
-        // try {
-        //   const result =  await createAgreementLineItem(lineItemPayload);
-        //   console.log("resultshgdwy", result);
-        //   if (result.Success) {
-        //     toast.success("Agreement line item created successfully");
-        //   }
-        // } catch (err) {
-        //   toast.error(err.Errors[0].Message);
-        // }
+      
       });
     }
-
-    // try {
-    //   await Promise.all(requests);
-
-    //   //head
-    //   navigate("/", {
-    //     state: {
-    //       agreementId,
-    //       agreementName: "Trial",
-    //     },
-    //   });
-
-    //   // navigate("/");
-    // } catch (err) {
-    //   console.error("Submission failed:", err);
-    // }
 
     try {
   const results = await Promise.all(requests);
@@ -642,10 +571,7 @@ console.log("finally",lineItemPayload);
 }
   };
 
-  /**
-   * Helper to extract values from the complex Discount objects
-   * we created in the Discount Pricing Strategy step.
-   */
+ 
   const mapDiscountsToPayload = (payload, type, discounts) => {
     if (!discounts || discounts.length === 0) return;
 
@@ -658,7 +584,7 @@ console.log("finally",lineItemPayload);
         addIfNumber(payload, field, val);
       });
     } else if (type === "Tier Discount % + Scaled") {
-      // discounts[0] = TierDiscount array, [1] = scaledDiscount array, [2] = Volume array
+
       discounts[0]?.TierDiscount?.forEach((val, i) =>
         addIfNumber(payload, `APTS_Discount_Tier_${i + 1}_c`, val),
       );
@@ -753,29 +679,7 @@ console.log("finally",lineItemPayload);
     setActiveTab(tab);
   }
 };
-  // const handleTabSelect = (tab) => {
-  //   const index = tabs.indexOf(tab);
-
-  //   //  Global unlock
-  //   const isUnlocked = activeTab === tabs[1] && hasProducts;
-
-  //   if (isUnlocked) {
-  //     setActiveTab(tab);
-  //     return;
-  //   }
-
-  //   if (index === 0) {
-  //     setActiveTab(tab);
-  //     return;
-  //   }
-
-  //   const previousTab = tabs[index - 1];
-
-  //   if (completedTabs.includes(previousTab)) {
-  //     setActiveTab(tab);
-  //   }
-  // };
-
+ 
   const handleBack = () => {
     const index = tabs.indexOf(activeTab);
     if (index > 0) {
@@ -792,17 +696,7 @@ console.log("finally",lineItemPayload);
       setActiveTab(tabs[index + 1]);
     }
   };
-  // const markCompletedAndNext = () => {
-  //   setCompletedTabs((prev) =>
-  //     prev.includes(activeTab) ? prev : [...prev, activeTab],
-  //   );
-
-  //   const index = tabs.indexOf(activeTab);
-
-  //   if (index < tabs.length - 1) {
-  //     setActiveTab(tabs[index + 1]);
-  //   }
-  // };
+  
 
   console.log(payload.productSelection.selectedProducts);
   console.log(payload.productSelection.selectedParentProducts);
@@ -820,25 +714,7 @@ console.log("finally",lineItemPayload);
             onChange={(data) => updatePayload("agreementGroup", data)}
           />
         );
-  //       case "Product Selection":
-  // return (
-  //   <ProductSelectionForm
-  //     onComplete={markCompletedAndNext}
-  //     onProductsChange={(products) => {
-  //       const ps = payload.productSelection;
-  //       // If Hierarchy: We care about BUs
-  //       if (ps.MatchProductsBy === "Hierarchy") {
-  //         setHasProducts(ps.selectedBUs?.length > 0);
-  //       } else {
-  //         // If Product: We care about the products array passed up
-  //         setHasProducts(products.length > 0);
-  //       }
-  //     }}
-  //     data={payload.productSelection}
-  //     onChange={(data) => updatePayload("productSelection", data)}
-  //   />
-  // );
-// Change this in NewAgreement.js
+
 case "Product Selection":
   return (
     <ProductSelectionForm
@@ -849,17 +725,7 @@ case "Product Selection":
       onChange={(data) => updatePayload("productSelection", data)}
     />
   );
-      // case "Product Selection":
-      //   return (
-      //     <ProductSelectionForm
-      //       onComplete={markCompletedAndNext}
-      //       onProductsChange={(products) => {
-      //         setHasProducts(products.length > 0);
-      //       }}
-      //       data={payload.productSelection}
-      //       onChange={(data) => updatePayload("productSelection", data)}
-      //     />
-      //   );
+     
 
       case "Discount Pricing Strategy":
         return (
@@ -874,21 +740,16 @@ case "Product Selection":
 
       case "Agreement Header Information":
         return (
-          //head
+        
           <AgreementHeaderInformationForm
-            agreementHeader={agreementHeader} // ✅ ADD THIS
+            agreementHeader={agreementHeader} 
             onComplete={markCompletedAndNext}
             data={payload.agreementHeaderInfo}
-            // data={payload.agreementHeaderInfo}
+            
             onChange={(data) => updatePayload("agreementHeaderInfo", data)}
           />
 
-          //head
-          // <AgreementHeaderInformationForm
-          //   onComplete={markCompletedAndNext}
-          //   data={payload.agreementHeaderInfo}
-          //   onChange={(data) => updatePayload("agreementHeaderInfo", data)}
-          // />
+          
         );
 
       case "Information":
@@ -920,7 +781,7 @@ case "Product Selection":
   return (
     <div style={{ display: "flex" }}>
       <Sidebar
-        // tabs={tabs}
+     
         activeTab={activeTab}
         completedTabs={completedTabs}
         onSelect={handleTabSelect}

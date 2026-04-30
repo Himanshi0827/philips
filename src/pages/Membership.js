@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { getMember,queryGetmember,getAccountById ,getAccountsByIds} from "../api/member"; // your functions
-// import LookupTypeAhead from "../components/LookupTypeAhead";
+import { getMember,queryGetmember,getAccountById ,getAccountsByIds} from "../api/member"; 
 import AgreementGroupSelector from "../components/AgreementGroupSelector";
 import { searchLookupRecords } from "../api/SearchLookup";
 import "./Members.css";
@@ -15,12 +14,10 @@ export default function Membership() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  // const [agreementGroup, setAgreementGroup] = useState(null);
   const [agreementGroup, setAgreementGroup] = useState([]);
   const { agreementId } = useParams();
    sessionStorage.setItem("agreementId",agreementId);
   const [showCreate, setShowCreate] = useState(false);
-  // const agreementId =sessionStorage.getItem("agreementId)") ;
   const [agreementDetails, setAgreementDetails] = useState(null);
   const [viewAll, setViewAll] = useState(false);
 const navigate = useNavigate();
@@ -34,8 +31,6 @@ const navigate = useNavigate();
     const res = await queryGetAgreementDetails(agreementId);
     setAgreementDetails(res?.[0]);
     console.log("name",agreementDetails);
-
-      // API returns array
   } catch (err) {
     console.error(err);
   }
@@ -72,8 +67,7 @@ const loadMembers = async () => {
       accountData: accountMap[rec.APTS_Member_c] || null,
     }));
 
-    // setMembers(enrichedRecords);
-    //  Deduplicate by Account (LWC behavior)
+   
 const deduped = Object.values(
   enrichedRecords.reduce((acc, rec) => {
     const accId = rec?.APTS_Member_c;
@@ -138,13 +132,6 @@ setMembers(groupedMembers);
     )
   );
 }
-  // if (agreementGroup?.length > 0) {
-  //   data = data.filter((m) =>
-  //     agreementGroup.some(
-  //       (g) => g.Id === m?.APTS_Agreement_Group_c?.Id
-  //     )
-  //   );
-  // }
 
   return data;
 }, [members, search, agreementGroup]);
@@ -170,7 +157,7 @@ console.log("stat",visible);
   mode="page"
 />
       ) : (
-        // your existing table UI
+       
 
         <>
          {/* HEADER */}
@@ -271,7 +258,7 @@ console.log("stat",visible);
       state: {
         member: m,
         agreementDetails: agreementDetails,
-        accountId: m.APTS_Member_c,   //  IMPORTANT
+        accountId: m.APTS_Member_c,   
       },
     })
   }
@@ -327,7 +314,7 @@ console.log("stat",visible);
   </button>
 )}
             </>
-          {/* )} */}
+        
         </div>
         </>
       )}

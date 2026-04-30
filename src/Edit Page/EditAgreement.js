@@ -16,21 +16,18 @@ import { toast } from "react-toastify";
 
 function EditAgreement() {
   const navigate = useNavigate();
-  const { agreementId } = useParams();   // 👈 from URL
+  const { agreementId } = useParams();   //  from URL
 const location = useLocation();
  
 const id =
-  agreementId ||                      // ✅ FIRST priority (URL)
+  agreementId ||                      //  FIRST priority (URL)
   location.state?.agreementId ||     // fallback (navigation)
   null;
  
 if (!id) {
   console.error("Agreement ID not found in URL or state");
 }
-// const location = useLocation();
-//   // 🔥 STATIC DEV MODE (remove later)
-//   const agreementId =
-//     location.state?.agreementId || "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
+
 const agreementName =sessionStorage.getItem("agreementName") ;
   const [agreementHeader, setAgreementHeader] = useState([]);
    useEffect(() => {
@@ -58,7 +55,6 @@ const agreementName =sessionStorage.getItem("agreementName") ;
 
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const [completedTabs, setCompletedTabs] = useState([]);
-  //   setCompletedTabs(tabs);
   const [hasProducts, setHasProducts] = useState(false);
   const [agreement, setAgreement] = useState([]);
   const { state } = useLocation();
@@ -102,7 +98,6 @@ const agreementName =sessionStorage.getItem("agreementName") ;
       setActiveTab(tab);
     }
   };
-  //try
 
   const handleChange = (field, value) => {
     console.log("Field Changed:", field);
@@ -141,15 +136,12 @@ const agreementName =sessionStorage.getItem("agreementName") ;
       console.log("======== PUT DEBUG ========");
       console.log("Original:", originalAgreement);
       console.log("Updated:", agreement);
-      //await updateAgreementLineItem(temp, agreement);
 
       const response = await updateAgreementLineItem(temp, agreement);
       if (response.Success) {
         toast.success("Agreement Line Item updated successfully");
       }
 
-      //  alert("Agreement updated successfully");
-     // navigate("/");
       navigate(`/${agreementId}`);
     } catch (err) {
       toast.error(err.Errors[0].Message);
@@ -222,18 +214,19 @@ const agreementName =sessionStorage.getItem("agreementName") ;
   return (
     <div style={{ display: "flex" }}>
       <Sidebar
-        // tabs={tabs}
+    
         activeTab={activeTab}
         completedTabs={completedTabs}
         onSelect={handleTabSelect}
       />
 
       <div style={{ flex: 1 }}>
-        {/* <TopBar title={activeTab} onBack={handleBack} onSave={handleSave} /> */}
+      
         <TopBar
   title={activeTab}
   onSave={handleSave}
   mode="edit"
+  agreementHeader={agreementName}
   agreementId={agreementId}
 />
 

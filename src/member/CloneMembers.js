@@ -27,9 +27,7 @@ const [endDate, setEndDate] = useState("");
 const [isTierFromSource, setIsTierFromSource] = useState(false);
 
 const [selectedMembers, setSelectedMembers] = useState([]);
-  /* =========================
-     LOAD MEMBERS (SOURCE)
-  ========================== */
+
 
   useEffect(() => {
     if (!sourceAgreement) return;
@@ -167,9 +165,7 @@ const loadPicklist = async () => {
 
       </div>
 
-      {/* =========================
-          AGREEMENT SECTION
-      ========================== */}
+    
       <div className="clone-card">
         <div className="form-grid">
 
@@ -290,9 +286,7 @@ const loadPicklist = async () => {
         </div>
       </div>
 
-      {/* =========================
-          MEMBERS SECTION
-      ========================== */}
+     
 
       {sourceAgreement && (
         <div className="members-section">
@@ -302,12 +296,12 @@ const loadPicklist = async () => {
           {loading ? (
             <p>Loading...</p>
           ) : members.length === 0 ? (
-            // ✅ SECOND SCREEN (EMPTY STATE)
+            //  SECOND SCREEN (EMPTY STATE)
             <div className="empty-banner">
               No active Members exists in source agreement which are not present in target agreement
             </div>
           ) : (
-            // ✅ THIRD SCREEN (TABLE)
+            //  THIRD SCREEN (TABLE)
             <div className="table-container">
               <table className="members-table">
                 <thead>

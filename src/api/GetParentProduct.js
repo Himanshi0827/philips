@@ -17,8 +17,7 @@ export const getParentProduct = async (childProduct) => {
         "ParentProduct",
       ],
     };
-    // select Id,Name,ParentProduct.Name,Parent Product.Id,ParentProduct from ProductOptionComponent where
-    // ComponentProduct= childProduct.Name
+
     const response = await axios.post(
       `${BASE_URL}/ProductOptionComponent`,
       body,
@@ -44,11 +43,9 @@ export const getParentProduct = async (childProduct) => {
           ChildProductCode: childProduct?.ProductCode,
         }));
       console.log("My try", parent);
-      // return response.data.Data;
+   
       return parent;
-      //   return {
-      //     Name: response.data.Data.ParentProduct?.Name
-      //   };
+    
     }
 
     return null;

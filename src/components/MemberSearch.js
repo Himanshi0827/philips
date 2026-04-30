@@ -1,80 +1,3 @@
-// import { useEffect, useState } from "react";
-// import { getFilteredAccounts } from "../api/member";
-
-// export default function MemberSearch({ value, onChange }) {
-//   const [allAccounts, setAllAccounts] = useState([]);
-//   const [input, setInput] = useState("");
-//   const [results, setResults] = useState([]);
-//   const [show, setShow] = useState(false);
-
-//   // 🔹 Load once
-//   useEffect(() => {
-//     loadAccounts();
-//   }, []);
-
-//   const loadAccounts = async () => {
-//     const data = await getFilteredAccounts();
-//     setAllAccounts(data);
-//     setResults(data); // initial list
-//   };
-
-//   // 🔹 Local filtering
-//   useEffect(() => {
-//     if (!input) {
-//       setResults(allAccounts);
-//       return;
-//     }
-
-//     const filtered = allAccounts.filter(acc =>
-//       acc.Name?.toLowerCase().includes(input.toLowerCase()) ||
-//       acc.MP1_Customer_id_1__c?.toLowerCase().includes(input.toLowerCase())
-//     );
-
-//     setResults(filtered);
-//   }, [input, allAccounts]);
-
-//   const handleSelect = (acc) => {
-//     onChange(acc);
-//     setInput(acc.Name);
-//     setShow(false);
-//   };
-
-//   return (
-//     <div className="lookup-container">
-//       <input
-//         type="text"
-//         value={input}
-//         placeholder="Search Member"
-//         onChange={(e) => {
-//           setInput(e.target.value);
-//           setShow(true);
-//           onChange(null);
-//         }}
-//         onFocus={() => setShow(true)}
-//       />
-
-//       {show && results.length > 0 && (
-//         <ul className="lookup-dropdown">
-//           {results.map((r) => (
-//             <li
-//               key={r.Id}
-//               className="lookup-item"
-//               onClick={() => handleSelect(r)}
-//             >
-//               <div className="lookup-content">
-//                 <div className="lookup-title">{r.Name}</div>
-//                 <div className="lookup-subtext">
-//                   MP1: {r.MP1_Customer_id_1__c || "N/A"}
-//                 </div>
-//               </div>
-//             </li>
-//           ))}
-//         </ul>
-//       )}
-//     </div>
-//   );
-// }
-
 
 import { useEffect, useState } from "react";
 import { getAccounts } from "../api/member";
@@ -93,7 +16,7 @@ export default function MemberSearch({ value, onChange,type }) {
         Inactive_Flag_c: false
       };
 
-      // ✅ MEMBER FILTER
+      //  MEMBER FILTER
       if (type === "MEMBER") {
         filters = {
           ...filters,
@@ -102,7 +25,7 @@ export default function MemberSearch({ value, onChange,type }) {
         };
       }
 
-      // ✅ GPO FILTER
+      //  GPO FILTER
       if (type === "GPO") {
         filters = {
           ...filters,
@@ -116,11 +39,15 @@ export default function MemberSearch({ value, onChange,type }) {
 
     load();
   }, [type]);
-useEffect(() => {
+
+  useEffect(() => {
   if (value?.Name) {
-    setInput(value.Name); // 👈 THIS FIXES YOUR UI
+    setInput(value.Name);
+  } else {
+    setInput(""); //  THIS FIXES CLEAR ISSUE
   }
 }, [value]);
+
 useEffect(() => {
   const handleClickOutside = (e) => {
     if (!e.target.closest(".lookup-container")) {
@@ -141,12 +68,6 @@ const filtered = list
     return 0;
   });
 
-  // 🔍 Local filter
-  // const filtered = list.filter(acc =>
-  //   acc.Name?.toLowerCase().includes(input.toLowerCase()) ||
-  //   acc.MP1_Customer_id_1_c?.toLowerCase().includes(input.toLowerCase()) ||
-  //   acc.Golden_Record_Key_c?.toLowerCase().includes(input.toLowerCase())
-  // );
 
   return (
   
@@ -168,10 +89,9 @@ const filtered = list
     )}
 
       <input
-  value={value ? "" : input}   // 👈 hide text when selected
+  value={input}   //  hide text when selected
       placeholder={value ? "" : `Search ${type}`}
-        // value={input}
-        // placeholder="Search Member"
+     
         onChange={(e) => {
           setInput(e.target.value);
           setShow(true);

@@ -13,7 +13,7 @@ export async function getMemberById(id) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
+        
       },
     });
  
@@ -37,7 +37,7 @@ export async function getMember() {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": "application/json",
-      // "user-id": "83cdd1a7-25f8-c8e4-2ecb-e33c1cd9a2cf",
+   
     },
   });
  
@@ -85,7 +85,7 @@ export async function getAccountById(id) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
+   
       },
     });
  
@@ -184,7 +184,7 @@ export async function getAccountsByIds(ids = []) {
         body: JSON.stringify({
           ObjectName: "Account",
           Criteria: `Id IN (${formattedIds})`,
-          // Select: ["Id", "Name", "MP1_Customer_id_1_c"],
+         
           Select: ["*"],
         }),
       }
@@ -248,7 +248,7 @@ export async function updateMember(id, payload) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
+     
       },
       body: JSON.stringify(payload),
     });
@@ -256,8 +256,7 @@ export async function updateMember(id, payload) {
     if (!response.ok) {
       const errorData = await response.json();
       throw errorData;
-      // const errorText = await response.text();
-      //throw new Error(errorText || "Failed to update APTS_Account_Contract_c");
+    
     }
     const result = await response.json();
     return result;
@@ -266,13 +265,6 @@ export async function updateMember(id, payload) {
     throw err;
   }
 }
-
-
-
-
-
-
-
 
 
 
@@ -328,54 +320,13 @@ export async function getAccounts({
   }
 }
 
-// export async function getAccounts({ filters = {}, likeFields = [], searchText = "" }) {
-//   try {
-//     const token = await getAccessToken();
-
-//     let criteria = buildCriteria(filters);
-
-//     // 🔍 Add search condition
-//     if (searchText && likeFields.length) {
-//       const likeClause = likeFields
-//         .map(field => `${field} LIKE '%${searchText}%'`)
-//         .join(" OR ");
-
-//       criteria += ` AND (${likeClause})`;
-//     }
-
-//     const response = await fetch(
-//       "https://preview-rls09.congacloud.com/api/data/v1/query/Account",
-//       {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           Accept: "application/json",
-//           Authorization: `Bearer ${token}`,
-//         },
-//         body: JSON.stringify({
-//           ObjectName: "Account",
-//           Criteria: criteria,
-//           Select: ["*"],
-//         }),
-//       }
-//     );
-
-//     const result = await response.json();
-//     return result.Data || [];
-//   } catch (err) {
-//     console.error(err);
-//     return [];
-//   }
-// }
-
-
 export const buildCriteria = (filters = {}) => {
   const clauses = [];
 
   Object.entries(filters).forEach(([key, value]) => {
     if (value === null || value === undefined || value === "") return;
 
-    // ✅ HANDLE NOT NULL
+    //  HANDLE NOT NULL
     if (typeof value === "object" && value.notNull) {
       clauses.push(`${key} != null`);
     }
@@ -389,3 +340,54 @@ export const buildCriteria = (filters = {}) => {
 
   return clauses.join(" AND ");
 };
+
+
+export async function getMembershipAgreements(memberId) {
+  const token = getAccessToken();
+
+  const response = await fetch(
+    "https://preview-rls09.congacloud.com/api/data/v1/query/APTS_Account_Contract_c",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        ObjectName: "APTS_Account_Contract_c",
+        Criteria: `
+          APTS_Member_c = '${memberId}'
+        `,
+        Select: ["Id", "Name", "APTS_Related_Agreement_c", "APTS_Member_c"]
+      })
+    }
+  );
+
+  const result = await response.json();
+  return result.Data;
+}
+
+
+
+
+export async function createGPODesignateChange(payload) {
+  const accessToken = getAccessToken();
+
+  const response = await fetch(
+    "https://preview-rls09.congacloud.com/api/data/v1/objects/APTS_GPO_Designation_Changes_c",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    }
+  );
+console.log("createGPODesignateChange response", response);
+  if (!response.ok) {
+    throw new Error("Failed to create GPO designation change");
+  }
+
+  return response.json();
+}

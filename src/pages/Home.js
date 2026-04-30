@@ -11,27 +11,16 @@ import { toast } from "react-toastify";
 const PAGE_SIZE = 5;
 
 function Home() {
-  //const location = useLocation();//head
+  
   const navigate = useNavigate();
-  //head
-//   const agreementId = location.state?.agreementId;
-// const agreementName = location.state?.agreementName;
-// const agreementHeader = location.state?.agreementHeader;
 
-// const agreementId =
-//   location.state?.agreementId ||
-//   "c6fb1c12-5f42-4012-8c44-adf46ce98b8c";
-
-// const agreementName =
-//   location.state?.agreementName ||
-//   "Philips Trial";
-const { agreementId } = useParams();   // 👈 from URL
+const { agreementId } = useParams();   //  from URL
 const location = useLocation();
  sessionStorage.setItem("agreementId",agreementId);
  
 const id =
-  agreementId ||                      // ✅ FIRST priority (URL)
-  location.state?.agreementId ||     // fallback (navigation)
+  agreementId ||                     
+  location.state?.agreementId ||    
   null;
  
 if (!id) {
@@ -40,21 +29,21 @@ if (!id) {
 
 const agreementName =sessionStorage.getItem("agreementName") ;
 const agreementHeader = location.state?.agreementHeader || null;
-//head
+
   const [agreements, setAgreements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
    const [Acc,setAcc] = useState(null);
    const [searchTerm, setSearchTerm] = useState("");
   console.log(agreements);
-  // 🔹 Load Agreement Line Items from Conga
+  //  Load Agreement Line Items from Conga
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
         setError(null);
-        //head
-        const data = await queryAgreementLineItemsByAgreement(id);  //head
+        
+        const data = await queryAgreementLineItemsByAgreement(id); 
      
         const records = Array.isArray(data?.Data)
   ? data.Data
@@ -63,17 +52,12 @@ const agreementHeader = location.state?.agreementHeader || null;
   : [];
   console.log("ty",records[0]?.Agreement);
 const trying = await queryGetAgreementDetails(agreementId);
-//const agreementvalue = await getAgreementById(agreementId);
-//console.log();
+
   console.log(trying);
   setAcc(trying);
- //sessionStorage.setItem("agreementName",trying[0].Name);
- sessionStorage.setItem("agreementName",trying[0].Name);
-// const filtered_agreements = records.sort(
-//   (x, y) => new Date(y.CreatedDate) - new Date(x.CreatedDate)
-// );
 
-// setAgreements(filtered_agreements);
+ sessionStorage.setItem("agreementName",trying[0].Name);
+
 const activeRecords = records.filter(
   (rec) => !rec.Apts_IsSoftDeleted_c
 );
@@ -83,11 +67,10 @@ const filtered_agreements = activeRecords.sort(
 );
 
 setAgreements(filtered_agreements);
-//head
+
       } catch (err) {
         console.error(err);
-        // Not authenticated → login
-        // login();
+      
       } finally {
         setLoading(false);
       }
@@ -97,7 +80,7 @@ setAgreements(filtered_agreements);
   }, [id]);
 
   const handleEdit = (Id) => {
-    // navigate("/edit", { state: { id: Id } });
+
     navigate(`/edit/${agreementId}`, { state: { id: Id } });
   };
 
@@ -121,10 +104,9 @@ setAgreements(filtered_agreements);
     );
   });
 }, [agreements, searchTerm]);
-  //const totalPages = Math.ceil(agreements.length / PAGE_SIZE);
-//const totalPages = Math.ceil((agreements?.length || 0) / PAGE_SIZE);   //head
+
 const totalPages = Math.ceil((filteredAgreements?.length || 0) / PAGE_SIZE);
-  // Slice only rows, NOT columns
+
   const visibleRows = useMemo(() => {
   if (viewAll) return filteredAgreements;
 
@@ -132,12 +114,6 @@ const totalPages = Math.ceil((filteredAgreements?.length || 0) / PAGE_SIZE);
   return filteredAgreements.slice(start, start + PAGE_SIZE);
 }, [filteredAgreements, page, viewAll]);
 console.log("item",visibleRows);
-  // const visibleRows = useMemo(() => {
-  //   if (viewAll) return agreements;
-
-  //   const start = (page - 1) * PAGE_SIZE;
-  //   return agreements.slice(start, start + PAGE_SIZE);
-  // }, [agreements, page, viewAll]);
 
   const isFirst = page === 1;
   const isLast = page === totalPages;
@@ -201,10 +177,10 @@ const handleDelete = async (id) => {
         <div className="header-left">
           <span className="brand">PHILIPS</span>
           <span className="agreement-name">
-            {/* head */}
+        
   Agreement: {agreementName || "No Agreement Selected"}
 </span>
-          {/* <span className="agreement-name">Agreement: Premier Healthcare</span> */}
+        
         </div>
 
         <div className="header-actions">
@@ -222,7 +198,6 @@ const handleDelete = async (id) => {
   })
 }
 
-           // onClick={() => navigate("/newALIfromquote")}
           >
             New ALIs from Quotes
           </button>
@@ -230,7 +205,7 @@ const handleDelete = async (id) => {
           <button
             className="primary"
             onClick={() =>
-          //    navigate("/clone", {
+   
 
  navigate(`/clone/${agreementId}`, {
   state: {
@@ -239,21 +214,16 @@ const handleDelete = async (id) => {
     agreementHeader: agreementHeader
   }
 })
-            //   navigate("/clone", {
-            //     state: {
-            //       targetAgreementId: "facc622f-2e3d-42c4-9094-06827f132497",
-            //       targetAgreementName: "Dummy",
-            //     },
-            //   })
+       
              }
           >
             Clone Agreement Line Items
           </button>
-             {/* head */}
+         
           <button
             className="primary"
             onClick={() =>
-              // navigate("/new-agreement", {
+          
                navigate(`/new-agreement/${agreementId}`, {
     state: {
       id,
@@ -261,7 +231,7 @@ const handleDelete = async (id) => {
       agreementHeader
     }
   })
-              // navigate("/new-agreement")
+             
             }
           >
             New Agreement Line Item
@@ -302,7 +272,7 @@ const handleDelete = async (id) => {
              <>
     {filteredAgreements.length === 0 ? (
       <div className="empty-state">
-        {/* <h3>No Agreement Line Items Found</h3> */}
+       
         <p>No Agreement Line Items found, Please create new Agreement Line Item!</p>
       </div>
     ) : (
@@ -322,9 +292,6 @@ const handleDelete = async (id) => {
                   <th>Parent Product</th>
                   <th>Parent Product  Code</th>
                   <th>Pricing Family</th>
-                  {/* <th>Related Service</th> */}
-
-
                   <th>Billing Plan</th>
 
 
@@ -439,10 +406,10 @@ const handleDelete = async (id) => {
                     </td>
 
 
-                       <td>{item.APTS_Parent_Product_c}</td>
+                       <td>{item.APTS_Parent_Product_c.Name}</td>
                   <td>{item.Parent_Product_Code_c}</td>
                   <td>{item.Pricing_Family_c}</td>
-                  {/* <td>Related Service</td> */}
+             
 
 
                     <td>{item.APTS_BillingPlan_c}</td>

@@ -11,7 +11,7 @@ export async function getPriceListById(id) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
+        
       },
     });
  
@@ -37,7 +37,7 @@ export async function updatePriceList(id, payload) {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        // "user-id": "6cfff136-e62b-d435-133d-455fb809c836",
+       
       },
       body: JSON.stringify(payload),
     });
@@ -45,8 +45,7 @@ export async function updatePriceList(id, payload) {
     if (!response.ok) {
       const errorData = await response.json();
       throw errorData;
-      // const errorText = await response.text();
-      //throw new Error(errorText || "Failed to update agreement");
+     
     }
     const result = await response.json();
     return result;
