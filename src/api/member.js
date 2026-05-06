@@ -202,7 +202,42 @@ export async function getAccountsByIds(ids = []) {
   }
 }
 
+export async function getAgreementsByIds(ids = []) {
+  if (!ids.length) return [];
 
+  const token = getAccessToken();
+  const formattedIds = ids.map(id => `'${id}'`).join(",");
+
+  const response = await fetch(
+    "https://preview-rls09.congacloud.com/api/data/v1/query/Agreement",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        ObjectName: "Agreement",
+        Criteria: `
+          Id IN (${formattedIds})
+          AND Status = 'Activated'
+          AND StatusCategory = 'In Effect'
+          AND Apttus_Market_c = 'North America'
+          AND APTS_SalesArea_c = 'United States'
+          AND APTS_Country_Code_c = 'US'
+        `,
+        Select: [
+          "Id",
+          "Name",
+          "Account" // GPO Account ID
+        ]
+      })
+    }
+  );
+
+  const result = await response.json();
+  return result.Data || [];
+}
 
 
 export async function queryGetOIT(member_id) {
@@ -298,7 +333,7 @@ export async function getAccounts({
     const result = await response.json();
     let data = result.Data || [];
 
-    // ✅ CLIENT SIDE SEARCH (WORKS ALWAYS)
+    // CLIENT SIDE SEARCH (WORKS ALWAYS)
     if (searchText) {
       const lower = searchText.toLowerCase();
 
@@ -422,12 +457,13 @@ export async function UpdateGPODesignateChange(id,payload) {
 }
 
 
-export async function getRetryRecords() {
+export async function getRetryRecords(UserId) {
 
   const token = getAccessToken();
    const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
   const formattedDate = sevenDaysAgo.toISOString();
+  console.log("formattedDate", `Bearer ${token}`);
   const response = await fetch(
     "https://preview-rls09.congacloud.com/api/data/v1/query/APTS_GPO_Designation_Changes_c",
      {
@@ -442,6 +478,7 @@ export async function getRetryRecords() {
         Criteria: `
           APTS_Status_c = 'Error'
           AND CreatedDate > '${formattedDate}'
+          AND CreatedBy.Id= '${UserId}'
         `,
         Select: [
           "Id",
@@ -457,4 +494,79 @@ export async function getRetryRecords() {
   return result.Data || [];
 }
 
+ export async function getUserIdFromToken() {
+  const token = getAccessToken();
+  console.log(" Raw Token:", token);
+ 
+  try {
+
+    // Remove "Bearer " if present
+
+    if (token.startsWith("Bearer ")) {
+
+      token = token.slice(7);
+
+      console.log(" Token after removing Bearer:", token);
+
+    }
+ 
+    // Split token
+
+    const parts = token.split('.');
+
+    if (parts.length !== 3) {
+
+      console.error(" Invalid JWT format");
+
+      return null;
+
+    }
+ 
+    const payload = parts[1];
+
+    console.log("Encoded Payload:", payload);
+ 
+    // Decode base64
+
+    let decodedPayload;
+ 
+    // Browser
+
+    if (typeof window !== "undefined" && typeof atob === "function") {
+
+      decodedPayload = JSON.parse(atob(payload));
+
+    } 
+
+    // Node.js
+
+    else {
+
+      decodedPayload = JSON.parse(
+
+        Buffer.from(payload, "base64").toString("utf-8")
+
+      );
+
+    }
+ 
+    console.log(" Decoded Payload:", decodedPayload);
+ 
+    // Extract user id
+
+    const userId = decodedPayload.c_user_id || decodedPayload.sub;
+ 
+    console.log(" Extracted UserId:", userId);
+ 
+    return userId;
+ 
+  } catch (error) {
+
+    console.error(" Error decoding token:", error);
+
+    return null;
+
+  }
+
+}
  

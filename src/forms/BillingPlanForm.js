@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { GetPicklist } from "../api/GetPicklist"; 
- 
+ import Select from "react-select";
 function BillingPlanForm({ data, product, onComplete, onSubmit, onChange, onChangeProduct }) {
   const [billingOptions, setBillingOptions] = useState([]);
   const [error, setError] = useState("");
@@ -24,25 +24,67 @@ function BillingPlanForm({ data, product, onComplete, onSubmit, onChange, onChan
  
   // 2. Build Hierarchy List (for MatchProductsBy === 'Hierarchy')
   useEffect(() => {
+    // const buildHierarchyList = (prod) => {
+    //   const final = [];
+    //   prod.selectedBUs?.forEach((bu) => {
+    //     const matchedMAGs = prod.selectedMAGs?.filter(
+    //       (mag) => mag.Business_Unit_ID_c === bu.Business_Unit_ID_c
+    //     ) || [];
+    //     if (matchedMAGs.length === 0) {
+    //       final.push(bu.Business_Unit_Name_c);
+    //     } else {
+    //       matchedMAGs.forEach((mag) => {
+    //         const matchedAG = prod.selectedAGs?.find(
+    //           (ag) => ag.Main_Article_Group_ID_c === mag.Main_Article_Group_ID_c
+    //         );
+    //         final.push(matchedAG ? matchedAG.Article_Group_Name_c : mag.Main_Article_Group_Name_c);
+    //       });
+    //     }
+    //   });
+    //   return [...new Set(final)];
+    // };
     const buildHierarchyList = (prod) => {
-      const final = [];
-      prod.selectedBUs?.forEach((bu) => {
-        const matchedMAGs = prod.selectedMAGs?.filter(
-          (mag) => mag.Business_Unit_ID_c === bu.Business_Unit_ID_c
-        ) || [];
-        if (matchedMAGs.length === 0) {
-          final.push(bu.Business_Unit_Name_c);
-        } else {
-          matchedMAGs.forEach((mag) => {
-            const matchedAG = prod.selectedAGs?.find(
-              (ag) => ag.Main_Article_Group_ID_c === mag.Main_Article_Group_ID_c
-            );
-            final.push(matchedAG ? matchedAG.Article_Group_Name_c : mag.Main_Article_Group_Name_c);
+  const final = [];
+
+  prod.selectedBUs?.forEach((bu) => {
+    const matchedMAGs = prod.selectedMAGs?.filter(
+      (mag) => mag.Business_Unit_ID_c === bu.Business_Unit_ID_c
+    ) || [];
+
+    //  CASE 1: Only BU
+    if (matchedMAGs.length === 0) {
+      final.push({
+        name: bu.Business_Unit_Name_c,
+        code: bu.Business_Unit_ID_c
+      });
+    } else {
+      matchedMAGs.forEach((mag) => {
+
+        const matchedAG = prod.selectedAGs?.find(
+          (ag) => ag.Main_Article_Group_ID_c === mag.Main_Article_Group_ID_c
+        );
+
+        // CASE 2: BU + MAG
+        if (!matchedAG) {
+          final.push({
+            name: mag.Main_Article_Group_Name_c,
+            code: `${bu.Business_Unit_ID_c}/${mag.Main_Article_Group_ID_c}`
+          });
+        }
+
+        // CASE 3: BU + MAG + AG
+        if (matchedAG) {
+          final.push({
+            name: matchedAG.Article_Group_Name_c,
+            code: `${bu.Business_Unit_ID_c}/${mag.Main_Article_Group_ID_c}/${matchedAG.Article_Group_ID_c}`
           });
         }
       });
-      return [...new Set(final)];
-    };
+    }
+  });
+
+  return final;
+};
     if (product.MatchProductsBy === 'Hierarchy') {
       setBillingList(buildHierarchyList(product));
     }
@@ -76,10 +118,25 @@ function BillingPlanForm({ data, product, onComplete, onSubmit, onChange, onChan
       <table className="data-table billing-table">
         <thead>
           <tr>
-            <th>Product Name</th>
+              {product.MatchProductsBy === 'Hierarchy' && (
+              <>
+             <th>Hierarchy</th>
+              <th>Hierarchy Code</th>
+               
+              </>
+            )}
             {/* Show Parent columns only in Product mode */}
+            {product.MatchProductsBy === 'Product' &&  (
+              <>
+              <th>Product Name</th>
+              <th>Product Code</th>
+              <th>Product Configuration Type</th>
+               
+              </>
+            )}
             {product.MatchProductsBy === 'Product' && parentFlag && (
               <>
+         
                 <th>Parent Product Name</th>
                 <th>Parent Product Code</th>
               </>
@@ -89,20 +146,64 @@ function BillingPlanForm({ data, product, onComplete, onSubmit, onChange, onChan
         </thead>
         <tbody>
           {/* --- HIERARCHY MODE --- */}
-          {product.MatchProductsBy === 'Hierarchy' && billingList.map((name, index) => (
+          {product.MatchProductsBy === 'Hierarchy' && billingList.map((item, index) => (
+  <tr key={`hier-${index}`}>
+    <td>{item.name}</td>
+    
+    <td>{item.code}</td>
+
+    <td>
+      <Select
+        value={
+          billingOptions
+            .map(opt => ({ value: opt.Value, label: opt.Label || opt.Value }))
+            .find(opt => opt.value === data[item.code])
+        }
+        onChange={(selected) => handleSelectChange(item.code, selected.value)}
+        options={[
+          { value: "1", label: "-- None --" },
+          ...billingOptions.map(opt => ({
+            value: opt.Value,
+            label: opt.Label || opt.Value
+          }))
+        ]}
+        placeholder={`Select Billing Plan for ${item.name}`}
+      />
+    </td>
+  </tr>
+))}
+          {/* {product.MatchProductsBy === 'Hierarchy' && billingList.map((name, index) => (
             <tr key={`hier-${index}`}>
               <td>{name}</td>
               <td>
-                <select value={data[name] || ""} className={`custom-select ${data[name]?"has=value":""}`} onChange={(e) => handleSelectChange(name, e.target.value)}>
-                <option value="" hidden>Select BillingPlan for {name}</option>
-                <option value="1">-- None --</option>
-                  {billingOptions.map((opt) => (
-                    <option key={opt.Value} value={opt.Value}>{opt.Label || opt.Value}</option>
-                  ))}
-                </select>
+                <Select
+  value={
+    billingOptions
+      .map(opt => ({ value: opt.Value, label: opt.Label || opt.Value }))
+      .find(opt => opt.value === data[name])
+  }
+  onChange={(selected) => handleSelectChange(name, selected.value)}
+  options={[
+    { value: "1", label: "-- None --" }, 
+    ...billingOptions.map(opt => ({
+      value: opt.Value,
+      label: opt.Label || opt.Value
+    }))
+  ]}
+  placeholder={`Select Billing Plan for ${name}`}
+  menuPlacement="auto"
+  styles={{
+    menuList: (provided) => ({
+      ...provided,
+      maxHeight: 200,   
+      overflowY: "auto"
+    })
+  }}
+/>
+                
               </td>
             </tr>
-          ))}
+          ))} */}
  
           {/* --- PRODUCT MODE (With Parent/Child Logic) --- */}
           {product.MatchProductsBy === 'Product' && product.selectedProducts.map((p, index) => {
@@ -114,6 +215,10 @@ function BillingPlanForm({ data, product, onComplete, onSubmit, onChange, onChan
             return (
               <tr key={`prod-${p.Id || index}`}>
                 <td>{p.Name}</td>
+                  <td>{p.ProductCode}</td>
+
+
+  <td>{p.Configuration}</td>
                 {/* Use parentInfo data or leave blank if no parent selected */}
                 {parentFlag &&
                   <>
@@ -125,7 +230,29 @@ function BillingPlanForm({ data, product, onComplete, onSubmit, onChange, onChan
                 </td>
                 </>}
                 <td>
-                  <select
+             <Select
+  value={
+    billingOptions
+      .map(opt => ({ value: opt.Value, label: opt.Label || opt.Value }))
+      .find(opt => opt.value === p?.BillingPlan)
+  }
+  onChange={(selected) => handleProductBilling(index, selected.value)}
+  options={billingOptions.map(opt => ({
+    value: opt.Value,
+    label: opt.Label || opt.Value
+  }))}
+  placeholder={`Select Billing Plan for ${p.Name}`}
+  menuPlacement="auto"
+  styles={{
+    menuList: (provided) => ({
+      ...provided,
+      maxHeight: 200,  
+      overflowY: "auto"
+    })
+  }}
+/>
+                  {/* <select
+                  //  size={2} 
                     value={p?.BillingPlan || ""}
                     className={`custom-select ${p?.BillingPlan?"has=value":""}`}
                     onChange={(e) => handleProductBilling(index, e.target.value)}
@@ -135,7 +262,7 @@ function BillingPlanForm({ data, product, onComplete, onSubmit, onChange, onChan
                     {billingOptions.map((opt) => (
                       <option key={opt.Value} value={opt.Value}>{opt.Label || opt.Value}</option>
                     ))}
-                  </select>
+                  </select> */}
                 </td>
               </tr>
             );

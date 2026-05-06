@@ -1,10 +1,9 @@
-
 import React, { useState,useEffect } from "react";
 import "../Designation.css"
 import {  useLocation } from "react-router-dom";
 
 import MemberSearch from "../components/MemberSearch";
-import { getAccounts,getMembershipAgreements ,createGPODesignateChange,getRetryRecords, UpdateGPODesignateChange} from "../api/member"; 
+import { getAccountsByIds,getAgreementsByIds,getAccounts,getMembershipAgreements ,createGPODesignateChange,getRetryRecords, UpdateGPODesignateChange,getUserIdFromToken} from "../api/member"; 
 import {getAgreementById} from "../api/api";
 import { queryGetAgreementDetails } from "../api/queryAgreementLineItemsByAgreement"; 
 
@@ -29,7 +28,8 @@ const [showCheckBox, setShowCheckBox] = useState(false);
 const [showConfirm, setShowConfirm] = useState(false);
 const [retryRecords, setRetryRecords] = useState([]);
 const [showRetry, setShowRetry] = useState(false);
-
+const [currentDesignated, setCurrentDesignated] = useState(null);
+const [unDesignate, setUnDesignate] = useState(false);
 const clearForm = () => {
   setRows([]);
   setMember(null);
@@ -42,11 +42,14 @@ const clearForm = () => {
 };
 useEffect(() => {
   loadRetryRecords();
+  
 }, []);
 
 const loadRetryRecords = async () => {
   try {
-    const data = await getRetryRecords();
+    const UserId = await getUserIdFromToken();
+    console.log("UserId for retry", UserId);
+    const data = await getRetryRecords(UserId);
 console.log("retry data", data);
     if (data.length > 0) {
       setRetryRecords(data);
@@ -73,28 +76,109 @@ useEffect(() => {
   }
   if (!member?.Name) return;
 
-  const load = async () => {
-    const data = await getAccounts({
-      filters: {
-        Market_c: "North America",
-        Country_c: "United States",
-        Inactive_Flag_c: false,
-        Golden_Record_Key_c: { notNull: true },
-        Name: member.Name // EXACT MATCH
-      }
-    });
-console.log("dataoption",data);
-    const mapped = data.map(rec => ({
-      label: `${rec.Designated_GPO_c?.Name || "No GPO"} ${
-        rec.Designated_GPO_c ? "(Designated)" : ""
-      }`,
-      value: rec.Id
-    }));
- console.log("hdshe",mapped);
-    setOptions(mapped);
-     console.log("hdshe",options);
-  };
+//   const load = async () => {
+//     const data = await getAccounts({
+//       filters: {
+//         Market_c: "North America",
+//         Country_c: "United States",
+//         Inactive_Flag_c: false,
+//         Golden_Record_Key_c: { notNull: true },
+//         Name: member.Name // EXACT MATCH
+//       }
+//     });
+// console.log("dataoption",data);
+// const mapped = data.map(rec => {
+//   const isDesignated = !!rec.Designated_GPO_c;
 
+//   if (isDesignated) {
+//     setCurrentDesignated(rec.Id); // store designated
+//     setShowCheckBox(true);        // show checkbox initially
+//   }
+
+//   return {
+//     label: `${rec.Designated_GPO_c?.Name || "No GPO"} ${
+//       isDesignated ? "(Designated)" : ""
+//     }`,
+//     value: rec.Id,
+//     isDesignated
+//   };
+// });
+
+// setOptions(mapped);
+// const designatedOption = mapped.find(o => o.isDesignated);
+
+// if (designatedOption) {
+//   setDesignated(designatedOption.value); 
+// }
+   
+//  console.log("hdshe",mapped);
+//     setOptions(mapped);
+//      console.log("hdshe",options);
+//   };
+
+const load = async () => {
+  // STEP 1: Contracts
+  const contracts = await getMembershipAgreements(member.Id);
+
+  const agreementIds = contracts
+    .map(c => c.APTS_Related_Agreement_c)
+    .filter(Boolean);
+
+  if (!agreementIds.length) {
+    setOptions([]);
+    return;
+  }
+
+  // STEP 2: Agreements
+  const agreements = await getAgreementsByIds(agreementIds);
+console.log("agreements", agreements);
+  const accountIds = [
+    ...new Set(agreements.map(a => a.Account?.Id))
+  ];
+console.log("accountIds", accountIds);
+  // STEP 3: Accounts
+  const accounts = await getAccountsByIds(accountIds);
+
+  // STEP 4: Map to radio options
+  // const mapped = accounts.map(acc => {
+  //   return {
+  //     label: acc.Name,
+  //     value: acc.Id,
+  //     isDesignated: acc.Id === member.Designated_GPO__c // adjust if needed
+  //   };
+  // });
+const mapped = accounts.map(acc => {
+  console.log("mapping account", acc.Id, member.Id);
+  console.log("current designated", member.Designated_GPO_c);
+  const isDesignated = acc.Id === member.Id;
+
+  return {
+    label: isDesignated
+      ? `${acc.Name} (Designated)`
+      : acc.Name,
+    value: acc.Id,
+    isDesignated
+  };
+});
+setOptions(mapped);
+
+const designatedOption = mapped.find(o => o.isDesignated);
+
+if (designatedOption) {
+  setDesignated(designatedOption.value);   
+  setCurrentDesignated(designatedOption.value); // optional but useful
+  setShowCheckBox(true); 
+} else {
+  setShowCheckBox(false);
+}
+  // setOptions(mapped);
+
+  // const designated = mapped.find(o => o.isDesignated);
+  // if (designated) {
+  //   setDesignated(designated.value);
+  //   setShowCheckBox(true);
+  // }
+};
   load();
 }, [member],[Acc]);
    const loadData = async () => {
@@ -127,38 +211,6 @@ const trying = await queryGetAgreementDetails(agreementId);
   setRows((prev) => [...prev, newRow]);
 };
 
-// const checkMembershipAgreements = async (memberId, newGpoId) => {
-//   try {
-//     // Step 1: Get contracts by member
-//     const contracts = await getMembershipAgreements(memberId);
-// console.log("contracts", contracts);
-// console.log("contractsData", contracts[0].APTS_Related_Agreement_c);
-// console.log("contracts length", contracts.length);
-//     if (contracts.length === 0) return 0;
-
-
-//     const agreements = await getAgreementById(contracts[0].APTS_Related_Agreement_c);
-// console.log("agreements", agreements);
-//     const today = new Date();
-
-//     // Step 4: Apply Apex-like filters
-//     const validAgreements = agreements.filter(agr => {
-//       return (
-//         new Date(agr.ContractEndDate) > today &&
-//         agr.APTS_Member_SAP_Status_c === "In Progress" && // adjust if needed
-//         agr.Account === newGpoId &&
-//         agr.Status === "Activated" &&
-//         agr.StatusCategory === "In Effect"
-//       );
-//     });
-
-//     return validAgreements.length;
-
-//   } catch (e) {
-//     console.error("Error in membership check", e);
-//     return 0;
-//   }
-// };
 
 const checkMembershipAgreements = async (memberId, newGpoId) => {
   try {
@@ -218,7 +270,7 @@ const handleConfirmYes = async () => {
         APTS_Designated_GPO_c: {Id: r.gpoId, Name: r.gpoName},
         APTS_Start_date_c: r.effectiveDate,
         APTS_Order_Intake_Volume_Tier_c: r.tier,
-        APTS_Un_designate_c: showCheckBox && designated === r.memberId ? true : false,
+        APTS_Un_designate_c: unDesignate,
         APTS_Customer_MP1_Id_c: member.MP1_Customer_id_1_c,
         APTS_Status_c: "Not Processed"
       };
@@ -249,6 +301,8 @@ const handleRetry = async () => {
       // Fix past date
       if (updatedDate && updatedDate < today) {
         updatedDate = today;
+      }else{
+        updatedDate = rec.APTS_Start_date_c;
       }
 
       const payload = {
@@ -345,6 +399,39 @@ const handleRetry = async () => {
     {options.map(opt => (
       <label key={opt.value}>
         <input
+  type="radio"
+  name="designation"
+  value={opt.value}
+  checked={designated === opt.value}   
+  onChange={(e) => {
+  const val = e.target.value;
+  setDesignated(val);
+
+  const selected = options.find(o => o.value === val);
+
+  // LWC logic equivalent
+  if (selected?.label.includes("(Designated)")) {
+    setShowCheckBox(true);
+  } else {
+    setShowCheckBox(false);
+    setUnDesignate(false); // reset checkbox
+  }
+}}
+  // onChange={(e) => {
+  //   const val = e.target.value;
+  //   setDesignated(val);
+
+  //   const selected = options.find(o => o.value === val);
+
+  //   if (selected?.isDesignated) {
+  //     setShowCheckBox(true);
+  //   } else {
+  //     setShowCheckBox(false);
+  //     setUnDesignate(false); // reset checkbox
+  //   }
+  // }}
+/>
+        {/* <input
           type="radio"
           name="designation"
           value={opt.value}
@@ -360,10 +447,22 @@ const handleRetry = async () => {
               setShowCheckBox(false);
             }
           }}
-        />
+        /> */}
         {opt.label}
       </label>
     ))}
+  </div>
+)}
+{showCheckBox && (
+  <div style={{ marginTop: "10px" }}>
+    <label>
+      <input
+        type="checkbox"
+        checked={unDesignate}
+        onChange={(e) => setUnDesignate(e.target.checked)}
+      />
+      {" "}Un-Designate
+    </label>
   </div>
 )}
                 </td>

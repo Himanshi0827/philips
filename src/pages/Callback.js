@@ -10,6 +10,7 @@ function Callback() {
     const processCallback = async () => {
       try {
         const user = await handleCallback();
+        console.log("User after callback:", user);
 
         // Get original route
         const returnUrl = user?.state?.returnUrl || "/";

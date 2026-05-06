@@ -109,7 +109,7 @@ if(field?.AgreementId)
               {r.Name}
             </div>
             <div className="product-meta">
-              {r.ConfigurationType} • BG: {r.BG_Code} • BU: {r.BU_Code}
+              {r.ConfigurationType} • {r.ProductCode}
             </div>
 
            

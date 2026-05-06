@@ -16,7 +16,7 @@ function HierarchyLookupList({ records, onSelect,check }) {
     <div>
       <input
         type="text"
-        placeholder="Search Business Unit / Business Group"
+        placeholder={`Search by ${check === 'Business Unit' ? 'Business Unit/Group' : check === 'MAG' ? 'Main Article Group/Business Unit' : 'Article Group/Main Article Group'}`}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         style={{ width: "100%", marginBottom: "10px" }}

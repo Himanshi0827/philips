@@ -35,7 +35,7 @@ const filtered = records.filter(p =>
       <strong>{p.Name}</strong> <small>({p.ProductCode})</small>
     </span>
     <span style={{ color: '#007bff' }}>
-      → Child: {p.ChildName}
+      → Child: {p.ChildName}({p.ChildProductCode})
     </span>
   </div>
 ))}
