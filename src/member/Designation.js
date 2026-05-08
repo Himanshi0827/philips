@@ -3,7 +3,7 @@ import "../Designation.css"
 import {  useLocation } from "react-router-dom";
 
 import MemberSearch from "../components/MemberSearch";
-import { getAccountsByIds,getAgreementsByIds,getAccounts,getMembershipAgreements ,createGPODesignateChange,getRetryRecords, UpdateGPODesignateChange,getUserIdFromToken} from "../api/member"; 
+import { getAccountsByIds,getAgreementsByIds,getAgreementsIds,getMembershipAgreements ,createGPODesignateChange,getRetryRecords, UpdateGPODesignateChange,getUserIdFromToken,fetchRecords,getAgreementDetailsByIds} from "../api/member"; 
 import {getAgreementById} from "../api/api";
 import { queryGetAgreementDetails } from "../api/queryAgreementLineItemsByAgreement"; 
 
@@ -30,6 +30,10 @@ const [retryRecords, setRetryRecords] = useState([]);
 const [showRetry, setShowRetry] = useState(false);
 const [currentDesignated, setCurrentDesignated] = useState(null);
 const [unDesignate, setUnDesignate] = useState(false);
+const [cfMsg, setCfMsg] = useState("");
+const [openModalCus, setOpenModalCus] = useState(false);
+const [custFrameagrList, setCustFrameagrList] = useState([]);
+
 const clearForm = () => {
   setRows([]);
   setMember(null);
@@ -130,7 +134,7 @@ const load = async () => {
   }
 
   // STEP 2: Agreements
-  const agreements = await getAgreementsByIds(agreementIds);
+  const agreements = await getAgreementsIds(agreementIds);
 console.log("agreements", agreements);
   const accountIds = [
     ...new Set(agreements.map(a => a.Account?.Id))
@@ -150,8 +154,13 @@ console.log("accountIds", accountIds);
 const mapped = accounts.map(acc => {
   console.log("mapping account", acc.Id, member.Id);
   console.log("current designated", member.Designated_GPO_c);
-  const isDesignated = acc.Id === member.Id;
+ // const isDesignated = acc.Id === member.Id;
+ const designatedId =
+  member.Designated_GPO_c?.Id ||
+  member.Designated_GPO_c;
 
+const isDesignated = acc.Id === designatedId;
+//  const isDesignated = acc.Id === member.Designated_GPO_c.Id;
   return {
     label: isDesignated
       ? `${acc.Name} (Designated)`
@@ -162,13 +171,22 @@ const mapped = accounts.map(acc => {
 });
 setOptions(mapped);
 
+ setShowCheckBox(false);
 const designatedOption = mapped.find(o => o.isDesignated);
 
 if (designatedOption) {
+  console.log(
+    "Found designated option",
+    designatedOption
+  );
   setDesignated(designatedOption.value);   
   setCurrentDesignated(designatedOption.value); // optional but useful
   setShowCheckBox(true); 
 } else {
+
+  console.log("No designated option found");
+
+  setDesignated(null);
   setShowCheckBox(false);
 }
   // setOptions(mapped);
@@ -212,52 +230,164 @@ const trying = await queryGetAgreementDetails(agreementId);
 };
 
 
-const checkMembershipAgreements = async (memberId, newGpoId) => {
+// const checkMembershipAgreements = async (memberId, newGpoId) => {
+//   try {
+//     const contracts = await getMembershipAgreements(memberId);
+// console.log("contracts", contracts);
+//     if (!contracts || contracts.length === 0) return 0;
+
+//     let allAgreements = [];
+
+//     //  Step 1: Fetch ALL agreements
+//     for (let contract of contracts) {
+//       if (contract.APTS_Related_Agreement_c) {
+//         const agr = await getAgreementById(
+//           contract.APTS_Related_Agreement_c
+//         );
+// console.log("agr for contract", contract.Id, agr);
+//         if (agr && agr.length > 0) {
+//           allAgreements.push(...agr);
+//         }
+//       }
+//     }
+
+//     const todayDate = new Date();
+
+//     //  Step 2: Apply EXACT same conditions as LWC/Apex
+//     const validAgreements = allAgreements.filter((agr) => {
+//       return (
+//         console.log("Checking agreement", agr.Id, ),
+//         agr.ContractEndDate &&
+//         new Date(agr.ContractEndDate) > todayDate &&
+
+//         agr.APTS_Member_SAP_Status_c === "In Progress" &&
+
+//         //  IMPORTANT: handle both cases (Id or direct value)
+//         (agr.Account === newGpoId || agr.Account?.Id === newGpoId) &&
+
+//         agr.Status === "Activated" &&
+//         agr.StatusCategory === "In Effect"
+//       );
+//     });
+
+//     console.log("Valid agreements after filter:", validAgreements);
+
+//     return validAgreements.length;
+
+//   } catch (e) {
+//     console.error("Error in membership check", e);
+//     return 0;
+//   }
+// };
+
+const checkMembershipAgreements = async (
+  memberId,
+  newGpoId
+) => {
+
   try {
-    const contracts = await getMembershipAgreements(memberId);
-console.log("contracts", contracts);
-    if (!contracts || contracts.length === 0) return 0;
 
-    let allAgreements = [];
+    /*
+      STEP 1:
+      Get contracts
+    */
 
-    //  Step 1: Fetch ALL agreements
-    for (let contract of contracts) {
-      if (contract.APTS_Related_Agreement_c) {
-        const agr = await getAgreementById(
-          contract.APTS_Related_Agreement_c
-        );
-console.log("agr for contract", contract.Id, agr);
-        if (agr && agr.length > 0) {
-          allAgreements.push(...agr);
-        }
-      }
+    const contracts =
+      await getMembershipAgreements(memberId);
+
+    console.log("contracts", contracts);
+
+   if (!contracts || contracts.length === 0) {
+      return 0;
     }
+
+
+    const AccountIds = [];
+
+    contracts.forEach(c => {
+
+      // const Account =
+      //   c?.APTS_Member_c?.Designated_GPO_c ||
+      //   c?.APTS_Member_c?.Designated_GPO_c?.Id;
+
+      const Account = c?.APTS_Member_c
+console.log("Account for contract", c.Id, Account);
+      if (Account) {
+        AccountIds.push(Account);
+      }
+    });
+    console.log("AccountIds", AccountIds);
+ const designate = await getAccountsByIds(AccountIds);
+
+     const designatedIds = [];
+
+    designate.forEach(c => {
+
+      // const designated =
+      //   c?.APTS_Member_c?.Designated_GPO_c ||
+      //   c?.APTS_Member_c?.Designated_GPO_c?.Id;
+
+      const designated = c?.Designated_GPO_c?.Id || c?.Designated_GPO_c;
+console.log("designated for contract", c.Id, designated);
+      if (designated) {
+        designatedIds.push(designated);
+      }
+    });
+    console.log("designatedIds", designatedIds);
+    
+
+
+    const agreementIds = contracts
+      .map(c => c.APTS_Related_Agreement_c)
+      .filter(Boolean);
+
+    if (!agreementIds.length) {
+      return 0;
+    }
+
+
+    const agreements =
+      await getAgreementsByIds(agreementIds);
+
+    console.log("agreements", agreements);
 
     const todayDate = new Date();
 
-    //  Step 2: Apply EXACT same conditions as LWC/Apex
-    const validAgreements = allAgreements.filter((agr) => {
-      return (
-        console.log("Checking agreement", agr.Id, ),
-        agr.ContractEndDate &&
-        new Date(agr.ContractEndDate) > todayDate &&
+    const validAgreements =
+      agreements.filter(agr => {
 
-        agr.APTS_Member_SAP_Status_c === "In Progress" &&
+        const agrAccount =
+          agr.Account?.Id || agr.Account;
 
-        //  IMPORTANT: handle both cases (Id or direct value)
-        (agr.Account === newGpoId || agr.Account?.Id === newGpoId) &&
+        return (
 
-        agr.Status === "Activated" &&
-        agr.StatusCategory === "In Effect"
-      );
-    });
+          agr.ContractEndDate &&
+          new Date(agr.ContractEndDate) > todayDate &&
 
-    console.log("Valid agreements after filter:", validAgreements);
+          agr.APTS_Agreement_SAP_Status_c ===
+            "In Progress" &&
+
+          (
+            agrAccount === newGpoId ||
+            designatedIds.includes(agrAccount)
+          ) 
+        );
+      });
+
+    console.log(
+      "validAgreements",
+      validAgreements
+    );
 
     return validAgreements.length;
 
   } catch (e) {
-    console.error("Error in membership check", e);
+
+    console.error(
+      "Error in membership check",
+      e
+    );
+
     return 0;
   }
 };
@@ -325,6 +455,188 @@ const handleRetry = async () => {
     toast.error("Retry failed");
   }
 };
+
+const handleDesignationValidation = async () => {
+
+  try {
+     if (unDesignate) {
+
+    console.log(
+      "UnDesignate checked - skipping validations"
+    );
+
+    handleAddRow();
+
+    return;
+  }
+
+    // MEMBER VALIDATION
+    if (!member || !selectedGPO) {
+      toast.error("Please Select the GPO Account");
+      return;
+    }
+
+    // DATE VALIDATION
+    if (effectiveDate < today) {
+      toast.error("Please Select the future date from Date picker to proceed further.");
+      return;
+    }
+
+    // SAP VALIDATION
+    const count = await checkMembershipAgreements(
+      member.Id,
+      selectedGPO.Id
+    );
+console.log("Valid agreement count for validation", count);
+    if (count > 0) {
+      toast.error(
+        "Member SAP status In Progress. Please try after sometime"
+      );
+      return;
+    }
+
+    // DUPLICATE VALIDATION
+    const duplicateRecords =
+      await fetchRecords(member.Id);
+console.log("duplicateRecords", duplicateRecords);
+    if (duplicateRecords.length > 0) {
+      toast.error(
+        "Duplicate record is identified of member designate change."
+      );
+      return;
+    }
+
+    // SAME GPO VALIDATION
+    if (
+      currentDesignated &&
+      currentDesignated === selectedGPO.Id
+    ) {
+      toast.error(
+        "Member is already designated to the same GPO. Please create a new membership record for the same designated GPO."
+      );
+      return;
+    }
+
+    // CFA VALIDATION
+// CFA VALIDATION
+const memberContracts = await getMembershipAgreements(member.Id);
+
+console.log("memberContracts", memberContracts);
+console.log("member.Id", member.Id);
+const accountIds = memberContracts
+  .map(c => c.APTS_Member_c)
+  .filter(Boolean);
+ console.log("accountIds from contracts", accountIds);
+  const designate = await getAccountsByIds(accountIds);
+
+     const designatedIds = [];
+
+    designate.forEach(c => {
+
+      const designated = c?.Designated_GPO_c?.Id || c?.Designated_GPO_c;
+console.log("accountIds from contracts designated for contract", c.Id, designated);
+      if (designated) {
+        designatedIds.push(designated);
+      }
+    });
+    console.log("designatedIds", designatedIds); 
+if (memberContracts && memberContracts.length > 0) {
+
+  let misccount = 0;
+  let mismcount = 0;
+
+  const cfagrlist = [];
+
+
+  const agreementIds = memberContracts
+    .map(rec => rec.APTS_Related_Agreement_c)
+    .filter(Boolean);
+
+
+
+  const agreements = await getAgreementDetailsByIds(
+    agreementIds,designatedIds,member.Id
+  );
+
+  console.log("agreements", agreements);
+
+  const agreementMap = {};
+
+  agreements.forEach(agr => {
+    agreementMap[agr.Id] = agr;
+  });
+
+
+
+  for (let rec of memberContracts) {
+
+    const agr =
+      agreementMap[rec.APTS_Related_Agreement_c];
+
+    if (!agr) continue;
+
+
+    const agrAccount =
+      agr.Account?.Id || agr.Account;
+console.log("agrAccount", agrAccount, "designatedIds", designatedIds);
+
+    const memberAccountId =rec.APTS_Member_c;
+
+if (
+  memberAccountId === member.Id &&
+  agrAccount === member.Id
+){
+
+      misccount++;
+      console.log("misccount", misccount);
+
+    } else {
+
+      mismcount++;
+      console.log("mismcount", mismcount);
+    }
+
+    cfagrlist.push({
+      Name: agr.Name,
+      AgmntId: agr.Id
+    });
+  }
+
+  console.log("misccount", misccount);
+  console.log("mismcount", mismcount);
+
+  if (cfagrlist.length > 0) {
+
+    setCustFrameagrList(cfagrlist);
+
+    if (misccount > 0) {
+
+      setCfMsg(
+        "Member is the customer of a CFA - a participant of a local agreement (LSP,MST,CAA,PSP). Do you want to proceed with Designation?"
+      );
+
+    } else if (mismcount > 0) {
+
+      setCfMsg(
+        "Member is a member of a CFA - a participant of a local agreement (LSP,MST,CAA,PSP). Do you want to proceed with Designation?"
+      );
+    }
+
+    setOpenModalCus(true);
+
+    return;
+  }
+}
+
+// FINAL
+handleAddRow();
+
+  } catch (e) {
+    console.error(e);
+    toast.error("Validation failed");
+  }
+};
+
   return (
     <div className="page-container">
       
@@ -493,7 +805,7 @@ You can create new membership records and designate the member to the select GPO
             </tbody>
           </table>
           <div className="button-container">
-          <button
+          {/* <button
   className="btn-primary"
   onClick={async () => {
     if (!member || !selectedGPO) {
@@ -523,6 +835,10 @@ console.log("valid agreement count", count);
     //  Only after validation
     handleAddRow();
   }}
+> */}
+<button
+  className="btn-primary"
+  onClick={handleDesignationValidation}
 >
   Submit Designated Change Request
 </button></div>
@@ -550,6 +866,42 @@ console.log("valid agreement count", count);
         >
           No
         </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{openModalCus && (
+  <div className="modal-overlay">
+    <div className="modal-box">
+
+      <h3>Confirmation</h3>
+
+      <p>{cfMsg}</p>
+
+      <div className="modal-actions">
+
+        <button
+          className="btn-primary"
+          onClick={() => {
+
+            setOpenModalCus(false);
+
+            handleAddRow();
+          }}
+        >
+          Yes
+        </button>
+
+        <button
+          className="btn-secondary"
+          onClick={() => {
+            setOpenModalCus(false);
+          }}
+        >
+          No
+        </button>
+
       </div>
     </div>
   </div>

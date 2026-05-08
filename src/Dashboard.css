@@ -52,7 +52,9 @@
 .section-title {
   background: #0070d2;
   color: white;
-  padding: 10px 20px;
+  /* padding: 10px 20px; */
+  margin-bottom: 4px;
+  padding-bottom: 0;
   font-weight: bold;
 }
  

@@ -159,7 +159,7 @@ function BillingPlanForm({ data, product, onComplete, onSubmit, onChange, onChan
             .map(opt => ({ value: opt.Value, label: opt.Label || opt.Value }))
             .find(opt => opt.value === data[item.code])
         }
-        onChange={(selected) => handleSelectChange(item.code, selected.value)}
+        onChange={(selected) => handleSelectChange(item.name, selected.value)}
         options={[
           { value: "1", label: "-- None --" },
           ...billingOptions.map(opt => ({

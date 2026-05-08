@@ -178,7 +178,7 @@ const handleDelete = async (id) => {
           <span className="brand">PHILIPS</span>
           <span className="agreement-name">
         
-  Agreement: {agreementName || "No Agreement Selected"}
+ | Agreement: {agreementName || "No Agreement Selected"}
 </span>
         
         </div>
@@ -242,11 +242,9 @@ const handleDelete = async (id) => {
       {/* Section Title */}
        <div className="section-title">Agreement Line Items</div>
       {filteredAgreements.length !== 0 &&(
-        <>
-     
-
-      {/* Search */}
+    
       <div className="table-toolbar">
+      <p style={{ margin: 0 }}>Search Agreement Line Item</p>  
       <input
   type="text"
   placeholder="Search all with product, msp, hierarchy etc..."
@@ -258,7 +256,7 @@ const handleDelete = async (id) => {
 />
        
       </div>
-      </>
+   
      ) }
 
       {/* Loading / Error */}
@@ -477,9 +475,12 @@ const handleDelete = async (id) => {
                 ◀ Previous
               </button>
 
-              <span className="page-info">
+              {/* <span className="page-info">
                 Page {page} of {totalPages}
-              </span>
+              </span> */}
+              <span className="page-info">
+  Page {page} of {totalPages} ( Total ALI(s): {filteredAgreements.length} )
+</span>
 
               <button onClick={goNext} disabled={isLast}>
                 Next ▶

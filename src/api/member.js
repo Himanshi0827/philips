@@ -225,11 +225,48 @@ export async function getAgreementsByIds(ids = []) {
           AND Apttus_Market_c = 'North America'
           AND APTS_SalesArea_c = 'United States'
           AND APTS_Country_Code_c = 'US'
+          AND (RecordType = 'GPO_Framework'
+          OR (APTS_Agreement_Sub_Type_c IN ('Cooperative Alliance Agreement', 'Long term strategic partnership', 'Product Specific Pricing', 'Master Purchase Agreement')
+      )AND RecordType = 'Customer_Framework')
+      AND APTS_Member_SAP_Status_c='In Progress'
         `,
         Select: [
-          "Id",
-          "Name",
-          "Account" // GPO Account ID
+          "*"
+        ]
+      })
+    }
+  );
+
+  const result = await response.json();
+  return result.Data || [];
+}
+
+export async function getAgreementsIds(ids = []) {
+  if (!ids.length) return [];
+
+  const token = getAccessToken();
+  const formattedIds = ids.map(id => `'${id}'`).join(",");
+
+  const response = await fetch(
+    "https://preview-rls09.congacloud.com/api/data/v1/query/Agreement",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        ObjectName: "Agreement",
+        Criteria: `
+          Id IN (${formattedIds})
+          AND Status = 'Activated'
+          AND StatusCategory = 'In Effect'
+          AND Apttus_Market_c = 'North America'
+          AND APTS_SalesArea_c = 'United States'
+          AND APTS_Country_Code_c = 'US'
+        `,
+        Select: [
+          "*"
         ]
       })
     }
@@ -393,7 +430,7 @@ export async function getMembershipAgreements(memberId) {
         Criteria: `
           APTS_Member_c = '${memberId}'
         `,
-        Select: ["Id", "Name", "APTS_Related_Agreement_c", "APTS_Member_c"]
+        Select: ["*"]
       })
     }
   );
@@ -570,3 +607,91 @@ export async function getRetryRecords(UserId) {
 
 }
  
+
+
+export async function fetchRecords(accId) {
+
+  const token = getAccessToken();
+   const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const formattedDate = sevenDaysAgo.toISOString();
+  console.log("formattedDate", `Bearer ${token}`);
+  const response = await fetch(
+    "https://preview-rls09.congacloud.com/api/data/v1/query/APTS_GPO_Designation_Changes_c",
+     {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        ObjectName: "APTS_GPO_Designation_Changes_c",
+        Criteria: `APTS_Member_Account_c.Id = '${accId}'
+          AND APTS_Status_c = 'Not Processed'`,
+        Select: [
+          "*"
+        ]
+      })
+    }
+  );
+
+  const result = await response.json();
+  return result.Data || [];
+}
+
+
+
+
+
+export async function getAgreementDetailsByIds(ids = [],accountIds=[],memberId) {
+
+  if (!ids.length) return [];
+
+  const token = getAccessToken();
+
+  const formattedIds = ids
+    .map(id => `'${id}'`)
+    .join(",");
+
+  const formattedAccountIds = accountIds
+    .map(id => `'${id}'`)
+    .join(",");
+
+  const response = await fetch(
+    "https://preview-rls09.congacloud.com/api/data/v1/query/Agreement",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        ObjectName: "Agreement",
+        Criteria: `
+          Id IN (${formattedIds})
+            AND Status = 'Activated'
+          AND StatusCategory = 'In Effect'
+          AND Apttus_Market_c = 'North America'
+          AND APTS_SalesArea_c = 'United States'
+          AND APTS_Country_Code_c = 'US'
+          AND APTS_Agreement_Sub_Type_c IN ('Cooperative Alliance Agreement', 'Long term strategic partnership', 'Product Specific Pricing', 'Master Purchase Agreement')
+          AND RecordType = 'Customer_Framework'
+          AND  ((Account.Id= '${memberId}' 
+          AND APTS_Customer_Pricelist_Customer_c.Id IN (${formattedAccountIds}))
+          OR APTS_Customer_Pricelist_Customer_c.Id IN (${formattedAccountIds}) 
+          OR Account.Id in (${formattedAccountIds}))
+        `,
+        Select: [
+          "Id",
+          "Name",
+          "Account"
+        ]
+      })
+    }
+  );
+console.log("getAgreementDetailsByIds response", response);
+  const result = await response.json();
+
+  return result.Data || [];
+}
