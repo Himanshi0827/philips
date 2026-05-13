@@ -69,6 +69,36 @@ function DiscountPopup({
   const [form, setForm] = useState({
     DiscountType: "",
   });
+  const [toastMessage, setToastMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
+
+  const hasValue = (value) => value !== "" && value != null;
+
+  const isVolumeThresholdInOrder = (thresholds) => {
+    let lastValue = null;
+    for (let i = 0; i < thresholds.length; i++) {
+      if (hasValue(thresholds[i])) {
+        const currentValue = Number(thresholds[i]);
+        if (lastValue !== null && currentValue <= lastValue) {
+          return false;
+        }
+        lastValue = currentValue;
+      }
+    }
+    return true;
+  };
+
+  const showErrorToast = (message) => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 4000);
+  };
+
+  const canEditVolumeThreshold = (discounts, thresholds, ind) => {
+    return ind === 0
+      ? hasValue(discounts[0])
+      : hasValue(discounts[ind]) && hasValue(thresholds[ind - 1]);
+  };
 
   useEffect(() => {
     const discounts = async () => {
@@ -257,8 +287,8 @@ function DiscountPopup({
   const handleTierChange = (ind, value) => {
     if (value > 100) {
       value = 100;
-    } else if (value < 0) {
-      value = 0;
+    } else if (value <= 0) {
+      value = null;
     }
     if (prev.MatchProductsBy === "Hierarchy") {
       const updatedTiers = [...tierDiscounts];
@@ -277,8 +307,8 @@ function DiscountPopup({
     if (fieldname === "Tier Discount") {
       if (value > 100) {
         value = 100;
-      } else if (value < 0) {
-        value = 0;
+      } else if (value <= 0) {
+        value = null;
       }
       const updatedTier_discount = [...scaledTier];
       updatedTier_discount[ind] = value;
@@ -288,8 +318,8 @@ function DiscountPopup({
     if (fieldname === "Scaled Discount") {
       if (value > 100) {
         value = 100;
-      } else if (value < 0) {
-        value = 0;
+      } else if (value <= 0) {
+        value = null;
       }
       const updateScaled_discount = [...scaledDiscounts];
       updateScaled_discount[ind] = value;
@@ -297,6 +327,14 @@ function DiscountPopup({
       onChange({ ...data, scaledDiscounts: updateScaled_discount });
     }
     if (fieldname === "Volume Threshold") {
+      if (value === "" || value == null) {
+        value = null;
+      }
+
+      if (value != null && value <= 0) {
+        value = null;
+      }
+
       const update_threshold = [...volumeT];
       update_threshold[ind] = value;
       setVolumeT(update_threshold);
@@ -355,8 +393,8 @@ function DiscountPopup({
     if (fieldname === "Tier Discount") {
       if (value > 100) {
         value = 100;
-      } else if (value < 0) {
-        value = 0;
+      } else if (value <= 0) {
+        value = null;
       }
       const updatedTier_discount = [...scaledTier_product];
       updatedTier_discount[ind] = value;
@@ -366,8 +404,8 @@ function DiscountPopup({
     if (fieldname === "Scaled Discount") {
       if (value > 100) {
         value = 100;
-      } else if (value < 0) {
-        value = 0;
+      } else if (value <= 0) {
+        value = null;
       }
       const updateScaled_discount = [...scaledDiscounts_product];
       updateScaled_discount[ind] = value;
@@ -375,6 +413,14 @@ function DiscountPopup({
       onChange({ ...data, scaledDiscounts_product: updateScaled_discount });
     }
     if (fieldname === "Volume Threshold") {
+      if (value === "" || value == null) {
+        value = null;
+      }
+
+      if (value != null && value <= 0) {
+        value = null;
+      }
+
       const update_threshold = [...volumeT_product];
       update_threshold[ind] = value;
       setVolumeTProduct(update_threshold);
@@ -384,6 +430,7 @@ function DiscountPopup({
 
   const handleOverrideChange = (ind, fieldname, value) => {
     if (fieldname === "Net Price Override") {
+  
       const update_net = [...productNetPrice];
       update_net[ind] = value;
       setProductNetPrice(update_net);
@@ -399,16 +446,28 @@ function DiscountPopup({
 
   const handleScaledNetChange = (ind, fieldname, value) => {
     if (fieldname === "Net Price Override") {
+   
       const update_net = [...productScaledNetPrice];
       update_net[ind] = value;
       setProductScaledNetPrice(update_net);
       onChange({ ...data, productScaledNetPrice: update_net });
     } else if (fieldname === "Scaled Discount Amount") {
+      if (value <=  0) {
+        value = null;
+      }
       const update = [...productScaledDiscountAmt];
       update[ind] = value;
       setProductScaledDiscountAmt(update);
       onChange({ ...data, productScaledDiscountAmt: update });
     } else if (fieldname === "Volume Threshold") {
+      if (value === "" || value == null) {
+        value = null;
+      }
+
+      if (value != null && value <= 0) {
+        value = null;
+      }
+
       const update = [...productVolumeThreshold];
       update[ind] = value;
       setProductVolumeThreshold(update);
@@ -503,6 +562,28 @@ function DiscountPopup({
     return [];
   };
   const handleSave = (selectedDiscount, index) => {
+    // Validate volume thresholds for discount types that use them
+    if (selectedDiscount === "Tier Discount % + Scaled") {
+      if (!isVolumeThresholdInOrder(volumeT_product)) {
+        showErrorToast("Volume Threshold should be in increasing order");
+        return;
+      }
+    }
+
+    if (selectedDiscount === "Net Price Override + Scaled") {
+      if (!isVolumeThresholdInOrder(productVolumeThreshold)) {
+        showErrorToast("Volume Threshold should be in increasing order");
+        return;
+      }
+    }
+
+    if (data.DiscountType === "Tier Discount % + Scaled") {
+      if (!isVolumeThresholdInOrder(volumeT)) {
+        showErrorToast("Volume Threshold should be in increasing order");
+        return;
+      }
+    }
+
     onSave(selectedDiscount, index);
 
     if (mode === "PRODUCT") {
@@ -970,61 +1051,48 @@ function DiscountPopup({
                             gap: "10px",
                           }}
                         >
-                          {volumeT_product.map((value, ind) => (
-                            <>
-                              <label>Volume Threshold{ind + 1}</label>
-                              <input
-                                key={ind}
-                                type="number"
-                                value={volumeT_product[ind] ?? ""}
-                                step="0.01"
-                                readOnly={
-                                  (ind === 0
-                                    ? !scaledDiscounts_product[0] &&
-                                      !volumeT_product[ind]
-                                    : !volumeT_product[ind - 1] &&
-                                      !volumeT_product[ind])
-                                }
-                                onChange={(e) =>
-                                  handleScaleChange_product(
-                                    ind,
-                                    "Volume Threshold",
-                                    e.target.value,
-                                  )
-                                }
-                                style={{
-                                  backgroundColor: (
-                                    ind === 0
-                                      ? !scaledDiscounts_product[0] &&
-                                        !volumeT_product[ind]
-                                      : !volumeT_product[ind - 1] &&
-                                        !volumeT_product[ind]
-                                  )
-                                    ? "#e0e0e0"
-                                    : "white",
-                                  cursor: (
-                                    ind === 0
-                                      ? !scaledDiscounts_product[0] &&
-                                        !volumeT_product[ind]
-                                      : !volumeT_product[ind - 1] &&
-                                        !volumeT_product[ind]
-                                  )
-                                    ? "not-allowed"
-                                    : "text",
-                                }}
-                                onBlur={(e) =>
-                                  handleBlur(
-                                    ind,
-                                    "Volume Threshold Product",
-                                    e.target.value,
-                                  )
-                                }
-                                onFocus={() =>
-                                  handleFocus(ind, "Volume Threshold Product")
-                                }
-                              />
-                            </>
-                          ))}
+                          {volumeT_product.map((value, ind) => {
+                            const disabled = !canEditVolumeThreshold(
+                              scaledDiscounts_product,
+                              volumeT_product,
+                              ind,
+                            );
+                            return (
+                              <>
+                                <label>Volume Threshold{ind + 1}</label>
+                                <input
+                                  key={ind}
+                                  type="number"
+                                  value={volumeT_product[ind] ?? ""}
+                                  step="0.01"
+                                  readOnly={disabled}
+                                  onChange={(e) =>
+                                    handleScaleChange_product(
+                                      ind,
+                                      "Volume Threshold",
+                                      e.target.value,
+                                    )
+                                  }
+                                  style={{
+                                    backgroundColor: disabled
+                                      ? "#e0e0e0"
+                                      : "white",
+                                    cursor: disabled ? "not-allowed" : "text",
+                                  }}
+                                  onBlur={(e) =>
+                                    handleBlur(
+                                      ind,
+                                      "Volume Threshold Product",
+                                      e.target.value,
+                                    )
+                                  }
+                                  onFocus={() =>
+                                    handleFocus(ind, "Volume Threshold Product")
+                                  }
+                                />
+                              </>
+                            );
+                          })}
                         </div>
                       </td>
                     </tr>
@@ -1177,61 +1245,48 @@ function DiscountPopup({
                             gap: "10px",
                           }}
                         >
-                          {productVolumeThreshold.map((value, ind) => (
-                            <>
-                              <label>Volume Threshold{ind + 1}</label>
-                              <input
-                                key={ind}
-                                type="number"
-                                value={productVolumeThreshold[ind] ?? ""}
-                                step="0.01"
-                                readOnly={
-                                  ind === 0
-                                    ? !productScaledDiscountAmt[0] &&
-                                      !productVolumeThreshold[ind]
-                                    : !productVolumeThreshold[ind - 1] &&
-                                      !productVolumeThreshold[ind]
-                                }
-                                onChange={(e) =>
-                                  handleScaledNetChange(
-                                    ind,
-                                    "Volume Threshold",
-                                    e.target.value,
-                                  )
-                                }
-                                style={{
-                                  backgroundColor: (
-                                    ind === 0
-                                      ? !productScaledDiscountAmt[0] &&
-                                        !productVolumeThreshold[ind]
-                                      : !productVolumeThreshold[ind - 1] &&
-                                        !productVolumeThreshold[ind]
-                                  )
-                                    ? "#e0e0e0"
-                                    : "white",
-                                  cursor: (
-                                    ind === 0
-                                      ? !productScaledDiscountAmt[0] &&
-                                        !productVolumeThreshold[ind]
-                                      : !productVolumeThreshold[ind - 1] &&
-                                        !productVolumeThreshold[ind]
-                                  )
-                                    ? "not-allowed"
-                                    : "text",
-                                }}
-                                onBlur={(e) =>
-                                  handleBlur(
-                                    ind,
-                                    "Volume Threshold Net",
-                                    e.target.value,
-                                  )
-                                }
-                                onFocus={() =>
-                                  handleFocus(ind, "Volume Threshold Net")
-                                }
-                              />
-                            </>
-                          ))}
+                          {productVolumeThreshold.map((value, ind) => {
+                            const disabled = !canEditVolumeThreshold(
+                              productScaledDiscountAmt,
+                              productVolumeThreshold,
+                              ind,
+                            );
+                            return (
+                              <>
+                                <label>Volume Threshold{ind + 1}</label>
+                                <input
+                                  key={ind}
+                                  type="number"
+                                  value={productVolumeThreshold[ind] ?? ""}
+                                  step="0.01"
+                                  readOnly={disabled}
+                                  onChange={(e) =>
+                                    handleScaledNetChange(
+                                      ind,
+                                      "Volume Threshold",
+                                      e.target.value,
+                                    )
+                                  }
+                                  style={{
+                                    backgroundColor: disabled
+                                      ? "#e0e0e0"
+                                      : "white",
+                                    cursor: disabled ? "not-allowed" : "text",
+                                  }}
+                                  onBlur={(e) =>
+                                    handleBlur(
+                                      ind,
+                                      "Volume Threshold Net",
+                                      e.target.value,
+                                    )
+                                  }
+                                  onFocus={() =>
+                                    handleFocus(ind, "Volume Threshold Net")
+                                  }
+                                />
+                              </>
+                            );
+                          })}
                         </div>
                         <br></br>
                         <br></br>
@@ -1259,6 +1314,26 @@ function DiscountPopup({
                 Cancel
               </button>
             </div>
+            {showToast && (
+              <div
+                style={{
+                  position: "fixed",
+                  bottom: "20px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  backgroundColor: "#f44336",
+                  color: "white",
+                  padding: "15px 20px",
+                  borderRadius: "4px",
+                  boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+                  zIndex: 9999,
+                  fontSize: "14px",
+                  fontWeight: "500",
+                }}
+              >
+                {toastMessage}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -1541,53 +1616,46 @@ function DiscountPopup({
                         gap: "10px",
                       }}
                     >
-                      {volumeT.map((value, ind) => (
-                        <>
-                          <label>Volume Threshold{ind + 1}</label>
-                          <input
-                            key={ind}
-                            type="number"
-                            value={volumeT[ind] ?? ""}
-                            step="0.01"
-                            readOnly={
-                              ind === 0
-                                ? !scaledDiscounts[0] && !volumeT[ind]
-                                : !volumeT[ind - 1] && !volumeT[ind]
-                            }
-                            onChange={(e) =>
-                              handleScaleChange(
-                                ind,
-                                "Volume Threshold",
-                                e.target.value,
-                              )
-                            }
-                            style={{
-                              backgroundColor: (
-                                ind === 0
-                                  ? !scaledDiscounts[0] && !volumeT[ind]
-                                  : !volumeT[ind - 1] && !volumeT[ind]
-                              )
-                                ? "#e0e0e0"
-                                : "white",
-                              cursor: (
-                                ind === 0
-                                  ? !scaledDiscounts[0] && !volumeT[ind]
-                                  : !volumeT[ind - 1] && !volumeT[ind]
-                              )
-                                ? "not-allowed"
-                                : "text",
-                            }}
-                            onBlur={(e) =>
-                              handleBlur(
-                                ind,
-                                "Volume Threshold",
-                                e.target.value,
-                              )
-                            }
-                            onFocus={() => handleFocus(ind, "Volume Threshold")}
-                          />
-                        </>
-                      ))}
+                      {volumeT.map((value, ind) => {
+                        const disabled = !canEditVolumeThreshold(
+                          scaledDiscounts,
+                          volumeT,
+                          ind,
+                        );
+                        return (
+                          <>
+                            <label>Volume Threshold{ind + 1}</label>
+                            <input
+                              key={ind}
+                              type="number"
+                              value={volumeT[ind] ?? ""}
+                              step="0.01"
+                              readOnly={disabled}
+                              onChange={(e) =>
+                                handleScaleChange(
+                                  ind,
+                                  "Volume Threshold",
+                                  e.target.value,
+                                )
+                              }
+                              style={{
+                                backgroundColor: disabled
+                                  ? "#e0e0e0"
+                                  : "white",
+                                cursor: disabled ? "not-allowed" : "text",
+                              }}
+                              onBlur={(e) =>
+                                handleBlur(
+                                  ind,
+                                  "Volume Threshold",
+                                  e.target.value,
+                                )
+                              }
+                              onFocus={() => handleFocus(ind, "Volume Threshold")}
+                            />
+                          </>
+                        );
+                      })}
                     </div>
                   </td>
                 </tr>

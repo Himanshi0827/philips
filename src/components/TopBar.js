@@ -85,7 +85,7 @@ const isAfterDiscount =
         disabled={!isDiscountCompleted}
         onClick={onAddBilling}
       >
-        Add Billing
+        Add Billing Plan
       </button>
     )}
 

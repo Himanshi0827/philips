@@ -84,56 +84,108 @@ if(field?.AgreementId)
  
   return (
     <div className="lookup-container">
-      <input
-        type="text"
-        value={inputValue}
-        placeholder={`Search ${field.DisplayName}`}
-        onChange={handleChange}
-        onFocus={() => inputValue.length >= 3 && setShowDropdown(true)}
-      />
 
- {showDropdown && results.length > 0 && (
-  <ul className="lookup-dropdown">
-    {results.map((r) => (
-      <li
-        key={r.Id}
-        className="lookup-item"
-        onClick={() => handleSelect(r)}
-      >
-         {field.isProductLookup ? (
-        <div className="lookup-row">
+  <div className="lookup-input-wrapper">
+    <input
+      type="text"
+      value={inputValue}
+      className="lookup-input-field"
+      placeholder={`Search by ${field.DisplayName?.toLowerCase()}`}
+      onChange={handleChange}
+      onFocus={() => inputValue.length >= 3 && setShowDropdown(true)}
+    />
+
+    {/* <span className="lookup-search-icon">🔍</span> */}
+  </div>
+
+  {showDropdown && results.length > 0 && (
+    <ul className="lookup-dropdown">
+      {results.map((r) => (
+        <li
+          key={r.Id}
+          className="lookup-item"
+          onClick={() => handleSelect(r)}
+        >
+          {field.isProductLookup ? (
+            <div className="lookup-row">
+              <div className="lookup-content">
+                <div className="lookup-title">
+                  {r.Name}
+                </div>
+
+                <div className="product-meta">
+                  {r.ConfigurationType} • {r.ProductCode}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="lookup-content">
+              <div className="lookup-title">
+                {r.Name}
+              </div>
+
+              <div className="lookup-subtext">
+                {r.Status || "In Effect"} • Expiry Date: {r.EndDate || "N/A"}
+              </div>
+            </div>
+          )}
+        </li>
+      ))}
+    </ul>
+  )}
+
+</div>
+//     <div className="lookup-container">
+//       <input
+//         type="text"
+//         value={inputValue}
+//         placeholder={`Search ${field.DisplayName}`}
+//         onChange={handleChange}
+//         onFocus={() => inputValue.length >= 3 && setShowDropdown(true)}
+//       />
+
+//  {showDropdown && results.length > 0 && (
+//   <ul className="lookup-dropdown">
+//     {results.map((r) => (
+//       <li
+//         key={r.Id}
+//         className="lookup-item"
+//         onClick={() => handleSelect(r)}
+//       >
+//          {field.isProductLookup ? (
+//         <div className="lookup-row">
  
 
-          <div className="lookup-content">
-            <div className="lookup-title">
-              {r.Name}
-            </div>
-            <div className="product-meta">
-              {r.ConfigurationType} • {r.ProductCode}
-            </div>
+//           <div className="lookup-content">
+//             <div className="lookup-title">
+//               {r.Name}
+//             </div>
+//             <div className="product-meta">
+//               {r.ConfigurationType} • {r.ProductCode}
+//             </div>
 
            
-          </div>
-        </div>
-          ) : (
+//           </div>
+//         </div>
+//           ) : (
       
-          <div className="lookup-content">
-            <div className="lookup-title">
-              {r.Name}
-            </div>
+//           <div className="lookup-content">
+//             <div className="lookup-title">
+//               {r.Name}
+//             </div>
            
 
-            <div className="lookup-subtext">
-              {r.Status || "In Effect"} • Expiry Date: {r.EndDate || "N/A"}
-            </div>
-          </div>
-        )}
-      </li>
-    ))}
-  </ul>
-)}
+//             <div className="lookup-subtext">
+//               {r.Status || "In Effect"} • Expiry Date: {r.EndDate || "N/A"}
+//             </div>
+//           </div>
+//         )}
+//       </li>
+//     ))}
+//   </ul>
+// )}
      
-    </div>
+//     </div>
   );
 }
  

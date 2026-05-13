@@ -36,6 +36,7 @@ function ProductList({
   return (
     <>
       <div className="table-toolbar">
+         <p style={{ margin: 0 }}>Search Products</p>  
         <input
           type="text"
           placeholder="Search by name or code..."
@@ -48,6 +49,7 @@ function ProductList({
         <table className="product-table">
           <thead>
             <tr>
+              <th></th>
               <th></th>
               <th>{isParentTable ? "Parent Product" : "Products"}</th>
               <th>{isParentTable ? "Parent Product Code" : "Product Code"}</th>
@@ -88,9 +90,11 @@ function ProductList({
           <tbody>
             {filteredProducts.map((p, index) => (
               <tr key={p.CompositeKey || p.Id || index}>
-                <td>
-                  <button onClick={() => onOpenDiscount(index)}>⚙️</button>
-                  {/* <button>📋</button> */}
+                <td> {index + 1}</td>
+                <td> 
+                  <button onClick={() => onOpenDiscount(index)}>
+                   ⚙️</button>
+                
                 </td>
                 <td>{p.Name}</td>
                 <td>{p.ProductCode || "N/A"}</td>
@@ -106,7 +110,7 @@ function ProductList({
                   </>
                 )}
 
-                <td>{p.DiscountType || "None"}</td>
+                <td>{p.DiscountType || ""}</td>
 
                 {[0, 1, 2, 3, 4].map((i) => (
                   <td key={`tier-${i}`}>

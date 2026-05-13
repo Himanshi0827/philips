@@ -195,6 +195,7 @@ else if (adjType === "Net Price Override") {
     const loadAg_group = async () => {
       try {
         const data = await GetLookup("APTS_Agreement_Groups_c");
+        console.log("Agreement Groups Data:", data);
         const final = data.Data.filter(
           (d) => d.APTS_Agreement_c === acc.state?.Id
         );

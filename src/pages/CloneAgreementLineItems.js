@@ -7,6 +7,7 @@ import { searchLookupRecords } from "../api/SearchLookup";
 import {  createAgreementLineItem,createAgreementGroup } from "../api/api";
 import { queryAgreementLineItemsByAgreement,queryCheckAgreementGroup } from "../api/queryAgreementLineItemsByAgreement";
 import TopBar from "../components/TopBar";
+import { GetLookup } from "../api/GetLookup";
 import {toast} from "react-toastify";
  
 function CloneAgreementLineItems() {
@@ -32,7 +33,7 @@ const [sourceGroup, setSourceGroup] = useState([]);
  
   const [lineItems, setLineItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
- 
+ const [agreementPlist, setAgreementPlist] = useState([]);
   /*  Load Source Line Items  */
 useEffect(() => {
   if (!sourceAgreement) return;
@@ -51,7 +52,36 @@ useEffect(() => {
  
   loadLineItems();
 }, [sourceAgreement]);
- 
+ useEffect(() => {
+  if (!targetAgreementId) return;
+console.log("target agreement id",targetAgreementId);
+  const loadTargetGroups = async () => {
+    try {
+      const groups =await GetLookup("APTS_Agreement_Groups_c");
+      console.log("groups",groups);
+       console.log("groups",groups.Data);
+       const final = groups.Data.filter(
+          (d) => d.APTS_Agreement_c === targetAgreementId
+        );
+      //  await searchLookupRecords({
+      //   searchText: "",
+      //   field: {
+      //     LookupObjectName: "APTS_Agreement_Groups_c",
+      //     TargetAgreement: targetAgreementId,
+      //     Part: "Target"
+      //   }
+      // });
+      
+console.log("groups",final);
+      setAgreementPlist(final|| []);
+      console.log("agreementPlist",agreementPlist);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  loadTargetGroups();
+}, [targetAgreementId]);
 console.log("trial Id",targetAgreementId);
   /*Select Row */
  
@@ -247,11 +277,25 @@ console.log("item",itemsToClone);
     toast.error("Error while cloning Agreement Lines.");
   }
 };
+const filteredLineItems = lineItems.filter(li => {
+  if (sourceGroup.length === 0) return true;
 
+  return sourceGroup.some(
+    group => group.Id === li.APTS_Agreement_Group_c?.Id
+  );
+});
+
+const handleSelectAll = (checked) => {
+  if (checked) {
+    setSelectedItems(filteredLineItems.map(item => item.Id));
+  } else {
+    setSelectedItems([]);
+  }
+};
   return (<div className="clone-container">
  
   <TopBar
-  title="Clone Agreement Line Items"
+  title="Agreement"
   onSave={handleClone}
   agreementHeader={agreementName}
   agreementId={agreementId}
@@ -261,7 +305,7 @@ console.log("item",itemsToClone);
   <div className="clone-card">
     <div className="clone-grid">
  
-      <div>
+      <div className="field">
         <label className="clone-label">Source Agreement</label>
         <LookupTypeAhead
           field={{
@@ -282,14 +326,20 @@ console.log("item",itemsToClone);
         />
       </div>
  
-      <div>
+      <div className="field">
         <label className="clone-label">Target Agreement</label>
         <input value={targetAgreementName} disabled />
       </div>
- 
+   </div>
+       </div>
       {sourceAgreement && (
         <>
-          <div>
+        <div className="section-header">Agreement Group</div>
+          <div className="clone-card">
+              
+              <div className="clone-grid">
+     
+          <div className="field">
             <label className="clone-label">Source Agreement Group</label>
             <LookupTypeAhead
             field={{
@@ -311,9 +361,7 @@ onChange={(record) => {
       
             searchFn={searchLookupRecords}
           />
-          </div>
-<div className="selected-groups">
-  {sourceGroup.map(group => (
+            {sourceGroup.map(group => (
     <span key={group.Id} className="group-chip">
       {group.Name}
       <button
@@ -327,24 +375,43 @@ onChange={(record) => {
       </button>
     </span>
   ))}
-</div>
+          </div>
+{/* <div className="selected-groups"> */}
 
-          <div className="clone-checkbox">
-  <label>
-    <input
-      type="checkbox"
-      checked={cloneGroupSameAsSource}
-      onChange={(e) => {setCloneGroupSameAsSource(e.target.checked);
-      
-      setTargetGroup(sourceGroup);}}
-    />
-    Clone Agreement Group same as Source
-  </label>
-</div>
+{/* </div> */}
+
+         
 {!cloneGroupSameAsSource && (
-  <div>
+  <div className="field">
   <label className="clone-label">Target Agreement Group</label>
-   <LookupTypeAhead
+    <select
+    placeholder="Select An Option"
+    className="clone-select"
+    value={targetGroup?.Id || ""}
+    onChange={(e) => {
+      const selectedId = e.target.value;
+
+      const selectedRecord = agreementPlist.find(
+        (g) => g.Id === selectedId
+      );
+
+      setTargetGroup(selectedRecord);
+    }}
+  >
+    {/* <option value="">
+     Select An Option
+    </option> */}
+
+    {agreementPlist.map((group) => (
+      <option
+        key={group.Id}
+        value={group.Id}
+      >
+        {group.Name}
+      </option>
+    ))}
+  </select>
+   {/* <LookupTypeAhead
   field={{
     DisplayName: "Agreement Group",
     LookupObjectName: "APTS_Agreement_Groups_c",
@@ -354,22 +421,65 @@ onChange={(record) => {
   value={targetGroup}
   onChange={(record) => setTargetGroup(record)}
   searchFn={searchLookupRecords}
-/>
+/> */}
 </div>
 )}
+ <div className="clone-checkbox">
+  <label className="clone-label">
+    <input
+      type="checkbox"
+      checked={cloneGroupSameAsSource}
+      onChange={(e) => {setCloneGroupSameAsSource(e.target.checked);
+      
+      setTargetGroup(sourceGroup);}}
+    />
+   Create Agreement Group Too
+  </label>
+ <p> *Agreement group conditions will not be cloned if the agreement group name is same in both source/target agreement.</p>
+</div>
+</div>
+</div>
         </>
       )}
  
-    </div>
-  </div>
- {sourceAgreement&&(
 
-    <div className="clone-table-wrapper">
-      <table className="clone-table">
+
+ {sourceAgreement&&(
+ <div className="clone-grid-section">
+
+    {/* Header */}
+    <div className="clone-grid-header">
+      <div className="clone-grid-title">
+        Agreement Line Items (Total: {lineItems.length})
+      </div>
+
+      <div className="clone-grid-subinfo">
+        <span>Total: {lineItems.length}</span>
+        <span>Selected: {selectedItems.length}</span>
+      </div>
+    </div>
+
+    {/* Scrollable Table */}
+    <div className="clone-grid-table-wrapper">
+
+    {/* <div className="clone-table-wrapper"> */}
+      {/* <table className="clone-table"> */}
+      <table className="clone-grid-table">
         <thead>
           <tr>
-            
-            <th></th>
+            <th>
+  <input
+    type="checkbox"
+    checked={
+      filteredLineItems.length > 0 &&
+      selectedItems.length === filteredLineItems.length
+    }
+    onChange={(e) =>
+      handleSelectAll(e.target.checked)
+    }
+  />
+</th>
+            {/* <th></th> */}
               <th>Name</th>
               <th>Agreement Group</th>
               <th>Line Type</th>
@@ -400,6 +510,8 @@ onChange={(record) => {
         <tbody>
           {lineItems
           .filter(li => {
+
+            {/* {filteredLineItems.map(li => { */}
       if (sourceGroup.length === 0) return true;
  
       return sourceGroup.some(
@@ -411,12 +523,31 @@ onChange={(record) => {
               <tr key={item.Id}>
                 <td>
                   <input
+  type="checkbox"
+  checked={selectedItems.includes(item.Id)}
+  onChange={() => toggleSelect(item)}
+/>
+                  {/* <input
                     type="checkbox"
                     onChange={() => toggleSelect(item)}
-                  />
+                  /> */}
                 </td>
                 <td>{item.Name}</td>
-                <td>{item.APTS_Agreement_Group_c?.Name}</td>
+                <td>
+  {item.APTS_Agreement_Group_c?.Id ? (
+    <a
+      href={`https://preview-rls09.congacloud.com/admin/entity/APTS_Agreement_Groups_c/detail/${item.APTS_Agreement_Group_c.Id}/`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="clone-link"
+    >
+      {item.APTS_Agreement_Group_c?.Name}
+    </a>
+  ) : (
+    "-"
+  )}
+</td>
+                {/* <td>{item.APTS_Agreement_Group_c?.Name}</td> */}
                 <td>{item.Line_Type_c}</td>
                 <td>{item.APTS_Discount_Type_c}</td>
                 <td>{item.APTS_Match_Products_By_c}</td>
@@ -457,6 +588,7 @@ onChange={(record) => {
         </tbody>
       </table>
     </div>
+     </div>
   )}
  
   {selectedItems.length > 0 && (

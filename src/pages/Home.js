@@ -389,7 +389,21 @@ const handleDelete = async (id) => {
                       )}
                     </td>
                     <td>{item.Name}</td>
-                    <td>{item.APTS_Agreement_Group_c?.Name}</td>
+                    <td>
+  {item.APTS_Agreement_Group_c?.Id ? (
+    <a
+      href={`https://preview-rls09.congacloud.com/admin/entity/APTS_Agreement_Groups_c/detail/${item.APTS_Agreement_Group_c.Id}/`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="clone-link"
+    >
+      {item.APTS_Agreement_Group_c?.Name}
+    </a>
+  ) : (
+    "-"
+  )}
+</td>
+                    {/* <td>{item.APTS_Agreement_Group_c?.Name}</td> */}
                     <td>{item.Line_Type_c}</td>
                     <td>{item.APTS_Discount_Type_c}</td>
                     <td>{item.APTS_Match_Products_By_c}</td>

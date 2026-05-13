@@ -43,10 +43,11 @@ function AgreementGroupForm({ data,onChange,onComplete }) {
           <tr>
             <td className="label">AgreementLineItem Name:</td>
             <td>
+              <div className="field">
               <input name="AgreementLineItemName" 
                       onChange={handleChange} 
                       value={data.AgreementLineItemName} 
-                      type="text" />
+                      type="text" /></div>
             </td>
           </tr>
           <tr>
