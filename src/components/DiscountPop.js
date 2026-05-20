@@ -95,6 +95,7 @@ function DiscountPopup({
   };
 
   const canEditVolumeThreshold = (discounts, thresholds, ind) => {
+    if (hasValue(thresholds[ind])) return true;
     return ind === 0
       ? hasValue(discounts[0])
       : hasValue(discounts[ind]) && hasValue(thresholds[ind - 1]);
@@ -561,31 +562,116 @@ function DiscountPopup({
 
     return [];
   };
-  const handleSave = (selectedDiscount, index) => {
+  const isFilledNetPrice=(scaled,volume)=>{
+    for(let i=0;i<scaled.length;i++)
+    {
+      if(scaled[i] && !volume[i])
+      {
+        showErrorToast(`🚫 Please enter corresponding Volume Threshold for Scaled Discount Amount, Tier ${i+1}`);
+        return true;
+      }
+      if(!scaled[i] && volume[i])
+      {
+        showErrorToast(`🚫 Please enter corresponding Scaled Discount Amount, Tier for Volume Threshold ${i+1}`);
+        return true;
+      }
+    }
+  }
+  const isFilled=(scaled,volume)=>{
+    for(let i=0;i<scaled.length;i++)
+    {
+      if(scaled[i] && !volume[i])
+      {
+        showErrorToast(`🚫 Please enter corresponding Volume Threshold for Scaled Discount %, Tier ${i+1}`);
+        return true;
+      }
+      if(!scaled[i] && volume[i])
+      {
+        showErrorToast(`🚫 Please enter corresponding Scaled Discount %, Tier for Volume Threshold ${i+1}`);
+        return true;
+      }
+    }
+  }
+  // const handleSave = (selectedDiscount, index) => {
+  //   // Validate volume thresholds for discount types that use them
+  //   if (selectedDiscount === "Tier Discount % + Scaled") {
+  //     if (!isVolumeThresholdInOrder(volumeT_product)) {
+  //       showErrorToast("Volume Threshold should be in increasing order");
+  //       return;
+  //     }
+  //   }
+
+  //   if (selectedDiscount === "Net Price Override + Scaled") {
+  //     if (!isVolumeThresholdInOrder(productVolumeThreshold)) {
+  //       showErrorToast("Volume Threshold should be in increasing order");
+  //       return;
+  //     }
+  //   }
+
+  //   if (data.DiscountType === "Tier Discount % + Scaled") {
+  //     if (!isVolumeThresholdInOrder(volumeT)) {
+  //       showErrorToast("Volume Threshold should be in increasing order");
+  //       return;
+  //     }
+  //   }
+
+  //   onSave(selectedDiscount, index);
+
+  //   if (mode === "PRODUCT") {
+  //     const products = [...prev.selectedProducts];
+  //     products[index] = {
+  //       ...products[index],
+  //       DiscountType: selectedDiscount,
+  //       Discounts: buildDiscountPayload(selectedDiscount),
+  //     };
+  //     onChangeProduct({ selectedProducts: products });
+  //   }
+
+  //   if (mode === "PARENT") {
+  //     const parents = [...prev.selectedParentProducts];
+  //     parents[index] = {
+  //       ...parents[index],
+  //       DiscountType: selectedDiscount,
+  //       Discounts: buildDiscountPayload(selectedDiscount),
+  //     };
+  //     onChangeProduct({ selectedParentProducts: parents });
+  //   }
+
+  //   onClose();
+  // };
+const handleSave = (selectedDiscount, index) => {
     // Validate volume thresholds for discount types that use them
     if (selectedDiscount === "Tier Discount % + Scaled") {
       if (!isVolumeThresholdInOrder(volumeT_product)) {
         showErrorToast("Volume Threshold should be in increasing order");
         return;
       }
+      if(isFilled(scaledDiscounts_product,volumeT_product))
+      {
+        return;
+      }
     }
-
+ 
     if (selectedDiscount === "Net Price Override + Scaled") {
       if (!isVolumeThresholdInOrder(productVolumeThreshold)) {
         showErrorToast("Volume Threshold should be in increasing order");
         return;
       }
+      if(isFilledNetPrice(productScaledDiscountAmt,productVolumeThreshold))
+      {
+        return;
+      }
     }
-
+ 
     if (data.DiscountType === "Tier Discount % + Scaled") {
       if (!isVolumeThresholdInOrder(volumeT)) {
         showErrorToast("Volume Threshold should be in increasing order");
         return;
       }
     }
-
+ 
     onSave(selectedDiscount, index);
-
+ 
     if (mode === "PRODUCT") {
       const products = [...prev.selectedProducts];
       products[index] = {
@@ -595,7 +681,7 @@ function DiscountPopup({
       };
       onChangeProduct({ selectedProducts: products });
     }
-
+ 
     if (mode === "PARENT") {
       const parents = [...prev.selectedParentProducts];
       parents[index] = {
@@ -605,10 +691,10 @@ function DiscountPopup({
       };
       onChangeProduct({ selectedParentProducts: parents });
     }
-
+ 
     onClose();
   };
-
+ 
   return (
     <>
       {prev.MatchProductsBy === "Product" && (
@@ -1318,7 +1404,7 @@ function DiscountPopup({
               <div
                 style={{
                   position: "fixed",
-                  bottom: "20px",
+                  top: "20px",
                   left: "50%",
                   transform: "translateX(-50%)",
                   backgroundColor: "#f44336",

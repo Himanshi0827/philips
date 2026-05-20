@@ -37,7 +37,7 @@ const isAfterDiscount =
           <span className="logo">PHILIPS</span>
        
             <span className="agreement-title">
-              Agreement: {agreementHeader}
+            |  Agreement: {agreementHeader}
             </span>
           
         </div>
@@ -89,8 +89,8 @@ const isAfterDiscount =
       </button>
     )}
 
-    {/*  FINAL BUTTON AVAILABLE AFTER DISCOUNT STEP */}
-    {isAfterDiscount && (
+    {/*  FINAL BUTTON AVAILABLE AFTER DISCOUNT STEP OR WHEN PRODUCT SELECTION IS COMPLETE */}
+    {(isAfterDiscount || (activeTab === "Product Selection" && isProductCompleted)) && (
       <button
         className="btn success"
         disabled={!isBillingCompleted}

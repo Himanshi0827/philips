@@ -102,6 +102,85 @@ export async function getAccountById(id) {
 
 
 
+export async function queryDesignatedContractsByMember(memberId) {
+  const token = getAccessToken();
+  const response = await fetch(
+    "https://preview-rls09.congacloud.com/api/data/v1/query/APTS_Account_Contract_c",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        ObjectName: "APTS_Account_Contract_c",
+        Criteria: `APTS_Designated_Flag_c = true AND APTS_Member_c = '${memberId}'`,
+        Select: ["Id", "APTS_End_Date_c"]
+      })
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch designated account contracts");
+  }
+
+  const result = await response.json();
+  return result.Data || [];
+}
+
+export async function updateAccountContract(id, payload) {
+  try {
+    const CONTRACT_URL =
+      "https://preview-rls09.congacloud.com/api/data/v1/objects/APTS_Account_Contract_c";
+    const accessToken = getAccessToken();
+    const response = await fetch(`${CONTRACT_URL}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData;
+    }
+
+    return response.json();
+  } catch (err) {
+    console.error(err.message);
+    throw err;
+  }
+}
+
+export async function updateAccount(id, payload) {
+  try {
+    const CONTRACT_URL =
+      "https://preview-rls09.congacloud.com/api/data/v1/objects/Account";
+    const accessToken = getAccessToken();
+    const response = await fetch(`${CONTRACT_URL}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData;
+    }
+
+    return response.json();
+  } catch (err) {
+    console.error(err.message);
+    throw err;
+  }
+}
+
 export async function queryGetmember(agreement_id) {
   const token = getAccessToken();
  console.log("agreement",agreement_id);
@@ -532,7 +611,7 @@ export async function getRetryRecords(UserId) {
 }
 
  export async function getUserIdFromToken() {
-  const token = getAccessToken();
+  let token = getAccessToken();
   console.log(" Raw Token:", token);
  
   try {
@@ -612,10 +691,9 @@ export async function getRetryRecords(UserId) {
 export async function fetchRecords(accId) {
 
   const token = getAccessToken();
-   const sevenDaysAgo = new Date();
+  const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  const formattedDate = sevenDaysAgo.toISOString();
-  console.log("formattedDate", `Bearer ${token}`);
+  console.log("Bearer token", token);
   const response = await fetch(
     "https://preview-rls09.congacloud.com/api/data/v1/query/APTS_GPO_Designation_Changes_c",
      {

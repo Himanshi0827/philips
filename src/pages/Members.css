@@ -357,3 +357,12 @@ tr:hover {
   margin-bottom: 15px;
 }
 
+/* Expired member rows */
+.expired-row td {
+  background-color: #fff7cc !important;
+}
+
+/* Hover state */
+.expired-row:hover td {
+  background-color: #ffef99 !important;
+}

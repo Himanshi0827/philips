@@ -82,24 +82,46 @@ const deduped = Object.values(
     return acc;
   }, {})
 );
-
 const groupedMembers = Object.values(
   enrichedRecords.reduce((acc, rec) => {
     const accId = rec?.APTS_Member_c;
+
     if (!accId) return acc;
 
     if (!acc[accId]) {
       acc[accId] = {
         ...rec,
-        groups: []
+        groups: [],
+        memberRecords: [], // IMPORTANT
       };
     }
 
-    acc[accId].groups.push(rec?.APTS_Agreement_Group_c?.Name);
+    acc[accId].groups.push(
+      rec?.APTS_Agreement_Group_c?.Name
+    );
+
+    acc[accId].memberRecords.push(rec);
 
     return acc;
   }, {})
 );
+// const groupedMembers = Object.values(
+//   enrichedRecords.reduce((acc, rec) => {
+//     const accId = rec?.APTS_Member_c;
+//     if (!accId) return acc;
+
+//     if (!acc[accId]) {
+//       acc[accId] = {
+//         ...rec,
+//         groups: []
+//       };
+//     }
+
+//     acc[accId].groups.push(rec?.APTS_Agreement_Group_c?.Name);
+
+//     return acc;
+//   }, {})
+// );
 setMembers(deduped);
 setMembers(groupedMembers);
 
@@ -112,46 +134,105 @@ setMembers(groupedMembers);
 
 
   
-  const filtered = useMemo(() => {
-  let data = members;
- const today = new Date();
+//   const filtered = useMemo(() => {
+//   let data = members;
+//  const today = new Date();
 
-  // Filter expired members (ONLY when checkbox is unchecked)
+//   // Filter expired members (ONLY when checkbox is unchecked)
+//   if (!includeExpired) {
+//     data = data.filter((m) => {
+//       const endDate = m?.APTS_End_Date_c
+//         ? new Date(m.APTS_End_Date_c)
+//         : null;
+
+//       return !endDate || endDate >= today; 
+//       // include if:
+//       // - no end date OR
+//       // - end date is today or future
+//     });
+//   }
+
+//   //  Search
+//   if (search) {
+//     const searchLower = search.toLowerCase();
+
+//     data = data.filter((m) =>
+//      m?.accountData?.Name?.toLowerCase().includes(searchLower) || // Account Name
+//      m?.accountData?.MP1_Customer_id_1_c?.toLowerCase().includes(searchLower)                 // MP1 ID
+//     );
+//   }
+
+//   //  Agreement Group filter (MULTI SELECT)
+//   if (agreementGroup?.length > 0) {
+//   data = data.filter((m) =>
+//     agreementGroup.some((g) =>
+//       m.groups?.includes(g.Name)   //  match by Name
+//     )
+//   );
+// }
+
+//   return data;
+// }, [members, search, agreementGroup, includeExpired]);
+  
+const filtered = useMemo(() => {
+  let data = members;
+
+  const today = new Date();
+
+  // =========================
+  // FILTER EXPIRED
+  // =========================
   if (!includeExpired) {
     data = data.filter((m) => {
-      const endDate = m?.APTS_End_Date_c
-        ? new Date(m.APTS_End_Date_c)
-        : null;
+      /*
+        groups/member records for same account
+        should remain visible if ANY record
+        is not expired
+      */
 
-      return !endDate || endDate >= today; 
-      // include if:
-      // - no end date OR
-      // - end date is today or future
+      // if no member records array exists
+      // fallback to current record
+      const memberRecords = m.memberRecords || [m];
+
+      const hasActiveMember = memberRecords.some((rec) => {
+        const endDate = rec?.APTS_End_Date_c
+          ? new Date(rec.APTS_End_Date_c)
+          : null;
+
+        return !endDate || endDate >= today;
+      });
+
+      return hasActiveMember;
     });
   }
 
-  //  Search
+  // =========================
+  // SEARCH
+  // =========================
   if (search) {
     const searchLower = search.toLowerCase();
 
     data = data.filter((m) =>
-     m?.accountData?.Name?.toLowerCase().includes(searchLower) || // Account Name
-     m?.accountData?.MP1_Customer_id_1_c?.toLowerCase().includes(searchLower)                 // MP1 ID
+      m?.accountData?.Name?.toLowerCase()?.includes(searchLower) ||
+      m?.accountData?.MP1_Customer_id_1_c
+        ?.toLowerCase()
+        ?.includes(searchLower)
     );
   }
 
-  //  Agreement Group filter (MULTI SELECT)
+  // =========================
+  // AGREEMENT GROUP FILTER
+  // =========================
   if (agreementGroup?.length > 0) {
-  data = data.filter((m) =>
-    agreementGroup.some((g) =>
-      m.groups?.includes(g.Name)   //  match by Name
-    )
-  );
-}
+    data = data.filter((m) =>
+      agreementGroup.some((g) =>
+        m.groups?.includes(g.Name)
+      )
+    );
+  }
 
   return data;
 }, [members, search, agreementGroup, includeExpired]);
-  
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
 
   const visible = useMemo(() => {
@@ -160,7 +241,20 @@ setMembers(groupedMembers);
     return filtered.slice(start, start + PAGE_SIZE);
   }, [filtered, page,viewAll]);
 console.log("stat",visible);
+const isExpiredAccount = (member) => {
+  const today = new Date();
 
+  const memberRecords = member.memberRecords || [member];
+
+  // expired only if ALL records are expired
+  return memberRecords.every((rec) => {
+    const endDate = rec?.APTS_End_Date_c
+      ? new Date(rec.APTS_End_Date_c)
+      : null;
+
+    return endDate && endDate < today;
+  });
+};
   return (
     <div className="members-container">
      
@@ -276,7 +370,11 @@ console.log("stat",visible);
 
                 <tbody>
                   {visible.map((m) => (
-                    <tr key={m.Id}>
+                    // <tr key={m.Id}>
+                     <tr
+  key={m.Id}
+  className={isExpiredAccount(m) ? "expired-row" : ""}
+>
                       <td>
                    
                         <button
