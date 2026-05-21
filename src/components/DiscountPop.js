@@ -64,7 +64,7 @@ function DiscountPopup({
   );
 
   const [selectedDiscount, setSelectedDiscount] = useState(
-    data.selectedDiscount || "",
+    data.selectedDiscount || "None",
   );
   const [form, setForm] = useState({
     DiscountType: "",
@@ -114,7 +114,7 @@ function DiscountPopup({
           );
           setTierDiscounts(data.tierDiscounts || ["", "", "", "", ""]);
           
-          setSelectedDiscount(product?.DiscountType || "");
+          setSelectedDiscount(product?.DiscountType || "None");
           //hierarchy
           setScaledDiscounts(data.scaledDiscounts || ["", "", "", "", ""]);
           setScaledTier(data.scaledTier || ["", "", "", "", ""]);
@@ -368,7 +368,7 @@ function DiscountPopup({
 
   const handleDiscountChange = (e) => {
     setSelectedDiscount(e.target.value);
-    // onChange({...data,selectedDiscount:e.target.value});
+//onChange({...data,selectedDiscount:e.target.value});
     if (
       e.target.value === "None" ||
       e.target.value === "Tier Discount" ||
