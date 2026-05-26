@@ -136,10 +136,13 @@ const handleTierChange = (index, value) => {
   {
     value=100;
   }
-  else if(value<0)
-  {
-    value=0;
-  }
+   else if (value <= 0) {
+      value = '';
+    }
+  // else if(value<0)
+  // {
+  //   value=0;
+  // }
   const updated = [...tierDiscounts];
   updated[index] = value;
   setTierDiscounts(updated);
@@ -153,10 +156,9 @@ const handleScaledDiscountChange = (index, value) => {
   {
     value=100;
   }
-  else if(value<0)
-  {
-    value=0;
-  }
+  else if (value <= 0) {
+      value = null;
+    }
   const updated = [...scaledDiscounts];
   updated[index] = value;
   setScaledDiscounts(updated);
@@ -166,6 +168,11 @@ const handleScaledDiscountChange = (index, value) => {
  
 //  Volume Threshold
 const handleScaledVolumeChange = (index, value) => {
+   if (value > 100) {
+        value = 100;
+      } else if (value <= 0) {
+        value = null;
+      }
   const updated = [...scaledVolume];
   updated[index] = value;
   setScaledVolume(updated);
@@ -175,6 +182,11 @@ const handleScaledVolumeChange = (index, value) => {
  
 //  Net Override (Scaled)
 const handleScaledAmountChange = (index, value) => {
+   if (value > 100) {
+        value = 100;
+      } else if (value <= 0) {
+        value = null;
+      }
   const updated = [...scaledAmount];
   updated[index] = value;
   setScaledAmount(updated);
