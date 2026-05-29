@@ -566,8 +566,9 @@ console.log("finally",lineItemPayload);
   });
 
 } catch (err) {
-  console.error("Submission failed:", err);
-  toast.error("Error while creating Agreement Line Items");
+  console.error("Submission failed:", err.Errors[0].Message);
+  const errorMessage = err.Errors[0]?.Message || "An error occurred during submission.";
+  toast.error(`${errorMessage}`);
 }
   };
 
