@@ -29,7 +29,9 @@ const [currentDesignated, setCurrentDesignated] = useState(null);
 const [unDesignate, setUnDesignate] = useState(false);
 const [cfMsg, setCfMsg] = useState("");
 const [openModalCus, setOpenModalCus] = useState(false);
-
+const [isProcessing, setIsProcessing] = useState(false);
+const [progress, setProgress] = useState(0);
+const [progressText, setProgressText] = useState("");
 const clearForm = () => {
   setRows([]);
   setMember(null);
@@ -546,9 +548,18 @@ console.log("Determining CFA role for member", memberId, "with agreements", agre
     isCFAMember
   };
 };
+const updateProgress = (value, text) => {
+  setProgress(value);
+  setProgressText(text);
+};
 const handleConfirmYes = async () => {
   try {
-    
+     setIsProcessing(true);
+
+    updateProgress(
+      0,
+      "Starting Designation Process..."
+    );
     for (let r of rows) {
       const payload = {
         Name: `Change Designation - ${r.memberName} to ${r.gpoName}`,
@@ -563,6 +574,10 @@ const handleConfirmYes = async () => {
       };
 
     const result = await createGPODesignateChange(payload);
+    updateProgress(
+  10,
+  "Creating Designation Change Record..."
+);
     console.log("designation change result", result);
  const createdId = result?.Data
  console.log("Created designation change ID", createdId);
@@ -571,13 +586,24 @@ const handleConfirmYes = async () => {
      // const createdId = result?.Data
 
       await handleGPOUndesignate(r.memberId, createdId);
+      updateProgress(
+  50,
+  "Processing Un-Designation..."
+);
       toast.info("Un-Designation will be processed along with Designation.");
+updateProgress(
+  100,
+  "Completed"
+);
     }
     else {
       // =====================================
 // STEP 1 - GET MEMBER CONTRACTS
 // =====================================
-
+updateProgress(
+  20,
+  "Fetching Member Contracts..."
+);
 const memberContracts =
   await getMembershipAgreements(
     r.memberId
@@ -609,7 +635,10 @@ console.log( "agreementIds", agreementIds);
 // =====================================
 // STEP 3 - GET AGREEMENTS
 // =====================================
-
+updateProgress(
+  30,
+  "Fetching Agreements..."
+);
 const agreements =
   await getAgreementsByIdsDesignation(
     agreementIds,
@@ -623,7 +652,10 @@ console.log("agreements without designated filter", agreements);
 // =====================================
 // STEP 4 - DETERMINE CFA ROLE
 // =====================================
-
+updateProgress(
+  40,
+  "Determining CFA Relationships..."
+);
 const {
   isCFACustomer,
   isCFAMember
@@ -645,7 +677,10 @@ console.log(
 // =====================================
 // STEP 5 - GET CFA MEMBERS
 // =====================================
-
+updateProgress(
+  50,
+  "Fetching CFA Members..."
+);
 let cfaMembers = [];
 
 if (
@@ -689,7 +724,10 @@ console.log(
 // =====================================
 // STEP 7 - DEACTIVATE OLD MEMBERSHIPS
 // =====================================
-
+updateProgress(
+  65,
+  "Deactivating Existing Memberships..."
+);
 const deactivatedMemberships = await deactivateMemberships(
   membersToMove,
   r.effectiveDate,
@@ -699,7 +737,10 @@ console.log("Old memberships deactivated for members", deactivatedMemberships);
 // =====================================
 // STEP 8 - CREATE NEW MEMBERSHIPS
 // =====================================
-
+updateProgress(
+  80,
+  "Creating New Memberships..."
+);
 for (const memberId of membersToMove) {
 
  const createdMembership = await createNewMemberships(
@@ -714,7 +755,10 @@ for (const memberId of membersToMove) {
 // =====================================
 // STEP 9 - UPDATE ACCOUNT GPO
 // =====================================
-
+updateProgress(
+  90,
+  "Updating Member Accounts..."
+);
 for (const memberId of membersToMove) {
 
   const updatedAccount = await updateAccount(
@@ -732,12 +776,19 @@ for (const memberId of membersToMove) {
 // =====================================
 // STEP 10 - MARK PROCESSED
 // =====================================
-
+updateProgress(
+  95,
+  "Marking Request as Processed..."
+);
 const updatedDesignation = await UpdateGPODesignateChange(
   createdId,
   {
     APTS_Status_c: "Processed"
   }
+);
+updateProgress(
+  100,
+  "Designation Process Completed"
 );
 console.log("Designation change updated", updatedDesignation);
     }
@@ -789,7 +840,18 @@ console.log("Designation change updated", updatedDesignation);
     console.error(e);
     
     toast.error("Failed to create designation");
-  }
+  }finally {
+
+  setTimeout(() => {
+
+    setIsProcessing(false);
+
+    setProgress(0);
+
+    setProgressText("");
+
+  }, 1000);
+}
 };
 
 
@@ -1059,7 +1121,7 @@ handleAddRow();
    
   </div>
 </div>
- 
+
       {/* CONDITIONAL DESIGNATION HEADER */}
       {showDesignationHeader && (
         <>
@@ -1165,13 +1227,21 @@ You can create new membership records and designate the member to the select GPO
       <p>Are you sure that you want to add/change the GPO Designation?</p>
 
       <div className="modal-actions">
-        <button
+        {/* <button
           className="btn-primary"
           onClick={handleConfirmYes}
         >
           Yes
-        </button>
-
+        </button> */}
+<button
+  className="btn-primary"
+  onClick={handleConfirmYes}
+  disabled={isProcessing}
+>
+  {isProcessing
+    ? "Processing..."
+    : "Yes"}
+</button>
         <button
           className="btn-secondary"
           onClick={() => setShowConfirm(false)}
@@ -1182,7 +1252,48 @@ You can create new membership records and designate the member to the select GPO
     </div>
   </div>
 )}
+ {isProcessing && (
+  <div className="modal-overlay">
+    <div
+      className="modal-box"
+      style={{ width: "450px" }}
+    >
+      <h3>
+        Processing Designation Change
+      </h3>
 
+      <p>{progressText}</p>
+
+      <div
+        style={{
+          width: "100%",
+          height: "20px",
+          background: "#ddd",
+          borderRadius: "10px",
+          overflow: "hidden"
+        }}
+      >
+        <div
+          style={{
+            width: `${progress}%`,
+            height: "100%",
+            background: "#0070d2",
+            transition: "width 0.5s ease"
+          }}
+        />
+      </div>
+
+      <div
+        style={{
+          marginTop: "10px",
+          textAlign: "center"
+        }}
+      >
+        {progress}%
+      </div>
+    </div>
+  </div>
+)}
 {openModalCus && (
   <div className="modal-overlay">
     <div className="modal-box">
