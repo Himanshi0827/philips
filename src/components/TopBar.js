@@ -70,7 +70,7 @@ const isAfterDiscount =
         disabled={!isProductCompleted}
         onClick={onAddDiscount}
       >
-        Add Discount
+        Add Discount Pricing Strategy
       </button>
     )}
 

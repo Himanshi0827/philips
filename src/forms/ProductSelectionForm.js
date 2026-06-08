@@ -752,7 +752,7 @@ const handleNext = () => {
         {/* {data.selectedRecords.map((r, i) => ( */}
            {data.selectedProducts.map((r, i) => (
           <div key={i} className="list-item manual">
-            <span>📦 {r.Name}</span>
+            <span>📦 {r.Name} • {r.ProductCode}</span>
             <span
               className="remove"
               onClick={() => {
@@ -805,7 +805,7 @@ const handleNext = () => {
       <div className="list-box">
         {data.selectedParentProducts.map(p => (
           <div key={p.Id} className="list-item">
-            🧩 {p.Name} --{p.ChildName}
+            🧩 [{p.Name}•{p.ProductCode}] -->[{p.ChildName}•{p.ChildProductCode}]
             <span
               className="remove"
               onClick={() =>{
